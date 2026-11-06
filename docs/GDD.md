@@ -93,4 +93,4 @@ Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptat
 
 ## 13. Budget
 
-*To be completed by the developer for the funding application.*
+See [BUDGET_DRAFT.md](BUDGET_DRAFT.md) (placeholders to fill in) and the video plan in [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
