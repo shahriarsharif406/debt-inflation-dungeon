@@ -1,0 +1,8 @@
+{
+  "name": "debt-inflation-dungeon",
+  "version": "2.0.0",
+  "description": "A financial-literacy roguelite: debt grows, cash melts, your move.",
+  "private": true,
+  "scripts": { "simulate": "node tests/simulate.js" },
+  "devDependencies": { "jsdom": "^24.0.0" }
+}
