@@ -38,6 +38,7 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 | Safety Net | Cash ÷ a typical surprise bill. Under 1× the gauge turns red. | Emergency fund |
 | Events | Repair, medical, rent rise, celebration, bonus, side gig, market boom/crash, income gap. Without cash, a bill spawns a 15%/month Emergency Imp. | Shocks, single-income risk |
 | Status temptations | Optional "everyone has one" purchases. Cash or credit; both raise a status score that does not build wealth. | Lifestyle inflation, credit use |
+| Insurance Shield | Optional. Premium 10% of pay each month; covers 80% of car, medical and phone bills (not rent rises or celebrations). Roughly break-even over a run; its value is avoiding the one bad month. | Insurance, risk transfer |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 
 **Income tiers:** Low ($350/mo), Middle ($600), High ($1,500). All values scale together so the dynamics are identical.
@@ -54,7 +55,7 @@ At the end of every run the player gets a *FinLit report card* computed from the
 - **Pressure:** status temptations accepted, credit use, income gaps.
 - One personalised tip chosen from the weakest area.
 
-Seven unlockable insights reward good habits (Debt-Free, Avalanche Mind, Safety Net, Status Resister, Money Grows, Not One Basket, Dungeon Master).
+Eight unlockable insights reward good habits (Debt-Free, Avalanche Mind, Safety Net, Status Resister, Money Grows, Not One Basket, Shielded, Dungeon Master). The report card also shows premiums paid against bills covered.
 
 ## 7. Audience
 
@@ -74,13 +75,13 @@ Single-file HTML/CSS/JS, no dependencies, hosted statically. Canvas (particles, 
 
 ## 10. Current scope (delivered in the jam build)
 
-Full 12-month game, 6 monsters, 3 assets, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon, tutorial, report card, 7 insights, share image, help screen, responsive layout.
+Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon, tutorial, report card, 8 insights, share image, help screen, responsive layout.
 
 ## 11. Roadmap if funded
 
 1. **Localisation:** translate the UI and examples; region packs for local financial products (the rules stay universal).
 2. **Teacher mode:** shareable class codes, a results summary, discussion prompts for each insight.
-3. **More depth:** minimum-payment mechanic, debt consolidation, insurance, longer careers, more floors.
+3. **More depth:** minimum-payment mechanic, debt consolidation, longer careers, more floors.
 4. **Packaging:** installable web app and store builds for phones.
 5. **Evaluation:** with a partner, measure learning outcomes before and after play.
 

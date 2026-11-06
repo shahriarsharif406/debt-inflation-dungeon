@@ -28,6 +28,7 @@ You have 12 months. Each month you decide what to do with your cash, then press 
 | Three assets: steady, mixed, wild | Risk vs. return and diversification |
 | Optional "everyone has one" purchases that feel reasonable | Status spending, and how credit makes it worse |
 | "Income gap" events halve your next paycheck | The risk of a single income |
+| Optional Insurance Shield: a monthly premium (10% of pay) covers 80% of car, medical and phone bills, but not rent rises or parties | Insurance: a small certain cost against a big uncertain one |
 
 ### Three paychecks, one trap
 
@@ -39,13 +40,14 @@ A seeded mode: everyone who plays on the same day, at the same income level, get
 
 ### Scoring
 
-★ survive 12 months · ★★ finish debt-free · ★★★ debt-free with high net worth. Seven unlockable "insights" (Avalanche Mind, Safety Net, Status Resister…) are saved in your browser.
+★ survive 12 months · ★★ finish debt-free · ★★★ debt-free with high net worth. Eight unlockable "insights" (Avalanche Mind, Safety Net, Status Resister…) are saved in your browser.
 
 ## Controls
 
 | Key | Action |
 |---|---|
 | `1`–`9` | Pay the nth monster (`Shift` = pay all) |
+| `I` | Toggle insurance |
 | `Enter` / `E` | End month |
 | `?` | How to play |
 
@@ -75,6 +77,8 @@ Expected shape: doing nothing or going all-in on the wild asset loses; paying th
 ## Documents
 
 - [Game design document](docs/GDD.md)
+- [2-minute video script](docs/VIDEO_SCRIPT.md)
+- [Budget draft](docs/BUDGET_DRAFT.md)
 
 ## Credits
 
