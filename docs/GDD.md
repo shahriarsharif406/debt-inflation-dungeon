@@ -10,6 +10,8 @@ A 5-minute roguelite where debt monsters grow, your cash melts, and every month 
 
 Most money games teach one concept at a time. Real money problems arrive together: debt grows while savings lose value, and a surprise bill lands at the worst moment. This game puts the two biggest forces, **interest** and **inflation**, on screen at once and makes the player balance them. The key design goal is *instant understanding*: a new player should grasp the whole game from the first screen.
 
+**Financial-management focus:** the player runs a household budget, not only a debt fight. Each month they split pay between needs, lifestyle and saving; build an emergency fund; and choose what to do with raises.
+
 **Core message:** debt traps people at every income level. Smart, early decisions get you out.
 
 ## 3. Design pillars
@@ -34,10 +36,15 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 |---|---|---|
 | Debt monsters | Each has a balance and a monthly rate (1.2%–15%). Their size on screen follows their balance. | Interest, compounding |
 | Inflation | Cash loses 1% / 2.5% / 4% a month on floors 1 / 2 / 3. A ring shows remaining buying power. | Inflation |
-| Assets | Safe Vault (steady), Index Totem (mixed), Dragon Stock (wild, with crash risk). Real return = nominal − inflation. | Risk vs return, diversification |
+| Assets | Savings Vault (steady), Index Totem (mixed), Dragon Stock (wild, with crash risk). Real return = nominal − inflation. | Risk vs return, diversification |
 | Safety Net | Cash ÷ a typical surprise bill. Under 1× the gauge turns red. | Emergency fund |
 | Events | Repair, medical, rent rise, celebration, bonus, side gig, market boom/crash, income gap. Without cash, a bill spawns a 15%/month Emergency Imp. | Shocks, single-income risk |
 | Status temptations | Optional "everyone has one" purchases. Cash or credit; both raise a status score that does not build wealth. | Lifestyle inflation, credit use |
+| Monthly budget | Needs 30% of base pay (fixed). Lifestyle Frugal 6% / Comfort 14% / Lavish 28%. Paid at month end. What remains is "free cash"; debt payments, investing and purchases use only free cash. A shortfall is covered by savings first, then the credit card. | Budgeting, needs vs wants |
+| Pay yourself first | Choose 0 / 10 / 20% of pay to move into the Savings Vault automatically at month end, before bills. | Saving habit |
+| Emergency fund | Goal: 3 months of living costs in the Savings Vault. Savings automatically absorb surprise bills and bill shortfalls; without them the shortfall becomes an Emergency Imp. | Emergency fund |
+| Raises and lifestyle creep | Pay rises 10% in months 4 and 8. The player picks: upgrade lifestyle (spending rises by the full raise), save it, or keep life the same. | Lifestyle creep |
+| Final settlement | At the end, cash and savings pay down remaining debt (highest rate first), so being asset-rich counts as debt-free. | Net worth thinking |
 | Insurance Shield | Optional. Premium 10% of pay each month; covers 80% of car, medical and phone bills (not rent rises or celebrations). Roughly break-even over a run; its value is avoiding the one bad month. | Insurance, risk transfer |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 
@@ -57,7 +64,7 @@ At the end of every run the player gets a *FinLit report card* computed from the
 - **Pressure:** status temptations accepted, credit use, income gaps.
 - One personalised tip chosen from the weakest area.
 
-Eight unlockable insights reward good habits (Debt-Free, Avalanche Mind, Safety Net, Status Resister, Money Grows, Not One Basket, Shielded, Dungeon Master). The report card also shows premiums paid against bills covered.
+Eleven unlockable insights reward good habits (Debt-Free, Avalanche Mind, Safety Net, Status Resister, Money Grows, Not One Basket, Pay Yourself First, Fortress, Creep Crusher, Shielded, Dungeon Master). The report card also shows savings rate, lifestyle share of pay, and emergency fund size in months. The report card also shows premiums paid against bills covered.
 
 ## 7. Audience
 
@@ -77,13 +84,13 @@ Single-file HTML/CSS/JS, no dependencies, hosted statically. Canvas (particles, 
 
 ## 10. Current scope (delivered in the jam build)
 
-Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon with a daily goal, XP and levels, tutorial, report card, 8 insights, share image, help screen, responsive layout.
+Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon with a daily goal, XP and levels, tutorial, report card, 11 insights, share image, help screen, responsive layout.
 
 ## 11. Roadmap if funded
 
 1. **Localisation:** translate the UI and examples; region packs for local financial products (the rules stay universal).
 2. **Teacher mode:** shareable class codes, a results summary, discussion prompts for each insight.
-3. **More depth:** minimum-payment mechanic, debt consolidation, longer careers, more floors.
+3. **More depth:** minimum-payment mechanic, debt consolidation, long-term compounding (multi-year careers), longer careers, more floors.
 4. **Packaging:** installable web app and store builds for phones.
 5. **Evaluation:** with a partner, measure learning outcomes before and after play.
 

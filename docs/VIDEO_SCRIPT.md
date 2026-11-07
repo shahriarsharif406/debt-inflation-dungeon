@@ -8,6 +8,7 @@
 | 0:08–0:20 | Pick Middle income. Monsters appear with their % labels. | "This is Debt & Inflation Dungeon. Every debt is a monster that grows every month. Your cash buys less every month too." |
 | 0:20–0:40 | Tutorial: tap PAY on the FASTEST monster. Defeat burst. Forecast numbers drop. | "Pay the fastest-growing one first. That is the avalanche method, and you just learned it by playing." |
 | 0:40–0:55 | Invest in Index Totem; real-return label (+1.2% real). | "Cash melts to inflation. Invest and you fight back, but risk is real." |
+| 0:48–0:55 | Monthly Budget card: switch Lifestyle to Frugal, Pay yourself first to 10%. "Free to spend" updates. | "Needs first. Then choose your lifestyle, and pay yourself first. What is left fights debt." |
 | 0:55–1:10 | Status temptation card ("Latest flagship phone"). Hover "Put it on credit", then show the Wyrm grow. | "Then life tempts you. Everyone has one. It feels reasonable. This is how the trap catches us all." |
 | 1:10–1:25 | End Month report: animated rows. A surprise bill with no cash spawns the Emergency Imp. Cut to Shield ON covering 80%. | "A surprise bill with no savings becomes a new monster at 15% a month. A small insurance cost can stop that." |
 | 1:25–1:40 | Switch to High income. Bigger numbers, same monsters. On-screen: "Rich or poor, the debt trap works the same way." | "Earn more and the numbers grow, but so do the temptations. Even high earners fall into the trap." |

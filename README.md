@@ -8,6 +8,7 @@ Built for **Zoud GameLab 2026** (theme: *Make FinLit Fun*).
 
 ![Title screen](docs/screens/desk-1-title.png)
 ![The dungeon hall](docs/screens/desk-2-game.png)
+![Budget, savings and emergency fund](docs/screens/desk-budget.png)
 
 ## Play
 
@@ -17,7 +18,7 @@ Built for **Zoud GameLab 2026** (theme: *Make FinLit Fun*).
 
 ## How it works
 
-You have 12 months. Each month you decide what to do with your cash, then press **END MONTH** and see what happens.
+You have 12 months. Each month you set a budget, put your free cash to work, then press **END MONTH** and see what happens.
 
 | What you see | What it teaches |
 |---|---|
@@ -25,7 +26,10 @@ You have 12 months. Each month you decide what to do with your cash, then press 
 | Your cash loses value every month, shown as a shrinking "buying power" ring | Inflation erodes idle money |
 | Fastest-growing monster is flagged in the tutorial | The avalanche method: pay the highest rate first |
 | Safety Net gauge (cash vs. a typical surprise bill) | Emergency funds |
-| Surprise bills with no cash create a 15%-a-month Emergency Imp | The real cost of having no buffer |
+| A monthly budget: Needs are fixed, you choose Lifestyle (Frugal / Comfort / Lavish), and what is left is "free cash" | Budgeting: needs before wants |
+| "Pay yourself first": 0 / 10 / 20% of pay moves to your Savings Vault automatically | Saving as a habit, not a leftover |
+| A 3-month Emergency Fund goal. Savings automatically cover surprise bills; with none, a bill becomes a 15%-a-month Emergency Imp | Emergency funds, and the real cost of having no buffer |
+| Two raises (months 4 and 8): upgrade your lifestyle, save it, or keep life the same | Lifestyle creep |
 | Three assets: steady, mixed, wild | Risk vs. return and diversification |
 | Optional "everyone has one" purchases that feel reasonable | Status spending, and how credit makes it worse |
 | "Income gap" events halve your next paycheck | The risk of a single income |
@@ -45,7 +49,7 @@ Every run earns XP that carries across games (saved in your browser) and unlocks
 
 ### Scoring
 
-★ survive 12 months · ★★ finish debt-free · ★★★ debt-free with high net worth. Eight unlockable "insights" (Avalanche Mind, Safety Net, Status Resister…) are saved in your browser.
+★ survive 12 months · ★★ finish debt-free · ★★★ debt-free with high net worth. Eleven unlockable "insights" (Avalanche Mind, Pay Yourself First, Fortress, Creep Crusher…). At the end, cash and savings automatically settle remaining debt are saved in your browser.
 
 ## Controls
 
@@ -77,7 +81,7 @@ npm run simulate        # all tiers
 node tests/simulate.js mid
 ```
 
-Expected shape: doing nothing or going all-in on the wild asset loses; paying the fastest-growing debt first wins; chasing status leaves you in debt. The Daily Dungeon is verified to be deterministic.
+Expected shape: doing nothing loses; lavish living plus status purchases loses; a frugal budget, paying the fastest-growing debt first and building an emergency fund wins; living lavishly leaves you in debt. The Daily Dungeon is verified to be deterministic.
 
 ## Documents
 

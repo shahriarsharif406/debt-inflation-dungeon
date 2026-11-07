@@ -168,6 +168,15 @@ h1 em{background:linear-gradient(90deg,#ffe08a,#ffb347);-webkit-background-clip:
 .lvup{font-style:normal;color:#06050c;background:var(--gold);padding:2px 7px;border-radius:8px;font-weight:900;font-size:11px;margin-left:6px}
 .xpbox .meter{color:var(--gold)}
 .lvl{text-align:center;color:var(--mute);font-size:13px;margin:-4px 0 10px}.lvl b{color:var(--gold)}
+.budget{margin-top:11px;padding:13px 14px;border-radius:18px;border:1px solid #6ea8ff44;background:linear-gradient(#6ea8ff10,#ffffff04)}
+.bh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.bh b{font-size:11.5px;letter-spacing:.16em;color:#8db8ff}.bh span{font-size:11.5px;color:var(--mute)}
+.bl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0}.bl span{font-size:14px;font-weight:700}.bl small{display:block;font-weight:500;font-size:11.5px;color:var(--mute)}.bl b{font-size:16px}
+.seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:2px 0 8px;padding:3px;border-radius:12px;background:#0c0919;border:1px solid var(--line)}
+.seg3 button{min-height:38px;border-radius:9px;font-weight:800;font-size:13px;color:var(--mute)}.seg3 button.on{background:linear-gradient(#2c2552,#201a40);color:#fff;box-shadow:inset 0 0 0 1px #6ea8ff88}
+.free{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:9px 12px;border-radius:12px;background:#4de2a114;border:1px solid #4de2a155}.free span{font-size:13px;font-weight:700}.free b{font-size:18px;color:var(--green)}
+.goal{margin-top:10px}.goal span{font-size:12.5px;font-weight:700}.goal small{display:block;margin-top:5px;font-size:12px;color:var(--mute)}.goal .meter{color:var(--green)}
+.opts{display:grid;gap:10px;margin:16px 0 4px}.opt{text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#ffffff08;min-height:64px}
+.opt b{display:block;font-size:16px;margin-bottom:3px}.opt span{font-size:13px;color:var(--mute);line-height:1.4}.opt:hover,.opt:focus-visible{border-color:#6ea8ff;background:#6ea8ff14}
 .shield{margin-top:11px;display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:16px;border:1px solid #ffffff1f;background:#ffffff08}
 .shield.on{border-color:#4de2a1aa;background:#4de2a114}
 .shield .si{font-size:22px;width:30px;text-align:center}
@@ -346,13 +355,14 @@ const REDUCED=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").ma
 
 /* ---------- data ---------- */
 const TIERS={
-  low:{label:"LOW INCOME",sub:"Small paycheck. One surprise bill can sink you.",salary:350,cash:350,chunk:50,scale:.55,doom:3300,
-       debts:{card:500,student:900,shark:200},later:{vamp:350,hydra:600},star3:1400,tempFreq:.35,evFreq:.7},
-  mid:{label:"MIDDLE INCOME",sub:"The classic dungeon.",salary:600,cash:600,chunk:100,scale:1,doom:5500,
-       debts:{card:900,student:1600,shark:300},later:{vamp:600,hydra:1000},star3:2500,tempFreq:.55,evFreq:.7},
-  high:{label:"HIGH INCOME",sub:"Big paycheck. Bigger temptations. Same trap.",salary:1500,cash:1500,chunk:250,scale:2.4,doom:13200,
-       debts:{card:2200,student:3800,shark:700},later:{vamp:1500,hydra:2400},star3:6000,tempFreq:.9,evFreq:.8}
+  low:{label:"LOW INCOME",sub:"Small paycheck. One surprise bill can sink you.",salary:350,cash:350,chunk:50,scale:.55,doom:2500,
+       debts:{card:400,student:720,shark:160},later:{vamp:210,hydra:300},star3:880,tempFreq:.35,evFreq:.7},
+  mid:{label:"MIDDLE INCOME",sub:"The classic dungeon.",salary:600,cash:600,chunk:100,scale:1,doom:4300,
+       debts:{card:720,student:1280,shark:240},later:{vamp:360,hydra:500},star3:1500,tempFreq:.55,evFreq:.7},
+  high:{label:"HIGH INCOME",sub:"Big paycheck. Bigger temptations. Same trap.",salary:1500,cash:1500,chunk:250,scale:2.4,doom:10700,
+       debts:{card:1760,student:3040,shark:560},later:{vamp:900,hydra:1200},star3:3700,tempFreq:.9,evFreq:.8}
 };
+const BUD={need:.30,wants:[.06,.14,.28],save:[0,.10,.20]};
 const FLOORS=[
   {name:"The Cellar",inf:0.01,blurb:"Prices creep up slowly. Learn the rules."},
   {name:"The Vaults",inf:0.025,blurb:"Inflation is faster now. Idle cash melts quicker."},
@@ -368,7 +378,7 @@ const MON={
   emerg:{name:"Emergency Imp",tag:"Emergency borrowing",debt:0,rate:.15,color:"#ff8a3d",kind:"emerg"}
 };
 const ASSETS={
-  vault:{name:"Safe Vault",exp:.010,desc:"+1.0%/mo · steady"},
+  vault:{name:"Savings Vault",exp:.010,desc:"+1.0%/mo · steady · your emergency fund"},
   index:{name:"Index Totem",exp:.022,desc:"≈ +2.2%/mo · some swings"},
   dragon:{name:"Dragon Stock",exp:.040,desc:"≈ +4%/mo · wild swings"}
 };
@@ -395,6 +405,9 @@ const ACH=[
   {id:"stat",name:"Status Resister",desc:"Skip every status purchase"},
   {id:"grow",name:"Money Grows",desc:"Finish with net investment gains"},
   {id:"div",name:"Not One Basket",desc:"Hold 2+ asset types for 3 months"},
+  {id:"payfirst",name:"Pay Yourself First",desc:"Saved from your paycheck 10+ months"},
+  {id:"fortress",name:"Fortress",desc:"Built a 3-month emergency fund"},
+  {id:"creep",name:"Creep Crusher",desc:"Took both raises without raising your lifestyle"},
   {id:"shield",name:"Shielded",desc:"Insurance paid out when disaster struck"},
   {id:"pro",name:"Dungeon Master",desc:"Earn 3 stars"}
 ];
@@ -407,6 +420,8 @@ const GOALS=[
   {id:"free",txt:"Finish completely debt-free",ok:(st,sv,debt)=>sv&&debt===0},
   {id:"aval",txt:"Hit the fastest-growing debt with 80%+ of your payments",ok:(st)=>st.pays>=5&&st.payOK/st.pays>=.8},
   {id:"shield",txt:"Keep the Insurance Shield on and let it pay out",ok:(st)=>st.insHit>0},
+  {id:"fund",txt:"Build a full 3-month emergency fund",ok:()=>S.fortress},
+  {id:"payfirst",txt:"Pay yourself first in 10 or more months",ok:(st)=>st.saveMonths>=10},
   {id:"grow",txt:"Finish with positive investment gains",ok:(st,sv)=>sv&&st.inv>0}
 ];
 const dailyGoal=()=>GOALS[hashStr(new Date().toISOString().slice(0,10)+"|goal")%GOALS.length];
@@ -584,8 +599,8 @@ function newGame(tier,mode){
   if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier);R=mulberry32(seed)}else R=Math.random;
   const t0=TIERS[tier];
   S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0},mons:[],pp:1,over:false,done:false,
-     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0},
-     status:0,ins:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
+     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0},
+     status:0,ins:false,life:1,sv:1,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
   addMon("card",t0.debts.card);addMon("student",t0.debts.student);addMon("shark",t0.debts.shark);
   S.hist=[netWorth()];S.lastNW=netWorth();
 }
@@ -595,9 +610,29 @@ function rollTemptation(){
 }
 function buyTemp(onCard){
   if(S.busy||S.over||!S.temp)return;const c=S.temp.cost;
-  if(onCard){addMon("card",c);S.stats.onCard++}else{if(S.cash<c)return;S.cash-=c}
+  if(onCard){addMon("card",c);S.stats.onCard++}else{if(freeCash()<c)return;S.cash-=c}
   S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");
   toast(onCard?"Bought on credit. The Wyrm just grew.":"Bought with cash. Status +10, wealth +0.");render();
+}
+function budget(){const b=T().salary;return{needs:Math.round(b*BUD.need),wants:Math.round(b*BUD.wants[S.life])+S.wantsX,save:Math.round(S.sal*BUD.save[S.sv])+S.saveX}}
+const reserve=()=>{const b=budget();return b.needs+b.wants+b.save+(S.ins?premium():0)};
+const freeCash=()=>Math.max(0,S.cash-reserve());
+function setBud(k,i){if(S.busy||S.over)return;if(k==="life")S.life=i;else S.sv=i;S.stats.acts++;sfx.coin();render()}
+function raiseCard(){
+  const r=S.raise,ov=$("#ov");if(!r)return;
+  ov.innerHTML=`<div class="card"><div class="kick">GOOD NEWS</div><h1>You got a <em>raise</em></h1>
+    <p class="tg">Your pay rose by <b>${fmt(r.amt)}</b> a month. What do you do with it?</p>
+    <div class="opts"><button class="opt" data-raise="life"><b>🎭 Upgrade my lifestyle</b><span>Nicer things. Your monthly spending rises by the full ${fmt(r.amt)}.</span></button>
+    <button class="opt" data-raise="save"><b>💰 Save the raise</b><span>An extra ${fmt(r.amt)} goes to your Savings Vault every month.</span></button>
+    <button class="opt" data-raise="debt"><b>⚔ Keep life the same</b><span>${fmt(r.amt)} more free cash each month for debt and goals.</span></button></div></div>`;
+  ov.classList.add("on");ov.scrollTop=0;
+}
+function raisePick(k){
+  const r=S.raise;if(!r)return;
+  if(k==="life"){S.wantsX+=r.amt;S.status+=15;S.stats.raiseLife++;toast("Lifestyle upgraded. The raise is already spent.")}
+  else if(k==="save"){S.saveX+=r.amt;toast("The raise now goes straight to savings.")}
+  else toast("Same life, more free cash.");
+  S.raise=null;sfx.coin();$("#ov").classList.remove("on");render();
 }
 const premium=()=>Math.max(1,Math.round(T().salary*.10));
 function toggleIns(){if(S.busy||S.over)return;S.ins=!S.ins;S.stats.acts++;sfx.coin();toast(S.ins?`Shield ON. ${fmt(premium())} a month, paid when the month ends.`:"Shield OFF. Disasters are on you.");render()}
@@ -612,7 +647,7 @@ function render(){
   const tr=$("#track");tr.innerHTML="";
   for(let i=1;i<=LAST;i++){const p=document.createElement("div");p.className="pip f"+floorOf(i)+(i<S.month?" done":"")+(i===S.month?" now":"");tr.appendChild(p)}
   $("#floor").innerHTML=`<h1><small>FLOOR ${fi+1} · ${T().label}${S.mode==="daily"?" · DAILY "+S.label:""}</small>${fl.name}</h1><span class="rt">Month <b>${S.month}</b> of ${LAST} &nbsp;·&nbsp; Inflation <span class="badge b-amb">${pct(fl.inf)}/month</span></span>`;
-  const f=forecast(),net=S.cash/shockSize(),nl=net<1?"lo":net<2?"md":"hi";
+  const f=forecast(),net=(freeCash()+S.assets.vault)/shockSize(),nl=net<1?"lo":net<2?"md":"hi";
   $("#arena").innerHTML=arenaHTML();
   $("#forecast").innerHTML=
    `<div class="fc up"><small>▲ DEBT GROWS BY</small><strong data-num="fd" data-v="${f.di}" data-f="usd">${fmt(f.di)}</strong><em>if you end the month now</em></div>
@@ -631,7 +666,7 @@ function render(){
   else{
     const first=S.mons.reduce((a,m)=>m.rate>a.rate?m:a,S.mons[0]);
     mc.innerHTML=S.mons.map((m,i)=>{
-      const x=Math.min(S.cash,m.debt,T().chunk),all=Math.min(S.cash,m.debt),nx=Math.round(m.debt*m.rate);
+      const x=Math.min(freeCash(),m.debt,T().chunk),all=Math.min(freeCash(),m.debt),nx=Math.round(m.debt*m.rate);
       const s=(0.62+0.5*Math.min(m.debt/m.ref,2.2)).toFixed(2),den=m.ref*1.6;
       const w=Math.min(100,m.debt/den*100),gw=Math.min(100-w,nx/den*100);
       const glow=(tutOn()&&step===0&&m===first)?" glow":"";
@@ -651,15 +686,25 @@ function render(){
    `<div class="cash"><div><div class="big" data-num="cash" data-v="${S.cash}" data-f="usd">${fmt(S.cash)}</div>
       <div class="sub">Cash on hand ${cashBadge}</div></div>
       <div class="pp">${ring(S.pp)}<span>buying power of<br>your first $1</span><b data-num="pp" data-v="${S.pp.toFixed(3)}" data-f="pp">$${S.pp.toFixed(2)}</b></div></div>
+    ${(()=>{const b=budget(),fr=freeCash(),tgt=3*(b.needs+b.wants),fund=S.assets.vault,fp=Math.min(100,fund/tgt*100);
+      const seg=(k,names,cur)=>`<div class="seg3" role="group">${names.map((n,i)=>`<button data-${k}="${i}" class="${cur===i?"on":""}" aria-pressed="${cur===i}">${n}</button>`).join("")}</div>`;
+      return `<div class="budget"><div class="bh"><b>MONTHLY BUDGET</b><span>paid at month end</span></div>
+      <div class="bl"><span>🏠 Needs<small>rent · food · travel</small></span><b>${fmt(b.needs)}</b></div>
+      <div class="bl"><span>🎭 Lifestyle<small>fun · eating out · extras</small></span><b>${fmt(b.wants)}</b></div>
+      ${seg("life",["Frugal","Comfort","Lavish"],S.life)}
+      <div class="bl"><span>💰 Pay yourself first<small>auto-saved to your Savings Vault</small></span><b>${fmt(b.save)}</b></div>
+      ${seg("sv",["0%","10%","20%"],S.sv)}
+      <div class="free"><span>Free to spend on debt and goals</span><b>${fmt(fr)}</b></div>
+      <div class="goal"><span>🏦 Emergency fund goal: 3 months of living costs</span><div class="meter"><i style="width:${fp.toFixed(0)}%"></i></div><small>${fmt(fund)} of ${fmt(tgt)}${S.fortress?" · ✓ complete":""}</small></div></div>`})()}
     ${S.temp?`<div class="tempt"><small>EVERYONE AROUND YOU HAS ONE · OPTIONAL</small>
       <div class="tn"><span>${S.temp.name}</span><b>${fmt(S.temp.cost)}</b></div>
-      <div class="tb"><button class="btn" data-tbuy="cash" ${S.cash<S.temp.cost?"disabled":""}>Buy with cash</button>
+      <div class="tb"><button class="btn" data-tbuy="cash" ${freeCash()<S.temp.cost?"disabled":""}>Buy with cash</button>
       <button class="btn" data-tbuy="card">Put it on credit</button>
       <button class="btn" data-tskip="1">Skip it</button></div></div>`:""}
     <div class="shield ${S.ins?"on":""}"><div class="si">${S.ins?"🛡":"◇"}</div><div class="st"><b>Insurance Shield</b><small>${S.ins?"ON · covers 80% of car, medical and phone bills":"Costs "+fmt(premium())+"/month · covers 80% of car, medical and phone bills"}</small></div>
       <button class="btn" data-ins="1" aria-pressed="${S.ins}">${S.ins?"Turn off":"Turn on"}</button></div>
     <div class="assets">${Object.keys(ASSETS).map(k=>{
-      const a=ASSETS[k],v=S.assets[k],r=real(k),can=Math.min(S.cash,T().chunk),sell=Math.min(v,T().chunk);
+      const a=ASSETS[k],v=S.assets[k],r=real(k),can=Math.min(freeCash(),T().chunk),sell=Math.min(v,T().chunk);
       const g=(tutOn()&&step===1&&k==="index"&&can>0)?" glow":"";
       return `<div class="asset"><div class="ic">${ICON[k]}</div>
         <div><div class="nm">${a.name}<small>${a.desc}</small></div>
@@ -679,7 +724,7 @@ function render(){
 function pay(id,all){
   if(S.busy||S.over)return;
   const m=S.mons.find(x=>x.id===id);if(!m)return;
-  const amt=Math.min(S.cash,m.debt,all?Infinity:T().chunk);if(amt<=0)return;
+  const amt=Math.min(freeCash(),m.debt,all?Infinity:T().chunk);if(amt<=0)return;
   const maxRate=Math.max(...S.mons.map(x=>x.rate));
   S.stats.pays++;if(m.rate>=maxRate-1e-9)S.stats.payOK++;
   S.cash-=amt;m.debt-=amt;S.stats.acts++;
@@ -698,7 +743,7 @@ function pay(id,all){
   render();const e2=document.getElementById("m"+id);if(e2)e2.classList.add("hit");
 }
 function invest(k){
-  if(S.busy||S.over)return;const amt=Math.min(S.cash,T().chunk);if(amt<=0)return;
+  if(S.busy||S.over)return;const amt=Math.min(freeCash(),T().chunk);if(amt<=0)return;
   S.cash-=amt;S.assets[k]+=amt;S.stats.acts++;sfx.coin();render();
 }
 function sell(k){
@@ -718,14 +763,24 @@ function endMonth(){
   const rep=[],inf=curInf();let badHit=false;
   let di=0;S.mons.forEach(m=>{const d=Math.round(m.debt*m.rate);m.debt+=d;di+=d});S.stats.interest+=di;
   if(di>0)rep.push(["r","▲ Debt monsters grew",`+${fmt(di)}`]);
-  const loss=Math.round(S.cash*inf);S.cash-=loss;S.pp*=(1-inf);S.stats.infl+=loss;
-  rep.push(["a",`▼ Inflation ${pct(inf)} ate your cash`,`−${fmt(loss)}`]);
   const ev=R()<T().evFreq?EVENTS[Math.floor(R()*EVENTS.length)]:null;
   if(S.ins){const pr=Math.min(premium(),Math.max(0,S.cash));S.cash-=pr;S.stats.insPaid+=pr;rep.push(["a","🛡 Insurance premium",`−${fmt(pr)}`])}
+  {const b=budget();
+    const sv=Math.min(b.save,Math.max(0,S.cash));
+    if(sv>0){S.cash-=sv;S.assets.vault+=sv;S.stats.saved+=sv;if(sv>=b.save*.99)S.stats.saveMonths++;rep.push(["g","💰 Paid yourself first → Savings Vault",`+${fmt(sv)}`])}
+    const due=b.needs+b.wants,paid=Math.min(due,Math.max(0,S.cash));S.cash-=paid;S.stats.living+=due;S.status+=[0,2,6][S.life];
+    rep.push(["a","🏠 Living costs (needs + lifestyle)",`−${fmt(due)}`]);
+    let short=due-paid;
+    if(short>0){const used=Math.min(short,S.assets.vault);
+      if(used>0){S.assets.vault-=used;S.stats.fundUsed+=used;short-=used;rep.push(["g","🏦 Emergency fund covered the bills",`−${fmt(used)} savings`])}
+      if(short>0){addMon("card",short);S.stats.billDebt+=short;rep.push(["r","Not enough cash for living costs: put on the credit card",`+${fmt(short)} debt`]);badHit=true}}}
+  const loss=Math.round(S.cash*inf);S.cash-=loss;S.pp*=(1-inf);S.stats.infl+=loss;
+  rep.push(["a",`▼ Inflation ${pct(inf)} ate your cash`,`−${fmt(loss)}`]);
   let gain=0;Object.keys(S.assets).forEach(k=>{const v=S.assets[k];if(v<=0)return;const nv=Math.round(v*(1+assetReturn(k,ev)));gain+=nv-v;S.assets[k]=nv});
   S.stats.inv+=gain;
   if(totalAssets()+Math.abs(gain)>0)rep.push([gain>=0?"g":"r",gain>=0?"▲ Investments grew":"▼ Investments fell",(gain>=0?"+":"−")+fmt(Math.abs(gain))]);
   if(Object.values(S.assets).filter(v=>v>0).length>=2)S.stats.divMonths++;
+  {const b=budget();if(!S.fortress&&S.assets.vault>=3*(b.needs+b.wants)){S.fortress=true;rep.push(["g","🏦 Emergency fund complete: 3 months of living costs saved","★"])}}
   if(ev){
     if(ev.salary!==undefined){S.salaryMult=ev.salary;S.stats.gap++;rep.push(["r",`${ev.name}: ${ev.txt}`,"next pay −50%"]);badHit=true}
     else if(ev.cash!==undefined){
@@ -736,9 +791,13 @@ function endMonth(){
         if(S.ins&&ev.ins){const cov=Math.round(cost*.8);cost-=cov;S.stats.insSaved+=cov;S.stats.insHit++;rep.push(["g","🛡 Shield covered 80% of the bill",`+${fmt(cov)}`])}
         if(S.cash>=cost){S.cash-=cost;rep.push(["r",`${ev.name}: ${ev.txt}`,`−${fmt(cost)}`])}
         else{
-          const short=cost-S.cash;S.cash=0;addMon("emerg",short);S.stats.emerg++;
-          rep.push(["r",`${ev.name}: ${ev.txt}. You had no safety net!`,`−${fmt(cost)}`]);
-          rep.push(["r","An Emergency Imp appeared (15%/month)",`+${fmt(short)} debt`]);
+          let short=cost-S.cash;S.cash=0;
+          const used=Math.min(short,S.assets.vault);
+          if(used>0){S.assets.vault-=used;S.stats.fundUsed+=used;short-=used;rep.push(["g",`🏦 Emergency fund covered ${fmt(used)} of the bill`,"savings did their job"])}
+          if(short>0){addMon("emerg",short);S.stats.emerg++;
+            rep.push(["r",`${ev.name}: ${ev.txt}. You had no safety net!`,`−${fmt(cost)}`]);
+            rep.push(["r","An Emergency Imp appeared (15%/month)",`+${fmt(short)} debt`])}
+          else rep.push(["r",`${ev.name}: ${ev.txt}`,`−${fmt(cost)}`]);
         }
         badHit=true;
       }
@@ -749,8 +808,9 @@ function endMonth(){
   if(totalDebt()>=T().doom)return finish(false,m0);
   if(m0===LAST)return finish(true,m0);
   S.month++;
-  const pay_=Math.round(T().salary*S.salaryMult);S.salaryMult=1;S.cash+=pay_;S.income+=pay_;
-  rep.push([pay_<T().salary?"a":"g",pay_<T().salary?"Reduced paycheck arrives":"Paycheck arrives",`+${fmt(pay_)}`]);
+  if(S.month===4||S.month===8){const old=S.sal;S.sal=Math.round(S.sal*1.10);S.raise={amt:S.sal-old};S.stats.raises++;rep.push(["g","🎉 You got a raise!",`+${fmt(S.raise.amt)}/mo`])}
+  const pay_=Math.round(S.sal*S.salaryMult);S.salaryMult=1;S.cash+=pay_;S.income+=pay_;
+  rep.push([pay_<S.sal?"a":"g",pay_<S.sal?"Reduced paycheck arrives":"Paycheck arrives",`+${fmt(pay_)}`]);
   let fc=null;
   if(S.month===5){addMon("vamp",T().later.vamp);fc={title:"FLOOR 2 · THE VAULTS",text:`Inflation rises to ${pct(FLOORS[1].inf)}/month. An Overdraft Vampire appears (${fmt(T().later.vamp)}).`}}
   if(S.month===9){addMon("hydra",T().later.hydra);fc={title:"FLOOR 3 · THE ABYSS",text:`Inflation rises to ${pct(FLOORS[2].inf)}/month. A Medical Hydra appears (${fmt(T().later.hydra)}).`}}
@@ -767,7 +827,7 @@ function showReport(m,rep,fc){
     <button class="go" id="cont">CONTINUE TO MONTH ${m+1} ▶</button></div>`;
   ov.classList.add("on");ov.scrollTop=0;S.busy=false;render();
   rep.forEach((_,i)=>setTimeout(()=>{if(S.tok===tok)sfx.tick()},110*i+60));
-  const b=$("#cont");if(b){b.onclick=()=>{S.tok++;ov.classList.remove("on");render()};try{b.focus({preventScroll:true})}catch(e){}}
+  const b=$("#cont");if(b){b.onclick=()=>{S.tok++;ov.classList.remove("on");render();if(S.raise)raiseCard()};try{b.focus({preventScroll:true})}catch(e){}}
   say(`Month ${m} report. Net worth ${fmt(netWorth())}.`);
 }
 
@@ -782,25 +842,38 @@ function unlocked(survived,stars){
   if(survived&&st.inv>0)u.push("grow");
   if(st.divMonths>=3)u.push("div");
   if(st.insHit>0)u.push("shield");
+  if(st.saveMonths>=10)u.push("payfirst");
+  if(S.fortress)u.push("fortress");
+  if(survived&&st.raises>=2&&st.raiseLife===0)u.push("creep");
   if(stars===3)u.push("pro");
   return u;
 }
 function tipFor(){
   const st=S.stats;
+  if(st.billDebt>0)return"You spent more than you earned and the credit card paid the difference. Cut lifestyle first, because bills come before wants.";
+  if(st.raises>=1&&st.raiseLife>=1)return"A raise is the best moment to save. Spend it on lifestyle and it vanishes, which is how high earners stay stuck.";
+  if(st.saved===0&&st.emerg>0)return"Pay yourself first. Even 10% of pay into savings turns the next surprise bill into a non-event.";
   if(st.emerg>0)return"Keep roughly one surprise bill in cash. Without it, a single shock becomes a 15%-a-month Emergency Imp.";
   if(st.pays>=3&&st.payOK/st.pays<.8)return"Pay the fastest-growing debt first (the “avalanche” method). It saves the most money.";
   if(st.bought>=3)return"Status purchases felt normal each time, yet they were the trap. Wait a day before buying to keep up.";
   if(st.infl>st.interest)return"Idle cash lost more than your debts charged. Money that sits still gets cheaper every month.";
   return"Debt interest and inflation both work against you every month. Small, early moves beat big, late ones.";
 }
+function settle(){
+  let pool=Math.max(0,S.cash)+S.assets.vault,used=0;
+  S.mons.slice().sort((x,y)=>y.rate-x.rate).forEach(m=>{const a=Math.min(pool,m.debt);if(a>0){m.debt-=a;pool-=a;used+=a}});
+  let take=used;const fromCash=Math.min(take,Math.max(0,S.cash));S.cash-=fromCash;take-=fromCash;S.assets.vault-=take;
+  S.mons=S.mons.filter(m=>m.debt>0);return used;
+}
 function finish(survived,m){
   S.over=true;S.busy=false;S.done=survived;S.tok++;
+  S.settled=survived?settle():0;
   const debt=totalDebt(),nw=netWorth(),st=S.stats,stars=starsFor(survived);
   S.hist.push(nw);
   survived?sfx.win():sfx.lose();
   if(survived){flash("#ffcf5c");burst(innerWidth/2,innerHeight/3,{n:60,c:"#ffcf5c",s:9,l:80,coin:true,up:4,r:5})}else{shake();flash("#ff4d6d")}
   const title=!survived?"The debt <em>devoured</em> you":(debt===0?"You <em>cleared</em> the dungeon":"You <em>survived</em>. Barely.");
-  const sub=!survived?`Your debt hit ${fmt(T().doom)} in month ${m}.`:debt===0?"No debt left. Your money is yours again.":`You still owe ${fmt(debt)}. The monsters are still growing.`;
+  const sub=!survived?`Your debt hit ${fmt(T().doom)} in month ${m}.`:debt===0?(S.settled>0?`Your savings and cash cleared the last ${fmt(S.settled)} of debt. Your money is yours again.`:"No debt left. Your money is yours again."):`You still owe ${fmt(debt)}. The monsters are still growing.`;
   const earned=unlocked(survived,stars),had=(store.get("ach")||"").split(",").filter(Boolean),all=[...new Set([...had,...earned])];
   store.set("ach",all.join(","));
   const prevXp=+store.get("xp")||0,newAch=earned.filter(x=>!had.includes(x)).length;
@@ -825,6 +898,8 @@ function finish(survived,m){
       <div class="tile"><b>DEBT COST</b>Your debts charged <strong>${fmt(st.interest)}</strong>, about <strong>${sharePct}%</strong> of everything you earned.</div>
       <div class="tile"><b>INFLATION</b>Idle cash lost <strong>${fmt(st.infl)}</strong> of buying power.</div>
       <div class="tile"><b>METHOD</b>${st.pays?`<strong>${Math.round(st.payOK/st.pays*100)}%</strong> of your payments hit the fastest-growing debt.`:"You made no payments."}</div>
+      <div class="tile"><b>SAVINGS</b>You saved <strong>${fmt(st.saved)}</strong> automatically (<strong>${S.income?Math.round(st.saved/S.income*100):0}%</strong> of pay)${st.fundUsed?` and used <strong>${fmt(st.fundUsed)}</strong> of it in emergencies instead of borrowing`:""}. Fund: <strong>${(S.assets.vault/Math.max(1,budget().needs+budget().wants)).toFixed(1)}</strong> months of living costs.</div>
+      <div class="tile"><b>LIFESTYLE</b>Living costs took <strong>${S.income?Math.round(st.living/S.income*100):0}%</strong> of your pay.${st.raises?` Of ${st.raises} raises, you put <strong>${st.raises-st.raiseLife}</strong> toward savings or debt.`:""}</div>
       <div class="tile"><b>PRESSURE</b>${st.seen?`You gave in to <strong>${st.bought}</strong> of <strong>${st.seen}</strong> status temptations${st.onCard?` (${st.onCard} on credit)`:""}.`:"No status temptations showed up."} ${st.gap?`Income gaps hit <strong>${st.gap}×</strong>.`:""}</div>
     </div>
     ${st.insPaid||st.insHit?`<p class="note"><b>Insurance:</b> you paid <strong>${fmt(st.insPaid)}</strong> in premiums and it covered <strong>${fmt(st.insSaved)}</strong> of bills. ${st.insSaved>=st.insPaid?"This time it paid off. Even when it doesn't, you are buying protection from a crisis, not a profit.":"This time it cost more than it paid back. That is normal: insurance is a price for safety, and it matters most in the one month you can't afford."}</p>`:""}
@@ -902,11 +977,15 @@ function openHelp(){
   o.innerHTML=`<div class="card help"><div class="kick">HOW TO PLAY</div><h1>Survive <em>12 months</em></h1>
     <ol><li><b>Debt monsters grow</b> by the % shown, every month. Pay them down with cash.</li>
     <li><b>Cash melts.</b> Inflation makes idle money buy less. Investing can fight it, but prices swing.</li>
-    <li><b>Keep a safety net.</b> Surprise bills happen. No cash means an Emergency Imp (15% a month).</li>
+    <li><b>Set a monthly budget.</b> Needs are fixed. Choose your lifestyle, and pay yourself first. Whatever is left is free cash.</li>
+    <li><b>Build an emergency fund.</b> Savings cover surprise bills. With none, you get an Emergency Imp (15% a month).</li>
     <li><b>Status temptations</b> are optional and always feel reasonable. They are how the trap catches everyone.</li>
     <li>Finish before your debt hits the doom line. ★ survive · ★★ debt-free · ★★★ debt-free and wealthy.</li></ol>
     <h2>WORDS WORTH KNOWING</h2>
-    <dl><dt>Interest</dt><dd>The price of borrowing. It is charged on the whole balance, so it compounds.</dd>
+    <dl><dt>Budget</dt><dd>Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.</dd>
+    <dt>Pay yourself first</dt><dd>Move savings out the moment you are paid, before you can spend it.</dd>
+    <dt>Lifestyle creep</dt><dd>When pay rises, spending quietly rises with it, so you never get ahead.</dd>
+    <dt>Interest</dt><dd>The price of borrowing. It is charged on the whole balance, so it compounds.</dd>
     <dt>Inflation</dt><dd>Prices rise, so each dollar buys less. Cash loses value even while it sits still.</dd>
     <dt>Avalanche method</dt><dd>Pay the highest-rate debt first. It costs the least interest.</dd>
     <dt>Emergency fund</dt><dd>Cash set aside for surprises so one bad month does not become debt.</dd>
@@ -929,6 +1008,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.tbuy)buyTemp(t.dataset.tbuy==="card");
   else if(t.dataset.tskip)skipTemp();
   else if(t.dataset.ins)toggleIns();
+  else if(t.dataset.life!==undefined)setBud("life",+t.dataset.life);
+  else if(t.dataset.sv!==undefined)setBud("sv",+t.dataset.sv);
+  else if(t.dataset.raise)raisePick(t.dataset.raise);
   else if(t.dataset.mode){MODE=t.dataset.mode;store.set("mode",MODE);showTitle()}
   else if(t.dataset.tier){$("#ov").classList.remove("on");newGame(t.dataset.tier,MODE);render();beep(440,.1,"triangle");if(!store.get("tut"))say("Tutorial: tap PAY on the fastest-growing debt.")}
   else if(t.id==="helpLink"||t.id==="help")openHelp();
@@ -948,7 +1030,7 @@ document.addEventListener("keydown",e=>{
   const n=parseInt(e.key,10);if(n>=1&&n<=S.mons.length)pay(S.mons[n-1].id,e.shiftKey);
 });
 setSound(A.on);
-window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,seed:n=>{R=mulberry32(n)}};
+window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,setBud,raisePick,budget,freeCash,seed:n=>{R=mulberry32(n)}};
 bgInit();fxInit();newGame("mid",MODE);render();showTitle();
 })();
 </script>

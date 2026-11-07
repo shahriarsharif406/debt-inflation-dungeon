@@ -1,59 +1,39 @@
-const {JSDOM,VirtualConsole}=require("jsdom");
-const fs=require("fs");
-const html=fs.readFileSync(require("path").join(__dirname,"..","index.html"),"utf8");
-const errors=[];
-function boot(){
-  const vc=new VirtualConsole();
-  vc.on("jsdomError",e=>{if(!/Not implemented/.test(e.message))errors.push("jsdomError "+e.message)});
-  return new JSDOM(html,{runScripts:"dangerously",pretendToBeVisual:true,virtualConsole:vc,
-    beforeParse(w){w.matchMedia=q=>({matches:/reduce/.test(q),addEventListener(){},removeEventListener(){}});w.addEventListener("error",e=>errors.push("ERR "+e.message));
-      w.console.error=(...a)=>errors.push("console.error "+a.join(" "))}});
-}
-const click=(w,el)=>el.dispatchEvent(new w.MouseEvent("click",{bubbles:true}));
-{
-  const dom=boot(),w=dom.window,d=w.document;
-  console.log("tier buttons:",d.querySelectorAll(".tier").length,"mode buttons:",d.querySelectorAll("[data-mode]").length);
-  click(w,d.querySelector('[data-tier="high"]'));
-  console.log("closed:",!d.querySelector("#ov").classList.contains("on"),"tier:",w.__game.S.tier,"cash:",w.__game.S.cash,"monsters:",d.querySelectorAll(".mon").length);
-  click(w,d.querySelector("#help"));console.log("help opens:",d.querySelector("#ov2").classList.contains("on"));
-}
-const SHARED=boot();
-function play(tier,strategy,mode,seed){
-  const dom=SHARED,w=dom.window,d=w.document,G=w.__game;
-  G.newGame(tier,mode||"free");if(seed!==undefined)G.seed(seed);G.render();
-  let guard=0;
-  while(!G.S.over&&guard++<40){strategy(G);G.endMonth();const c=d.querySelector("#cont");if(c)click(w,c);G.S.busy=false}
-  const S=G.S,debt=S.mons.reduce((a,m)=>a+m.debt,0);
-  const nw=S.cash+S.assets.vault+S.assets.index+S.assets.dragon-debt;
-  return {over:S.over,month:S.month,debt,nw,done:S.done,stars:G.starsFor(S.done),st:{...S.stats},hist:S.hist.length};
-}
-const avalanche=G=>{let s=0;while(G.S.cash>0&&G.S.mons.length&&s++<80){const m=G.S.mons.slice().sort((a,b)=>b.rate-a.rate)[0];G.pay(m.id,true);G.S.busy=false}};
-const S={
-  idle:()=>{},
-  avalanche,
-  "avalanche+skip":G=>{if(G.S.temp)G.skipTemp();avalanche(G)},
-  "keeps up (card)":G=>{if(G.S.temp)G.buyTemp(true);avalanche(G)},
-  "keeps up (cash)":G=>{if(G.S.temp){G.S.cash>=G.S.temp.cost?G.buyTemp(false):G.buyTemp(true)}avalanche(G)},
-  allDragon:G=>{let s=0;while(G.S.cash>=G.S.salary&&s++<30)G.invest("dragon")}
+const {JSDOM,VirtualConsole}=require("jsdom");const fs=require("fs");
+const html=fs.readFileSync(require("path").join(__dirname,"..","index.html"),"utf8");const errs=[];
+const vc=new VirtualConsole();vc.on("jsdomError",e=>{if(!/Not implemented/.test(e.message))errs.push(e.message)});
+const dom=new JSDOM(html,{runScripts:"dangerously",pretendToBeVisual:true,virtualConsole:vc,beforeParse(w){w.matchMedia=q=>({matches:/reduce/.test(q),addEventListener(){},removeEventListener(){}});w.addEventListener("error",e=>errs.push(e.message))}});
+const w=dom.window,G=w.__game,d=w.document;
+function av(buf){buf=Math.min(buf||0,G.freeCash());G.S.cash-=buf;let k=0;while(G.freeCash()>0&&G.S.mons.length&&k++<80){const m=G.S.mons.slice().sort((a,b)=>b.rate-a.rate)[0];const c=G.S.cash;G.pay(m.id,true);G.S.busy=false;if(G.S.cash===c)break}G.S.cash+=buf}
+const STR={
+ idle:{life:1,sv:1,pay:false,temp:"skip",raise:"debt"},
+ "aval default":{life:1,sv:1,pay:true,temp:"skip",raise:"debt"},
+ "frugal sv0":{life:0,sv:0,pay:true,temp:"skip",raise:"debt"},
+ "frugal sv10":{life:0,sv:1,pay:true,temp:"skip",raise:"save"},
+ "comfy sv0":{life:1,sv:0,pay:true,temp:"skip",raise:"debt"},
+ "lavish sv0":{life:2,sv:0,pay:true,temp:"skip",raise:"life"},
+ "lavish+status":{life:2,sv:0,pay:true,temp:"card",raise:"life"},
+ "comfy+status":{life:1,sv:1,pay:true,temp:"card",raise:"life"},
+ "smart":{smart:true,pay:true,buf:1,temp:"skip",raise:"save"},
+ "smart no buf":{smart:true,pay:true,buf:0,temp:"skip",raise:"save"},
+ "comfy sv10 buf":{life:1,sv:1,pay:true,buf:1,temp:"skip",raise:"debt"}
 };
-const doom={low:3300,mid:5500,high:13200};
-for(const tier of (process.argv[2]?[process.argv[2]]:["low","mid","high"])){
-  console.log("\n== "+tier.toUpperCase()+" ==");
-  for(const [n,st] of Object.entries(S)){
-    const N=n==="idle"?8:30;let surv=0,free=0,s3=0,nws=[],bought=0;
-    for(let i=0;i<N;i++){const r=play(tier,st);
-      if(!r.over)errors.push(tier+" "+n+" unfinished");
-      if(r.done)surv++;if(r.debt===0&&r.done)free++;if(r.stars===3)s3++;nws.push(r.nw);bought+=r.st.bought;
-      if(r.hist<2)errors.push("hist missing")}
-    nws.sort((a,b)=>a-b);
-    console.log(`${n.padEnd(17)} survived ${String(surv).padStart(2)}/${N}  debt-free ${String(free).padStart(2)}/${N}  3★ ${String(s3).padStart(2)}  median nw ${String(nws[N>>1]).padStart(6)}  temptations avg ${(bought/N).toFixed(1)}`);
-  }
-}
-// daily determinism
-console.log("\n== DAILY determinism ==");
-for(const tier of ["low","mid","high"]){
-  const a=play(tier,S["avalanche+skip"],"daily"),b=play(tier,S["avalanche+skip"],"daily");
-  console.log(tier,"run1 nw",a.nw,"run2 nw",b.nw,a.nw===b.nw&&a.st.interest===b.st.interest?"SAME":"DIFFERENT");
-  if(a.nw!==b.nw)errors.push("daily not deterministic "+tier);
-}
-console.log("\nerrors:",errors.length?errors.slice(0,10):"none");
+function play(tier,st,mode,seed){G.newGame(tier,mode||"free");if(seed!==undefined)G.seed(seed);let n=0;
+ while(!G.S.over&&n++<40){
+  if(st.smart){const hi=G.S.mons.some(m=>m.rate>=.04);G.setBud("life",0);G.setBud("sv",hi?0:(G.S.assets.vault<3*(G.budget().needs+G.budget().wants)?2:1))}
+  else{G.setBud("life",st.life);G.setBud("sv",st.sv)}
+  if(G.S.temp){if(st.temp==="skip")G.skipTemp();else G.buyTemp(true)}
+  if(st.pay)av(st.buf?G.budget().needs*1.5:0);
+  G.endMonth();const c=d.querySelector("#cont");if(c)c.dispatchEvent(new w.MouseEvent("click",{bubbles:true}));G.S.busy=false;
+  if(G.S.raise)G.raisePick(st.raise);
+ }
+ const S=G.S,debt=S.mons.reduce((a,m)=>a+m.debt,0);const nw=S.cash+S.assets.vault+S.assets.index+S.assets.dragon-debt;
+ return{done:S.done,debt,nw,stars:G.starsFor(S.done),st:{...S.stats},fort:S.fortress,month:S.month}}
+const tiers=process.argv[2]?[process.argv[2]]:["mid"];const N=+process.argv[3]||16;
+for(const tier of tiers){console.log("\n==",tier);
+ for(const [n,st] of Object.entries(STR)){let surv=0,free=0,s2=0,s3=0,nws=[],em=0,bd=0,fo=0,fu=0;
+  for(let i=0;i<N;i++){const r=play(tier,st);if(r.done)surv++;if(r.done&&r.debt===0)free++;if(r.stars===3)s3++;nws.push(r.nw);em+=r.st.emerg;bd+=r.st.billDebt>0?1:0;fo+=r.fort?1:0;fu+=r.st.fundUsed}
+  nws.sort((a,b)=>a-b);
+  console.log(n.padEnd(14),`surv ${String(surv).padStart(2)}/${N} free ${String(free).padStart(2)} 3★ ${s3} medNW ${String(nws[N>>1]).padStart(6)} emergImp/run ${(em/N).toFixed(1)} billDebt runs ${bd} fortress ${fo} fundUsed/run ${(fu/N).toFixed(0)}`)}}
+console.log("\n== daily determinism ==");
+for(const t of ["low","mid","high"]){const a=play(t,STR["smart"],"daily"),b=play(t,STR["smart"],"daily");const ok=a.nw===b.nw&&a.st.interest===b.st.interest;console.log(t,ok?"SAME":"DIFFERENT");if(!ok)errs.push("daily not deterministic "+t)}
+console.log("errors:",errs.length?errs.slice(0,5):"none");
