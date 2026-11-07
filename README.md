@@ -7,6 +7,7 @@ A financial-literacy roguelite you can learn in ten seconds and finish in five m
 Built for **Zoud GameLab 2026** (theme: *Make FinLit Fun*).
 
 ![Title screen](docs/screens/desk-1-title.png)
+![The dungeon hall](docs/screens/desk-2-game.png)
 
 ## Play
 

@@ -56,6 +56,36 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .b-grn{background:#4de2a126;color:#8df0c5;border:1px solid #4de2a166}
 .b-blu{background:#6ea8ff22;color:#a9c8ff;border:1px solid #6ea8ff66}
 /* forecast */
+
+#arena{margin:0 0 12px}
+.hall{position:relative;height:204px;border-radius:20px;overflow:hidden;border:1px solid #ffffff1c;
+  background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--glow) 55%,transparent),transparent 62%),
+  repeating-linear-gradient(90deg,#ffffff06 0 2px,transparent 2px 86px),linear-gradient(#0d0a1c,#080614);
+  box-shadow:inset 0 0 60px #000a,0 14px 40px #0008;display:flex;align-items:flex-end;justify-content:space-between;padding:0 54px 16px;gap:12px}
+.hall::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(60% 120% at 50% 130%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),
+  linear-gradient(90deg,#000b,transparent 22%,transparent 78%,#000b)}
+.hall::after{content:"";position:absolute;left:0;right:0;top:0;height:34px;pointer-events:none;background:radial-gradient(40px 34px at 40px 0,transparent 98%,#0000),repeating-radial-gradient(60px 46px at 50% -14px,#05040c 0 44px,transparent 45px 70px);opacity:.9}
+.floorline{position:absolute;left:0;right:0;bottom:0;height:20px;background:linear-gradient(#1b1630,#0a0814);border-top:1px solid #ffffff14}
+.tch{position:absolute;top:42px;width:20px;height:58px;z-index:2}
+.tch.l{left:16px}.tch.r{right:16px}
+.tch::before{content:"";position:absolute;left:7px;top:22px;width:6px;height:36px;border-radius:3px;background:linear-gradient(#6b4a2a,#2c1d10)}
+.tch u{position:absolute;left:1px;top:0;width:18px;height:28px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 50% 70%,#fff6c9,#ffb347 45%,#ff4d6d00 75%);filter:blur(.5px) drop-shadow(0 0 14px #ffb347);animation:flame .7s ease-in-out infinite alternate}
+.tch.r u{animation-delay:.25s}
+@keyframes flame{from{transform:scale(.92,1) rotate(-3deg);opacity:.9}to{transform:scale(1.06,1.12) rotate(3deg);opacity:1}}
+.knw{position:relative;z-index:1;display:flex;align-items:flex-end;gap:10px;flex:none}
+.knw .kn{width:104px;height:126px;animation:breathe 3s ease-in-out infinite;transform-origin:50% 95%;filter:drop-shadow(0 6px 14px #5ea3ff55)}
+.stash{display:flex;flex-direction:column-reverse;align-items:center;gap:1px;position:relative;min-width:58px;padding-bottom:2px}
+.stash i{width:34px;height:7px;border-radius:50%;background:linear-gradient(#ffe08a,#e0a21d);box-shadow:0 1px 0 #7a5208,0 0 10px #ffcf5c33;transform:translateX(calc(((var(--i) * 7) % 5 - 2) * 1.4px))}
+.stash span{position:absolute;bottom:-3px;left:50%;transform:translate(-50%,100%);font-size:11px;font-weight:800;color:var(--gold);white-space:nowrap;display:none}
+.horde{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:flex-end;gap:2px;flex:1;min-width:0}
+.am{display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-width:0}
+.am .fig{width:92px;height:92px;scale:var(--s);transform-origin:50% 100%;margin-bottom:4px;animation-duration:calc(2.2s + var(--s) * .6s)}
+.am b{font-size:11.5px;font-weight:800;color:#fff;background:#0009;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);border-radius:99px;padding:1px 8px;margin-top:2px}
+.win{align-self:center;margin:0 auto;text-align:center;font-weight:900;letter-spacing:.2em;font-size:18px;color:var(--gold);text-shadow:0 0 24px #ffcf5c}
+.win small{display:block;letter-spacing:.04em;font-weight:600;font-size:12px;color:var(--mute);text-shadow:none;margin-top:4px}
+@media(max-width:700px){.hall{height:148px;padding:0 34px 14px}.knw .kn{width:62px;height:76px}.stash{min-width:40px}.stash i{width:26px}.am .fig{width:52px;height:52px}.am b{font-size:10px;padding:1px 5px}.tch{display:none}.win{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.tch u,.knw .kn,.am .fig{animation:none}}
 #forecast{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .fc{border-radius:16px;padding:10px 14px;border:1px solid var(--line);background:linear-gradient(180deg,#1b1735cc,#110e22cc)}
 .fc small{display:block;color:var(--mute);font-size:10.5px;letter-spacing:.12em;font-weight:800}
@@ -80,6 +110,8 @@ main{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
 #monsters{display:flex;flex-direction:column;gap:11px}
 .mon{position:relative;display:grid;grid-template-columns:104px 1fr;gap:6px 12px;align-items:center;padding:11px;border-radius:18px;border:1px solid color-mix(in srgb,var(--c) 50%,#2a2548);background:linear-gradient(135deg,color-mix(in srgb,var(--c) 15%,#150f27),#0f0c1d);box-shadow:0 0 30px color-mix(in srgb,var(--c) 15%,transparent),inset 0 1px 0 #ffffff12}
 .key{position:absolute;top:8px;right:10px;font-size:10.5px;font-weight:900;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:1px 6px;background:#0d0a1a}
+.mon,.fc,#wallet>div{box-shadow:inset 0 1px 0 #ffffff14,inset 0 0 0 1px #ffffff05}
+h1 em{background:linear-gradient(90deg,#ffe08a,#ffb347);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-style:normal;filter:drop-shadow(0 0 18px #ffb34766)}
 .fig{width:98px;height:98px;display:grid;place-items:center;transform-origin:50% 90%;animation:breathe 2.6s ease-in-out infinite;filter:drop-shadow(0 8px 16px color-mix(in srgb,var(--c) 60%,transparent))}
 .fig svg{width:100%;height:100%;overflow:visible}
 @keyframes breathe{0%,100%{translate:0 0}50%{translate:0 -4px}}
@@ -166,6 +198,16 @@ main{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
 .kick{font-size:11px;letter-spacing:.26em;font-weight:900;color:var(--accent);margin-bottom:8px}
 .peek{display:flex;justify-content:center;gap:4px;margin:-4px 0 6px}
 .peek .fig{width:74px;height:74px;animation-duration:3s}
+.ov:has(.card.hero){background:radial-gradient(90% 70% at 50% 0%,#1d3b8a66,transparent 65%),radial-gradient(70% 50% at 50% 110%,#ffb34733,transparent 70%),linear-gradient(#070511,#0b0818);backdrop-filter:none}
+.card.hero{position:relative;overflow:hidden;background:linear-gradient(#141029e6,#0c0a1ef2);border-color:#ffffff22;box-shadow:0 30px 90px #000c,inset 0 1px 0 #ffffff1a}
+.card.hero .tch{top:26px}.card.hero .tch.l{left:18px}.card.hero .tch.r{right:18px}
+.card.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:160px;pointer-events:none;background:radial-gradient(70% 100% at 50% 0%,#5ea3ff33,transparent 70%)}
+.peek{position:relative;gap:6px;padding:4px 0 10px}.peek .fig{width:96px;height:96px}
+.peek::after{content:"";position:absolute;left:8%;right:8%;bottom:2px;height:2px;background:linear-gradient(90deg,transparent,#ffffff30,transparent)}
+.hero h1{font-size:46px;letter-spacing:.005em;text-shadow:0 4px 30px #5ea3ff44}
+.hero h1 em{display:inline-block}
+@media(max-width:700px){.hero h1{font-size:32px}.peek .fig{width:78px;height:78px}.card.hero .tch{display:none}}
+
 .peek .fig:nth-child(2){animation-delay:-.8s;transform:scale(1.2)}.peek .fig:nth-child(3){animation-delay:-1.6s}
 .hero h1{text-align:center;font-size:36px}
 .hero .tg{text-align:center;font-size:17px;color:#d6d0f5}
@@ -279,6 +321,7 @@ kbd{font:700 12px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-r
     <div class="hudb"><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
   </div>
   <div id="floor"></div>
+  <div id="arena" aria-hidden="true"></div>
   <div id="forecast"></div>
   <div id="coach" class="hide"></div>
   <main>
@@ -486,6 +529,17 @@ function animateNums(){
 
 /* ---------- art ---------- */
 const K=(tag,a)=>`<${tag} ${a} fill="var(--c)"/><${tag} ${a} fill="url(#shade)"/>`;
+const KNIGHT=`<svg viewBox="0 0 100 120" aria-hidden="true"><ellipse cx="50" cy="112" rx="30" ry="6" fill="#0008"/><path d="M26 56 L26 100 Q50 116 74 100 L74 56Z" fill="#4a5a86"/><path d="M26 56 L74 56 L74 66 L26 66Z" fill="#6b7fb5"/><path d="M50 18 L28 40 L28 62 Q50 72 72 62 L72 40Z" fill="#8fa2d6"/><path d="M50 18 L28 40 L28 62 Q50 72 72 62 L72 40Z" fill="url(#shade)"/><rect x="34" y="42" width="32" height="8" rx="3" fill="#0b1022"/><path d="M50 18 Q60 0 82 8 Q66 12 60 26Z" fill="#ffcf5c"/><path d="M8 66 L30 66 L30 94 Q19 106 8 94Z" fill="#ffcf5c"/><path d="M8 66 L30 66 L30 94 Q19 106 8 94Z" fill="url(#shade)"/><path d="M19 72 L19 94" stroke="#a9741a" stroke-width="3"/><path d="M13 82 L25 82" stroke="#a9741a" stroke-width="3"/></svg>`;
+function arenaHTML(){
+  const sal=T().salary,coins=Math.max(0,Math.min(12,Math.ceil(S.cash/(sal*.18))));
+  const stack=Array.from({length:coins},(_,i)=>`<i style="--i:${i}"></i>`).join("");
+  const mons=S.mons.map(m=>{const sc=(0.7+0.55*Math.min(m.debt/m.ref,2.2)).toFixed(2);
+    return `<div class="am" style="--c:${m.color};--s:${sc}"><div class="fig">${monsterSVG(m.kind,m.id)}</div><b>${fmt(m.debt)}</b></div>`}).join("");
+  return `<div class="hall"><div class="tch l"><u></u></div><div class="tch r"><u></u></div>
+    <div class="knw"><div class="kn">${KNIGHT}</div><div class="stash" title="cash">${stack}<span>${fmt(S.cash)}</span></div></div>
+    <div class="horde">${mons||'<div class="win">ALL DEBT SLAIN<small>now guard your cash from inflation</small></div>'}</div>
+    <div class="floorline"></div></div>`;
+}
 function monsterSVG(kind,n){
   const d=((n||0)%5)*.7;
   const eyes=`<g class="eyes" style="animation-delay:${d}s"><circle cx="38" cy="50" r="8.5" fill="#fff"/><circle cx="62" cy="50" r="8.5" fill="#fff"/><circle cx="40" cy="52" r="4.2" fill="#14091a"/><circle cx="60" cy="52" r="4.2" fill="#14091a"/><circle cx="41.6" cy="50.2" r="1.5" fill="#fff"/><circle cx="61.6" cy="50.2" r="1.5" fill="#fff"/></g><path d="M28 40 L46 46 M72 40 L54 46" stroke="#14091a" stroke-width="4" stroke-linecap="round"/>`;
@@ -559,6 +613,7 @@ function render(){
   for(let i=1;i<=LAST;i++){const p=document.createElement("div");p.className="pip f"+floorOf(i)+(i<S.month?" done":"")+(i===S.month?" now":"");tr.appendChild(p)}
   $("#floor").innerHTML=`<h1><small>FLOOR ${fi+1} · ${T().label}${S.mode==="daily"?" · DAILY "+S.label:""}</small>${fl.name}</h1><span class="rt">Month <b>${S.month}</b> of ${LAST} &nbsp;·&nbsp; Inflation <span class="badge b-amb">${pct(fl.inf)}/month</span></span>`;
   const f=forecast(),net=S.cash/shockSize(),nl=net<1?"lo":net<2?"md":"hi";
+  $("#arena").innerHTML=arenaHTML();
   $("#forecast").innerHTML=
    `<div class="fc up"><small>▲ DEBT GROWS BY</small><strong data-num="fd" data-v="${f.di}" data-f="usd">${fmt(f.di)}</strong><em>if you end the month now</em></div>
     <div class="fc dn"><small>▼ CASH MELTS BY</small><strong data-num="fc" data-v="${f.cl}" data-f="usd">${fmt(f.cl)}</strong><em>if you end the month now</em></div>
@@ -823,7 +878,7 @@ function shareResult(){
 function showTitle(){
   const ov=$("#ov");
   const best=k=>{const b=JSON.parse(store.get("best_"+k)||"null");return b?`<small>best ${"★".repeat(b.stars)||"☠"} ${fmt(b.nw)}</small>`:"<small>no run yet</small>"};
-  ov.innerHTML=`<div class="card hero"><div class="peek"><div class="fig" style="--c:#ff4d6d">${monsterSVG("wyrm",1)}</div><div class="fig" style="--c:#b388ff">${monsterSVG("imp",2)}</div><div class="fig" style="--c:#f4a261">${monsterSVG("golem",3)}</div></div>
+  ov.innerHTML=`<div class="card hero"><div class="tch l"><u></u></div><div class="tch r"><u></u></div><div class="peek"><div class="fig" style="--c:#ff4d6d">${monsterSVG("wyrm",1)}</div><div class="fig" style="--c:#b388ff">${monsterSVG("imp",2)}</div><div class="fig" style="--c:#f4a261">${monsterSVG("golem",3)}</div></div>
     <div class="kick" style="text-align:center">A FINLIT ROGUELITE</div>
     <h1>DEBT &amp; <em>INFLATION</em><br>DUNGEON</h1>
     <p class="tg">Debt grows. Cash melts. <b>Your move.</b></p>
