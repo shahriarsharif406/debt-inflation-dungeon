@@ -38,6 +38,10 @@ Pick **Low**, **Middle** or **High** income at the start. Numbers scale, the rul
 
 A seeded mode: everyone who plays on the same day, at the same income level, gets exactly the same events and market swings. Compare scores fairly and share the result image.
 
+### Levels and daily goal
+
+Every run earns XP that carries across games (saved in your browser) and unlocks levels from Rookie to Dungeon Master. The Daily Dungeon also sets one goal per day (for example "finish without a single status purchase") for bonus XP.
+
 ### Scoring
 
 ★ survive 12 months · ★★ finish debt-free · ★★★ debt-free with high net worth. Eight unlockable "insights" (Avalanche Mind, Safety Net, Status Resister…) are saved in your browser.

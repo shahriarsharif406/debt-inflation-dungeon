@@ -43,6 +43,8 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 
 **Income tiers:** Low ($350/mo), Middle ($600), High ($1,500). All values scale together so the dynamics are identical.
 
+**Progression:** XP from every run (survival, stars, debt-free, new insights, daily goal) builds six levels, Rookie to Dungeon Master, so the lessons reward repeat play.
+
 **Daily Dungeon:** events, market returns and temptations are drawn from a seeded generator keyed to the date and tier.
 
 ## 6. Learning outcomes and how the game measures them
@@ -75,7 +77,7 @@ Single-file HTML/CSS/JS, no dependencies, hosted statically. Canvas (particles, 
 
 ## 10. Current scope (delivered in the jam build)
 
-Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon, tutorial, report card, 8 insights, share image, help screen, responsive layout.
+Full 12-month game, 6 monsters, 3 assets, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon with a daily goal, XP and levels, tutorial, report card, 8 insights, share image, help screen, responsive layout.
 
 ## 11. Roadmap if funded
 

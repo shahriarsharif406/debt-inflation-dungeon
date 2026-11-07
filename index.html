@@ -131,6 +131,11 @@ main{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
 .nw b{font-size:20px;font-variant-numeric:tabular-nums}
 .nw .spark{grid-row:1/3;grid-column:2;width:120px;height:34px;justify-self:end;color:var(--accent)}
 .nw small{color:var(--mute);font-size:12px}
+.xpbox{margin:14px 0 4px;padding:12px 14px;border-radius:14px;border:1px solid #ffcf5c55;background:#ffcf5c10}
+.xpbox .xr{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}.xpbox b{color:var(--gold);font-size:18px}.xpbox small{display:block;margin-top:7px;color:var(--mute);font-size:12.5px;line-height:1.4}
+.lvup{font-style:normal;color:#06050c;background:var(--gold);padding:2px 7px;border-radius:8px;font-weight:900;font-size:11px;margin-left:6px}
+.xpbox .meter{color:var(--gold)}
+.lvl{text-align:center;color:var(--mute);font-size:13px;margin:-4px 0 10px}.lvl b{color:var(--gold)}
 .shield{margin-top:11px;display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:16px;border:1px solid #ffffff1f;background:#ffffff08}
 .shield.on{border-color:#4de2a1aa;background:#4de2a114}
 .shield .si{font-size:22px;width:30px;text-align:center}
@@ -351,6 +356,17 @@ const ACH=[
   {id:"pro",name:"Dungeon Master",desc:"Earn 3 stars"}
 ];
 
+const LEVELS=[[0,"Rookie"],[60,"Saver"],[160,"Budgeter"],[320,"Debt Slayer"],[560,"Inflation Tamer"],[900,"Dungeon Master"]];
+function lvlInfo(xp){let i=0;LEVELS.forEach((l,k)=>{if(xp>=l[0])i=k});const a=LEVELS[i][0],b=LEVELS[i+1]?LEVELS[i+1][0]:null;return{n:i+1,name:LEVELS[i][1],a,b,p:b?(xp-a)/(b-a):1}}
+const GOALS=[
+  {id:"nostat",txt:"Finish without buying a single status item",ok:(st,sv)=>sv&&st.bought===0},
+  {id:"noemerg",txt:"Never fall into emergency borrowing",ok:(st,sv)=>sv&&st.emerg===0},
+  {id:"free",txt:"Finish completely debt-free",ok:(st,sv,debt)=>sv&&debt===0},
+  {id:"aval",txt:"Hit the fastest-growing debt with 80%+ of your payments",ok:(st)=>st.pays>=5&&st.payOK/st.pays>=.8},
+  {id:"shield",txt:"Keep the Insurance Shield on and let it pay out",ok:(st)=>st.insHit>0},
+  {id:"grow",txt:"Finish with positive investment gains",ok:(st,sv)=>sv&&st.inv>0}
+];
+const dailyGoal=()=>GOALS[hashStr(new Date().toISOString().slice(0,10)+"|goal")%GOALS.length];
 /* ---------- helpers ---------- */
 const fmt=n=>(n<0?"−":"")+"$"+Math.abs(Math.round(n)).toLocaleString("en-US");
 const FM={usd:fmt,x:v=>v.toFixed(1)+"×",pp:v=>"$"+v.toFixed(2)};
@@ -551,6 +567,9 @@ function render(){
   if(tutOn()){
     c.classList.remove("hide");
     c.innerHTML=`<b class="n">${step+1}</b><span>${["Debt monsters grow every month. Hit the fastest one: tap <b>PAY</b>.","Cash loses value every month. Put some into an asset, or skip. Then continue.","Happy with your move? <b>END MONTH</b> and watch what happens."][step]}</span>`;
+  }else if(S.mode==="daily"){
+    c.classList.remove("hide");const g=dailyGoal();
+    c.innerHTML=`<b class="n">★</b><span><b>Today's goal:</b> ${g.txt}. <em style="color:var(--gold);font-style:normal">+40 XP</em></span>`;
   }else c.classList.add("hide");
   const mc=$("#monsters");
   if(!S.mons.length)mc.innerHTML=`<div class="empty">All debt is gone.<br>Now keep your money safe from inflation.</div>`;
@@ -729,6 +748,12 @@ function finish(survived,m){
   const sub=!survived?`Your debt hit ${fmt(T().doom)} in month ${m}.`:debt===0?"No debt left. Your money is yours again.":`You still owe ${fmt(debt)}. The monsters are still growing.`;
   const earned=unlocked(survived,stars),had=(store.get("ach")||"").split(",").filter(Boolean),all=[...new Set([...had,...earned])];
   store.set("ach",all.join(","));
+  const prevXp=+store.get("xp")||0,newAch=earned.filter(x=>!had.includes(x)).length;
+  const goal=S.mode==="daily"?dailyGoal():null,goalOk=goal?goal.ok(st,survived,debt):false;
+  const dkey="goal_"+new Date().toISOString().slice(0,10),goalNew=goalOk&&!store.get(dkey);
+  const gain=10+(survived?50+stars*40+(debt===0?30:0):0)+newAch*25+(goalNew?40:0);
+  store.set("xp",String(prevXp+gain));if(goalNew)store.set(dkey,"1");
+  const L0=lvlInfo(prevXp),L1=lvlInfo(prevXp+gain);
   const bk="best_"+S.tier,prev=JSON.parse(store.get(bk)||"null"),isBest=survived&&(!prev||nw>prev.nw);
   if(isBest)store.set(bk,JSON.stringify({nw,stars}));
   const sharePct=S.income?Math.round(st.interest/S.income*100):0;
@@ -739,6 +764,7 @@ function finish(survived,m){
     <div class="big-nw" style="color:${nw>=0?"var(--green)":"var(--red)"}">${fmt(nw)}${isBest?'<span class="newbest">NEW BEST</span>':""}</div>
     <div class="sub-nw">final net worth</div>
     ${spark(S.hist,560,120,"chart")}
+    <div class="xpbox"><div class="xr"><b>+${gain} XP</b><span>Level ${L1.n} · ${L1.name}${L1.n>L0.n?' <em class="lvup">LEVEL UP!</em>':""}</span></div><div class="meter"><i style="width:${(L1.p*100).toFixed(0)}%"></i></div><small>${L1.b?`${prevXp+gain} / ${L1.b} XP to next level`:"Max level reached"}${goal?` · Daily goal: ${goalOk?(goalNew?"✓ done (+40 XP)":"✓ done"):"✗ not this time"} · ${goal.txt}`:""}</small></div>
     <h2>YOUR FINLIT REPORT CARD</h2>
     <div class="tiles">
       <div class="tile"><b>DEBT COST</b>Your debts charged <strong>${fmt(st.interest)}</strong>, about <strong>${sharePct}%</strong> of everything you earned.</div>
@@ -801,6 +827,7 @@ function showTitle(){
     <div class="kick" style="text-align:center">A FINLIT ROGUELITE</div>
     <h1>DEBT &amp; <em>INFLATION</em><br>DUNGEON</h1>
     <p class="tg">Debt grows. Cash melts. <b>Your move.</b></p>
+    ${(()=>{const xp=+store.get("xp")||0;if(!xp)return"";const L=lvlInfo(xp);return`<p class="lvl">Level ${L.n} · <b>${L.name}</b> · ${xp} XP</p>`})()}
     <div class="steps">
       <div class="step s1"><b>▲ DEBT</b><span>Monsters grow bigger every month</span></div>
       <div class="step s2"><b>▼ CASH</b><span>Your money buys less every month</span></div>
@@ -866,7 +893,7 @@ document.addEventListener("keydown",e=>{
   const n=parseInt(e.key,10);if(n>=1&&n<=S.mons.length)pay(S.mons[n-1].id,e.shiftKey);
 });
 setSound(A.on);
-window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,seed:n=>{R=mulberry32(n)}};
+window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,seed:n=>{R=mulberry32(n)}};
 bgInit();fxInit();newGame("mid",MODE);render();showTitle();
 })();
 </script>
