@@ -563,7 +563,12 @@ function fxLoop(){
 }
 const centerOf=el=>{const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]};
 function flash(color){const f=$("#flash");f.style.setProperty("--fc",color);f.classList.remove("go");void f.offsetWidth;f.classList.add("go")}
-function shake(){if(REDUCED)return;const a=$("#app");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake")}
+let trauma=0,shkT=0,shkOn=false;
+function shake(t){if(REDUCED)return;trauma=Math.min(1,trauma+(t===undefined?.6:t));if(!shkOn){shkOn=true;shkT=performance.now();requestAnimationFrame(shkLoop)}}
+function shkLoop(now){const a=$("#app"),dt=Math.min(.05,(now-shkT)/1000);shkT=now;trauma=Math.max(0,trauma-1.2*dt);
+  const k=trauma*trauma,x=Math.sin(now/22)*10*k,y=Math.sin(now/17+2)*7*k;
+  a.style.transform=k>.002?`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`:"";
+  if(trauma>0)requestAnimationFrame(shkLoop);else{shkOn=false;a.style.transform=""}}
 function floatText(el,txt,color){
   if(!el)return;const r=el.getBoundingClientRect(),s=document.createElement("div");
   s.className="fl";s.textContent=txt;s.style.color=color;s.style.left=(r.left+r.width/2-30)+"px";s.style.top=(r.top+r.height/3)+"px";
