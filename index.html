@@ -195,7 +195,7 @@ h1 em{background:linear-gradient(90deg,#ffe08a,#ffb347);-webkit-background-clip:
 #endBtn.glow{animation:glowg 1.2s ease-in-out infinite}
 @keyframes glowg{0%,100%{box-shadow:0 10px 34px #ff9f1c55}50%{box-shadow:0 10px 44px 8px #ffcf5cbb}}
 /* overlays */
-.ov{position:fixed;inset:0;z-index:20;display:none;align-items:flex-start;justify-content:center;padding:18px 14px;background:radial-gradient(800px 460px at 50% 12%,color-mix(in srgb,var(--glow) 70%,#000),#06050cf2);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);overflow:auto}
+.ov{position:fixed;inset:0;z-index:20;display:none;align-items:flex-start;justify-content:center;padding:18px 14px;background:radial-gradient(800px 460px at 50% 12%,color-mix(in srgb,var(--glow) 70%,#000),#06050ca6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(7px);overflow:auto}
 .ov.on{display:flex}#ov2{z-index:30}
 .card{width:100%;max-width:600px;margin:auto;border-radius:24px;padding:24px;background:linear-gradient(180deg,#1c1838,#0e0b1d);border:1px solid #3b3568;box-shadow:0 24px 90px #000b,inset 0 1px 0 #ffffff14;animation:pop .4s cubic-bezier(.2,.9,.3,1.2)}
 .card.wide{max-width:740px}
@@ -346,6 +346,18 @@ kbd{font:700 12px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-r
 .chips span.nw{box-shadow:0 0 12px #ffcf5c88;border-color:#ffcf5c}
 @media (prefers-reduced-motion:reduce){.space,.finale .rocket,.finale .stuck,.finale .hole{animation:none}.finale .rocket{bottom:60px}}
 .linkb{background:none;border:1px solid #b28cff66;color:#b8a8ff;border-radius:99px;font-size:11px;padding:2px 9px;margin-left:8px;cursor:pointer}
+
+/* premium pass */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(700px 420px at 12% 105%,#6e4cff33,transparent 70%),radial-gradient(640px 400px at 92% -5%,#ff4d6d26,transparent 70%),radial-gradient(500px 300px at 50% 50%,#1b3a8a1f,transparent 75%)}
+.space::before{content:"";position:absolute;left:-70px;bottom:70px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#ffd9a3,#d9743c 45%,#4a1a2a 80%);opacity:.5;box-shadow:0 0 60px #ff8a3d33,inset -22px -18px 40px #000a}
+.card{position:relative;border-color:transparent;background:linear-gradient(180deg,#1d1a3a,#0d0a1c) padding-box,linear-gradient(140deg,#ffcf5c88,#6ea8ff44 35%,#b28cff88 65%,#ff4d6d88) border-box;border:1.5px solid transparent;box-shadow:0 30px 100px #000c,0 0 60px #6e4cff22,inset 0 1px 0 #ffffff1f}
+.hero h1,.card h1{background:linear-gradient(100deg,#fff 0%,#fff 40%,#ffe9a8 50%,#fff 60%,#fff 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 6s ease-in-out infinite}
+.hero h1 em,.card h1 em{-webkit-text-fill-color:initial}
+@keyframes shine{0%,30%{background-position:120% 0}70%,100%{background-position:-20% 0}}
+.go{box-shadow:0 10px 34px #ffb34755,inset 0 1px 0 #fff6}
+.tier,.opt,.tile{backdrop-filter:blur(4px)}
+@media (prefers-reduced-motion:reduce){.hero h1,.card h1{animation:none;background-position:0 0}}
+.card.hero{background:linear-gradient(180deg,#1d1a3ae6,#0d0a1cf2) padding-box,linear-gradient(140deg,#ffcf5cbb,#6ea8ff66 35%,#b28cffbb 65%,#ff4d6dbb) border-box;border:1.5px solid transparent;box-shadow:0 30px 100px #000c,0 0 70px #6e4cff33}
 </style>
 </head>
 <body data-floor="0">
