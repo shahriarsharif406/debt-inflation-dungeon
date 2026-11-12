@@ -26,7 +26,7 @@ function play(tier,st,mode,seed){G.newGame(tier,mode||"free");if(seed!==undefine
   G.endMonth();const c=d.querySelector("#cont");if(c)c.dispatchEvent(new w.MouseEvent("click",{bubbles:true}));G.S.busy=false;
   if(G.S.raise)G.raisePick(st.raise);
  }
- const S=G.S,debt=S.mons.reduce((a,m)=>a+m.debt,0);const nw=S.cash+S.assets.vault+S.assets.index+S.assets.dragon-debt;
+ const S=G.S,debt=S.mons.reduce((a,m)=>a+m.debt,0);const nw=S.cash+S.assets.vault+S.assets.index+S.assets.dragon+S.assets.orbit-debt;
  return{done:S.done,debt,nw,stars:G.starsFor(S.done),st:{...S.stats},fort:S.fortress,month:S.month}}
 const tiers=process.argv[2]?[process.argv[2]]:["mid"];const N=+process.argv[3]||16;
 for(const tier of tiers){console.log("\n==",tier);

@@ -312,10 +312,44 @@ kbd{font:700 12px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-r
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.space{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(1px 1px at 12% 18%,#fff9,transparent),radial-gradient(1px 1px at 72% 12%,#fff8,transparent),radial-gradient(1.5px 1.5px at 40% 60%,#cfd8ff99,transparent),radial-gradient(1px 1px at 88% 70%,#fff7,transparent),radial-gradient(1px 1px at 25% 85%,#fff7,transparent),radial-gradient(1.5px 1.5px at 60% 35%,#ffe9b399,transparent),radial-gradient(1px 1px at 5% 50%,#fff6,transparent),radial-gradient(1px 1px at 95% 30%,#fff6,transparent);animation:tw 6s ease-in-out infinite alternate}
+.space::after{content:"";position:absolute;right:-90px;top:90px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#b28cff55,#2a1a5a33 55%,transparent 72%);box-shadow:0 0 80px #6e4cff22}
+@keyframes tw{from{opacity:.55}to{opacity:1}}
+#escape{margin:6px 0 2px}
+.esc{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;padding:8px 12px;border-radius:12px;background:#0b0a1acc;border:1px solid #b28cff44}
+.esc .el{font-size:11px;font-weight:900;letter-spacing:.1em;color:#b28cff}
+.esc .et{position:relative;height:8px;border-radius:99px;background:#00000088}
+.esc .et i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#6ea8ff,#b28cff,#ffcf5c);transition:width .6s}
+.esc .rk{position:absolute;top:-6px;transform:rotate(45deg);transition:left .6s}
+.esc b{font-size:13px;color:var(--gold)}
+.esc small{grid-column:1/-1;font-size:11px;color:var(--mute)}
+.ctag{font-size:11.5px;color:#b8a8ff;background:#b28cff14;border:1px dashed #b28cff55;border-radius:8px;padding:5px 8px;margin:6px 0;line-height:1.4}
+.finale{position:relative;height:150px;border-radius:14px;overflow:hidden;margin:6px 0 10px;background:linear-gradient(180deg,#05030f,#1a1040 70%,#3a1d5c);border:1px solid #b28cff44;text-align:center}
+.finale .sf{position:absolute;inset:0;background:radial-gradient(1px 1px at 15% 25%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 35%,#fff,transparent),radial-gradient(1px 1px at 50% 15%,#fff9,transparent),radial-gradient(1px 1px at 30% 70%,#fff8,transparent),radial-gradient(1px 1px at 90% 80%,#fff8,transparent)}
+.finale .rocket{position:absolute;left:50%;bottom:-40px;margin-left:-22px;animation:launch 2.6s .3s cubic-bezier(.5,0,.8,.6) forwards}
+.finale .rocket svg{filter:drop-shadow(0 12px 14px #ff8a3d)}
+.finale .stuck{position:absolute;left:50%;bottom:34px;margin-left:-22px;animation:bob 3s ease-in-out infinite}
+.finale .hole{position:absolute;left:50%;top:26px;width:90px;height:90px;margin-left:-45px;border-radius:50%;background:radial-gradient(circle,#000 40%,#6e1fff 55%,#ff4d6d 62%,transparent 70%);animation:spin 5s linear infinite;box-shadow:0 0 40px #6e1fff}
+.finale .cap{position:absolute;left:0;right:0;bottom:8px;font-weight:900;font-size:13px;letter-spacing:.12em;color:#ffcf5c;text-shadow:0 2px 8px #000}
+@keyframes launch{0%{transform:translateY(0)}100%{transform:translateY(-230px)}}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cdx{display:grid;gap:8px;margin:10px 0}
+.cdx div{padding:9px 11px;border-radius:10px;background:#ffffff0a;border:1px solid #ffffff14;font-size:13px;line-height:1.45}
+.cdx div.on{border-color:#4de2a177;background:#4de2a112}
+.cdx b{display:block;font-size:13.5px}
+.cdx em{font-style:normal;color:#b8a8ff;font-size:11.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chips span{font-size:12px;padding:4px 9px;border-radius:99px;background:#ffffff0d;border:1px solid #ffffff18;color:var(--mute)}
+.chips span.on{background:#4de2a122;border-color:#4de2a1;color:#fff}
+.chips span.nw{box-shadow:0 0 12px #ffcf5c88;border-color:#ffcf5c}
+@media (prefers-reduced-motion:reduce){.space,.finale .rocket,.finale .stuck,.finale .hole{animation:none}.finale .rocket{bottom:60px}}
+.linkb{background:none;border:1px solid #b28cff66;color:#b8a8ff;border-radius:99px;font-size:11px;padding:2px 9px;margin-left:8px;cursor:pointer}
 </style>
 </head>
 <body data-floor="0">
-<canvas id="bg" aria-hidden="true"></canvas>
+<div class="space" aria-hidden="true"></div><canvas id="bg" aria-hidden="true"></canvas>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="flash"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -327,9 +361,10 @@ kbd{font:700 12px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-r
   <div id="top">
     <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M16 76Q8 42 34 34Q50 27 66 34Q92 42 84 76Q50 92 16 76Z" fill="#ff4d6d"/><circle cx="38" cy="52" r="8" fill="#fff"/><circle cx="62" cy="52" r="8" fill="#fff"/><circle cx="40" cy="54" r="4" fill="#14091a"/><circle cx="60" cy="54" r="4" fill="#14091a"/></svg><span><b>DEBT</b> &amp; <b>INFLATION</b> DUNGEON</span></div>
     <div id="track" aria-hidden="true"></div>
-    <div class="hudb"><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
+    <div class="hudb"><button class="ib" id="codex" aria-label="Money Codex">📖</button><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
   </div>
   <div id="floor"></div>
+  <div id="escape" aria-label="Escape velocity"></div>
   <div id="arena" aria-hidden="true"></div>
   <div id="forecast"></div>
   <div id="coach" class="hide"></div>
@@ -380,7 +415,8 @@ const MON={
 const ASSETS={
   vault:{name:"Savings Vault",exp:.010,desc:"+1.0%/mo · steady · your emergency fund"},
   index:{name:"Index Totem",exp:.022,desc:"≈ +2.2%/mo · some swings"},
-  dragon:{name:"Dragon Stock",exp:.040,desc:"≈ +4%/mo · wild swings"}
+  dragon:{name:"Dragon Stock",exp:.040,desc:"≈ +4%/mo · wild swings"},
+  orbit:{name:"Orbit Fund",exp:.030,desc:"≈ +3%/mo · launches can fail 🚀"}
 };
 const EVENTS=[
   {name:"Car breaks down",txt:"Repair bill",cash:-250,t:"bad",ins:1},
@@ -391,6 +427,8 @@ const EVENTS=[
   {name:"Side gig",txt:"Weekend job pays",cash:120,t:"good"},
   {name:"Market boom",txt:"Investments jump",mkt:"boom",t:"good"},
   {name:"Market crash",txt:"Investments tumble",mkt:"crash",t:"bad"},
+  {name:"Launch window",txt:"A space mission succeeds, orbit stocks surge",mkt:"space",t:"good"},
+  {name:"Launch failure",txt:"A rocket explodes on the pad",mkt:"fail",t:"bad"},
   {name:"Big celebration",txt:"Family event everyone expects you to fund",cash:-350,t:"bad"},
   {name:"Income gap",txt:"One paycheck covers everything, and next month's is half",salary:.5,t:"bad"}
 ];
@@ -437,7 +475,7 @@ let S,MODE=store.get("mode")==="daily"?"daily":"free";
 const T=()=>TIERS[S.tier];
 const sc=n=>Math.round(n*T().scale/10)*10;
 const totalDebt=()=>S.mons.reduce((a,m)=>a+m.debt,0);
-const totalAssets=()=>S.assets.vault+S.assets.index+S.assets.dragon;
+const totalAssets=()=>S.assets.vault+S.assets.index+S.assets.dragon+S.assets.orbit;
 const netWorth=()=>S.cash+totalAssets()-totalDebt();
 const curInf=()=>FLOORS[floorOf(S.month)].inf;
 const shockSize=()=>Math.round(T().salary*.5);
@@ -572,6 +610,7 @@ function monsterSVG(kind,n){
 const ICON={
   vault:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6ea8ff" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5V6M12 18v-2.5M8.5 12H6M18 12h-2.5"/></svg>`,
   index:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4de2a1" stroke-width="2" stroke-linecap="round"><path d="M4 20V13M10 20V8M16 20v-9M21 20V4"/></svg>`,
+  orbit:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b28cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 3 4 7 3 11l-3 3-3-3c-1-4 0-8 3-11z"/><circle cx="12" cy="9" r="1.4"/><path d="M9 14l-3 3 2 .5M15 14l3 3-2 .5M12 17v4"/></svg>`,
   dragon:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff8a3d" stroke-width="2" stroke-linejoin="round"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/></svg>`
 };
 function spark(vals,w,h,cls){
@@ -598,8 +637,8 @@ function newGame(tier,mode){
   let seed=0,label="";
   if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier);R=mulberry32(seed)}else R=Math.random;
   const t0=TIERS[tier];
-  S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0},mons:[],pp:1,over:false,done:false,
-     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0},
+  S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0,orbit:0},mons:[],pp:1,over:false,done:false,
+     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0},
      status:0,ins:false,life:1,sv:1,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
   addMon("card",t0.debts.card);addMon("student",t0.debts.student);addMon("shark",t0.debts.shark);
   S.hist=[netWorth()];S.lastNW=netWorth();
@@ -622,6 +661,7 @@ function raiseCard(){
   const r=S.raise,ov=$("#ov");if(!r)return;
   ov.innerHTML=`<div class="card"><div class="kick">GOOD NEWS</div><h1>You got a <em>raise</em></h1>
     <p class="tg">Your pay rose by <b>${fmt(r.amt)}</b> a month. What do you do with it?</p>
+    <div class="ctag">📖 Hedonic treadmill: new comforts feel normal fast, so spending quietly rises to match pay.</div>
     <div class="opts"><button class="opt" data-raise="life"><b>🎭 Upgrade my lifestyle</b><span>Nicer things. Your monthly spending rises by the full ${fmt(r.amt)}.</span></button>
     <button class="opt" data-raise="save"><b>💰 Save the raise</b><span>An extra ${fmt(r.amt)} goes to your Savings Vault every month.</span></button>
     <button class="opt" data-raise="debt"><b>⚔ Keep life the same</b><span>${fmt(r.amt)} more free cash each month for debt and goals.</span></button></div></div>`;
@@ -698,6 +738,7 @@ function render(){
       <div class="goal"><span>🏦 Emergency fund goal: 3 months of living costs</span><div class="meter"><i style="width:${fp.toFixed(0)}%"></i></div><small>${fmt(fund)} of ${fmt(tgt)}${S.fortress?" · ✓ complete":""}</small></div></div>`})()}
     ${S.temp?`<div class="tempt"><small>EVERYONE AROUND YOU HAS ONE · OPTIONAL</small>
       <div class="tn"><span>${S.temp.name}</span><b>${fmt(S.temp.cost)}</b></div>
+      <div class="ctag">📖 Social proof · Present bias · Opportunity cost</div>
       <div class="tb"><button class="btn" data-tbuy="cash" ${freeCash()<S.temp.cost?"disabled":""}>Buy with cash</button>
       <button class="btn" data-tbuy="card">Put it on credit</button>
       <button class="btn" data-tskip="1">Skip it</button></div></div>`:""}
@@ -708,12 +749,14 @@ function render(){
       const g=(tutOn()&&step===1&&k==="index"&&can>0)?" glow":"";
       return `<div class="asset"><div class="ic">${ICON[k]}</div>
         <div><div class="nm">${a.name}<small>${a.desc}</small></div>
-        <div class="ln">vs inflation: <span class="real ${r>=0?"pos":"neg"}">${r>=0?"+":""}${pct(r)} real</span></div></div>
+        <div class="ln">📖 Rule of 72: doubles in ~${Math.round(72/(a.exp*100))} mo · vs inflation: <span class="real ${r>=0?"pos":"neg"}">${r>=0?"+":""}${pct(r)} real</span></div></div>
         <div class="val" data-num="a${k}" data-v="${v}" data-f="usd">${fmt(v)}</div>
         <div class="ab"><button class="btn${g}" data-inv="${k}" ${can<=0?"disabled":""}>Invest ${fmt(can)}</button>
         <button class="btn" data-sell="${k}" ${sell<=0?"disabled":""}>Sell ${fmt(sell)}</button></div></div>`}).join("")}</div>
     <div class="nw"><span>Net worth</span>${spark(S.hist,120,34,"spark")}<b data-num="nw" data-v="${netWorth()}" data-f="usd" style="color:${netWorth()>=0?"var(--green)":"var(--red)"}">${fmt(netWorth())}</b>
       <small style="grid-column:1/-1;margin-top:2px">cash + invested − debt${S.status?" · status ★ "+S.status:""}</small></div>`;
+  {const d0=S.d0||(S.d0=totalDebt()||1),dp=Math.max(0,Math.min(1,1-totalDebt()/d0)),ap=Math.min(1,totalAssets()/T().star3),esc=Math.round((.7*dp+.3*ap)*100);
+   $("#escape").innerHTML=`<div class="esc"><span class="el">🛰 ESCAPE VELOCITY</span><div class="et"><i style="width:${esc}%"></i><svg class="rk" style="left:calc(${esc}% - 9px)" viewBox="0 0 24 24" width="18" height="18"><path d="M12 2c3 3 4 7 3 11l-3 3-3-3c-1-4 0-8 3-11z" fill="#fff"/><path d="M9 14l-3 3 3 .5M15 14l3 3-3 .5" fill="#ff8a3d"/></svg></div><b>${esc}%</b><small>Debt is gravity. Pay it down and build your fund to break free.</small></div>`}
   const eb=$("#endBtn");
   eb.innerHTML=(S.month===LAST?"END FINAL MONTH ▶":"END MONTH ▶")+`<small>debt grows · cash melts · life happens</small>`;
   eb.classList.toggle("glow",tutOn()&&step===2);
@@ -756,6 +799,7 @@ function assetReturn(k,ev){
   const mk=ev&&ev.mkt;
   if(k==="vault")return .010;
   if(k==="index"){let r=.022+.03*gauss();if(mk==="boom")r+=.04;if(mk==="crash")r-=.10;return Math.max(-.25,r)}
+  if(k==="orbit"){let r=.03+.09*gauss();if(R()<.07)r=-.45;if(mk==="boom")r+=.05;if(mk==="crash")r-=.15;if(mk==="space")r+=.14;if(mk==="fail")r-=.40;return Math.max(-.7,r)}
   let r=.04+.14*gauss();if(R()<.08)r=-.35;if(mk==="boom")r+=.10;if(mk==="crash")r-=.30;return Math.max(-.75,r);
 }
 function endMonth(){
@@ -801,8 +845,10 @@ function endMonth(){
         }
         badHit=true;
       }
-    }else{rep.push([ev.t==="good"?"g":"r",`${ev.name}: ${ev.txt}`,ev.mkt==="boom"?"markets ▲":"markets ▼"]);if(ev.t==="bad")badHit=true}
+    }else{rep.push([ev.t==="good"?"g":"r",`${ev.name}: ${ev.txt}`,ev.mkt==="boom"?"markets ▲":ev.mkt==="space"?"orbit fund ▲":ev.mkt==="fail"?"orbit fund ▼":"markets ▼"]);if(ev.t==="bad")badHit=true}
   }else rep.push(["n","A quiet month","·"]);
+  if(S.assets.orbit>0)S.stats.orbitMonths++;
+  if(badHit)S.stats.shocks++;
   if(badHit){sfx.bad();shake();flash("#ff4d6d");buzz(80)}else flash(gain>0?"#4de2a1":"#ffb347");
   const m0=S.month;
   if(totalDebt()>=T().doom)return finish(false,m0);
@@ -879,7 +925,9 @@ function finish(survived,m){
   const prevXp=+store.get("xp")||0,newAch=earned.filter(x=>!had.includes(x)).length;
   const goal=S.mode==="daily"?dailyGoal():null,goalOk=goal?goal.ok(st,survived,debt):false;
   const dkey="goal_"+new Date().toISOString().slice(0,10),goalNew=goalOk&&!store.get(dkey);
-  const gain=10+(survived?50+stars*40+(debt===0?30:0):0)+newAch*25+(goalNew?40:0);
+  const cdxAll=(store.get("cdx")||"").split(",").filter(Boolean),cdxNow=codexUnlocked(survived,debt),cdxNew=cdxNow.filter(x=>!cdxAll.includes(x));
+  store.set("cdx",[...new Set([...cdxAll,...cdxNow])].join(","));
+  const gain=cdxNew.length*15+10+(survived?50+stars*40+(debt===0?30:0):0)+newAch*25+(goalNew?40:0);
   store.set("xp",String(prevXp+gain));if(goalNew)store.set(dkey,"1");
   const L0=lvlInfo(prevXp),L1=lvlInfo(prevXp+gain);
   const bk="best_"+S.tier,prev=JSON.parse(store.get(bk)||"null"),isBest=survived&&(!prev||nw>prev.nw);
@@ -888,6 +936,7 @@ function finish(survived,m){
   const real=S.tier==="high"?`<p class="note"><b>Real-world note:</b> even in high-income places like the UAE, financial advisers and officials describe status spending, weak budgeting and heavy card use as common reasons households end up in debt. High pay doesn't remove the trap.</p>`:"";
   $("#ov").innerHTML=`<div class="card wide"><div class="kick">${T().label}${S.mode==="daily"?" · DAILY "+S.label:""}</div>
     <h1 style="text-align:center">${title}</h1><p class="tg" style="text-align:center">${sub}</p>
+    <div class="finale"><div class="sf"></div>${!survived?'<div class="hole"></div><div class="cap">PULLED INTO THE DEBT SINGULARITY</div>':debt===0?'<div class="rocket"><svg width="44" height="70" viewBox="0 0 24 38"><path d="M12 1c4 4 6 10 5 17l-5 5-5-5c-1-7 1-13 5-17z" fill="#fff"/><circle cx="12" cy="11" r="2.4" fill="#6ea8ff"/><path d="M7 18l-5 6 5 1zM17 18l5 6-5 1z" fill="#ff4d6d"/><path d="M9 24c0 6 3 12 3 12s3-6 3-12z" fill="#ff8a3d"/></svg></div><div class="cap">ESCAPE VELOCITY REACHED</div>':'<div class="stuck"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M12 2c3 3 4 7 3 11l-3 3-3-3c-1-4 0-8 3-11z" fill="#fff"/><path d="M9 14l-3 3 3 .5M15 14l3 3-3 .5" fill="#ff8a3d"/></svg></div><div class="cap">STUCK IN ORBIT · DEBT STILL PULLING</div>'}</div>
     <div class="stars">${[0,1,2].map(i=>i<stars?`<i style="animation-delay:${i*.25}s">★</i>`:`<span>★</span>`).join("")}</div>
     <div class="big-nw" style="color:${nw>=0?"var(--green)":"var(--red)"}">${fmt(nw)}${isBest?'<span class="newbest">NEW BEST</span>':""}</div>
     <div class="sub-nw">final net worth</div>
@@ -905,6 +954,8 @@ function finish(survived,m){
     ${st.insPaid||st.insHit?`<p class="note"><b>Insurance:</b> you paid <strong>${fmt(st.insPaid)}</strong> in premiums and it covered <strong>${fmt(st.insSaved)}</strong> of bills. ${st.insSaved>=st.insPaid?"This time it paid off. Even when it doesn't, you are buying protection from a crisis, not a profit.":"This time it cost more than it paid back. That is normal: insurance is a price for safety, and it matters most in the one month you can't afford."}</p>`:""}
     <p class="note"><b>Next time:</b> ${tipFor()}</p>
     ${real}
+    <h2>MONEY CODEX · THEORIES YOU PRACTISED <button class="linkb" id="cdxLink">open</button></h2>
+    <div class="chips">${CODEX.map(c=>`<span class="${cdxNow.includes(c.id)?"on":""}${cdxNew.includes(c.id)?" nw":""}">${cdxNow.includes(c.id)?"✓ ":""}${c.n}</span>`).join("")}</div>
     <h2>INSIGHTS UNLOCKED · ${all.length}/${ACH.length}</h2>
     <div class="ach">${ACH.map(a=>`<div class="${earned.includes(a.id)?"on":all.includes(a.id)?"on":""}"><b>${earned.includes(a.id)?"★ ":""}${a.name}</b>${a.desc}</div>`).join("")}</div>
     <p class="note" style="text-align:center"><b>Rich or poor, the debt trap works the same way.</b><br>It catches every income level, but smart decisions get you out.</p>
@@ -972,6 +1023,28 @@ function showTitle(){
   </div>`;
   ov.classList.add("on");ov.scrollTop=0;
 }
+
+const CODEX=[
+ {id:"compound",n:"Compound Interest",w:"Bernoulli · \"the eighth wonder\" idea",d:"Interest is charged on interest, so balances snowball.",ok:(st,v,d)=>v&&d===0},
+ {id:"oppcost",n:"Opportunity Cost",w:"Friedrich von Wieser",d:"Every dollar spent on one thing cannot do another job, like killing a monster.",ok:(st,v,d,I)=>st.seen>0&&st.bought<=1},
+ {id:"fisher",n:"Real vs Nominal Return",w:"Irving Fisher",d:"What matters is your return minus inflation, not the headline number.",ok:(st)=>st.inv>st.infl},
+ {id:"mpt",n:"Diversification",w:"Harry Markowitz · Modern Portfolio Theory",d:"Do not put all your eggs in one basket. Mixing assets cuts risk.",ok:(st)=>st.divMonths>=3},
+ {id:"behav",n:"Behavioural Economics",w:"Kahneman & Tversky · Prospect Theory",d:"Social proof and present bias make bad purchases feel normal.",ok:(st)=>st.seen>0&&st.bought===0},
+ {id:"smooth",n:"Consumption Smoothing",w:"Modigliani · Friedman",d:"Save in good months so shocks do not become debt.",ok:(st,v,d,I)=>st.fundUsed>0||(st.saveMonths>=6&&st.emerg===0)},
+ {id:"treadmill",n:"Hedonic Treadmill",w:"Brickman & Campbell",d:"New comforts become normal, so spending rises with pay (lifestyle creep).",ok:(st)=>st.raises>0&&st.raiseLife===0},
+ {id:"r72",n:"Rule of 72",w:"A classic compounding shortcut",d:"72 ÷ rate % gives the months it takes to double. It works for debt too.",ok:(st)=>st.inv>0},
+ {id:"swan",n:"Black Swan Risk",w:"Nassim Taleb",d:"Rare shocks hit hardest when you have no buffer or protection.",ok:(st,v)=>v&&st.shocks>=2&&st.emerg===0},
+ {id:"rational",n:"Rational Choice",w:"Classical economics · debt avalanche",d:"Pay the most expensive debt first. It is the cheapest path to freedom.",ok:(st)=>st.pays>=3&&st.payOK/st.pays>=.7}
+];
+function codexUnlocked(survived,debt){return CODEX.filter(c=>c.ok(S.stats,survived,debt)).map(c=>c.id)}
+function openCodex(){
+  const had=(store.get("cdx")||"").split(",").filter(Boolean),o=$("#ov2");
+  o.innerHTML=`<div class="card help"><div class="kick">MONEY CODEX</div><h1>Ten ideas that <em>run money</em></h1>
+    <p class="tg">Real economic theories live inside this dungeon. Practise them in play to unlock each one (${had.length}/${CODEX.length}).</p>
+    <div class="cdx">${CODEX.map(c=>`<div class="${had.includes(c.id)?"on":""}"><b>${had.includes(c.id)?"✓ ":"◇ "}${c.n}</b><em>${c.w}</em><br>${c.d}</div>`).join("")}</div>
+    <p class="note">Simplified for play. Not financial advice.</p><button class="go" id="closeHelp">CLOSE</button></div>`;
+  o.classList.add("on");o.scrollTop=0;$("#closeHelp").onclick=closeHelp;
+}
 function openHelp(){
   const o=$("#ov2");
   o.innerHTML=`<div class="card help"><div class="kick">HOW TO PLAY</div><h1>Survive <em>12 months</em></h1>
@@ -1014,6 +1087,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.mode){MODE=t.dataset.mode;store.set("mode",MODE);showTitle()}
   else if(t.dataset.tier){$("#ov").classList.remove("on");newGame(t.dataset.tier,MODE);render();beep(440,.1,"triangle");if(!store.get("tut"))say("Tutorial: tap PAY on the fastest-growing debt.")}
   else if(t.id==="helpLink"||t.id==="help")openHelp();
+  else if(t.id==="codex"||t.id==="cdxLink")openCodex();
 });
 $("#endBtn").onclick=endMonth;
 $("#mute").onclick=()=>{aInit();setSound(!A.on)};

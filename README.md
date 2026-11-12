@@ -8,6 +8,9 @@ Built for **Zoud GameLab 2026** (theme: *Make FinLit Fun*).
 
 ![Title screen](docs/screens/desk-1-title.png)
 ![The dungeon hall](docs/screens/desk-2-game.png)
+![Escape Velocity and the Orbit Fund](docs/screens/desk-space.png)
+![Money Codex](docs/screens/desk-codex.png)
+![Rocket finale](docs/screens/desk-finale.png)
 ![Budget, savings and emergency fund](docs/screens/desk-budget.png)
 
 ## Play
@@ -30,7 +33,9 @@ You have 12 months. Each month you set a budget, put your free cash to work, the
 | "Pay yourself first": 0 / 10 / 20% of pay moves to your Savings Vault automatically | Saving as a habit, not a leftover |
 | A 3-month Emergency Fund goal. Savings automatically cover surprise bills; with none, a bill becomes a 15%-a-month Emergency Imp | Emergency funds, and the real cost of having no buffer |
 | Two raises (months 4 and 8): upgrade your lifestyle, save it, or keep life the same | Lifestyle creep |
-| Three assets: steady, mixed, wild | Risk vs. return and diversification |
+| Four assets: steady, mixed, wild, and the space-tech **Orbit Fund** (launch windows surge, launch failures crash) | Risk vs. return and diversification |
+| **Escape Velocity** meter: debt is gravity; paying it down and building a fund lifts your rocket. Finale: rocket launch, stuck in orbit, or pulled into the debt singularity | Net-worth thinking, shown as a physical metaphor |
+| **Money Codex**: ten real economic ideas (compound interest, opportunity cost, Fisher real returns, Markowitz diversification, Kahneman behavioural bias, consumption smoothing, hedonic treadmill, Rule of 72, Taleb black swans, rational choice) tagged in play and unlocked by how you play | Theory made practical |
 | Optional "everyone has one" purchases that feel reasonable | Status spending, and how credit makes it worse |
 | "Income gap" events halve your next paycheck | The risk of a single income |
 | Optional Insurance Shield: a monthly premium (10% of pay) covers 80% of car, medical and phone bills, but not rent rises or parties | Insurance: a small certain cost against a big uncertain one |
