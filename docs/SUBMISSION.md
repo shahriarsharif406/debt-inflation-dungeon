@@ -15,7 +15,7 @@ Debt monsters grow, cash melts, a rocket to escape. Eleven real economic ideas i
 | Educational impact (15) | Report card from your own choices, Money Codex, "next time" tip, optional discussion via the Daily Dungeon |
 | Creativity (15) | Debt monsters with inflation, space-tech escape-velocity metaphor, theory-driven Codex |
 | Development and commercial potential (20) | docs/BUDGET.md: $48,000 plan, 6 phases, revenue paths, risks |
-| Localisation bonus (5) | Optional Gulf pack with region-specific events and temptations, not a translation (Arabic and right-to-left are budgeted in docs/BUDGET.md) |
+| Localisation bonus (5) | Optional Gulf pack with region-specific events and temptations, plus a full Arabic interface with right-to-left layout (button on the title screen). Native-speaker review of the Arabic is budgeted in docs/BUDGET.md |
 
 ## Submission checklist
 - [ ] Upload `debt-inflation-dungeon-itch.zip`, tick "This file will be played in the browser", size 1280×800 or fullscreen

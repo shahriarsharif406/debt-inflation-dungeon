@@ -50,6 +50,9 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 | Escape Velocity | 70% debt paid down + 30% assets progress. Debt-free ends in a rocket launch; debt remaining shows "stuck in orbit"; losing shows a black hole. | Net worth as escape from gravity |
 | Money Codex | Eleven economic theories (Becker human capital, Bernoulli compounding, Wieser opportunity cost, Fisher, Markowitz, Kahneman & Tversky, Modigliani/Friedman, Brickman & Campbell, Rule of 72, Taleb, classical rational choice). Tagged on temptations, raises and assets; unlocked by play; +15 XP each. | Economics theory in practice |
 | Skill course | Months 2-7 offer: pay cash or a 1.5%/mo Skill Loan for +12% pay. Early it repays itself; late it does not. | Good vs bad debt, human capital (Becker) |
+| Arabic | Full Arabic interface with right-to-left layout, chosen with a button on the title screen and remembered. Numbers and amounts stay readable inside Arabic text. | Access for Arabic-speaking players |
+| What could have been | End-screen note estimating avoidable interest (payments that missed the fastest-growing debt), idle-cash inflation loss and status purchases | Learning from your own choices |
+| Simplified-model note | End screen and help state that numbers are simplified and not financial advice | Honesty about limits |
 | Gulf pack | Optional region toggle adding UAE-flavoured events (remittance with fees, pay-in-4, giving season, Eid hosting, hidden exchange margin) and temptations. Daily seed includes the region. | Regional adaptation |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 

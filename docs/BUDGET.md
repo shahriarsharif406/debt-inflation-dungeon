@@ -6,14 +6,14 @@
 
 ## 1. What exists today
 
-The jam build is complete and playable in a browser: 12-month game, 3 income levels, 4 assets including a space-tech Orbit Fund, budgeting and savings systems, insurance, a Daily Dungeon, XP and levels, a 10-theory Money Codex, and a report card. Balance is checked by thousands of automated games. **The funding pays for expansion, validation and reach, not for a first version.**
+The jam build is complete and playable in a browser: 12-month game, 3 income levels, 4 assets including a space-tech Orbit Fund, budgeting and savings systems, insurance, a Daily Dungeon, XP and levels, an 11-theory Money Codex, a "what could have been" report card, a Gulf region pack, and an Arabic interface with right-to-left layout. Balance is checked by thousands of automated games. **The funding pays for expansion, validation and reach, not for a first version.**
 
 ## 2. Budget
 
 | # | Category | What it pays for | Amount | Share |
 |---|---|---|---|---|
 | 1 | Lead development | Teacher mode and class codes, multi-year careers, debt consolidation and minimum-payment mechanics, save and sync, analytics without personal data | $17,000 | 35% |
-| 2 | Localisation and regional adaptation | Arabic with right-to-left layout, Spanish, Bengali, Hindi; a native-speaker finance review of each region pack (UAE/Gulf first: remittances, zakat and giving, buy-now-pay-later) | $7,500 | 15.6% |
+| 2 | Localisation and regional adaptation | Native-speaker review and polish of the Arabic already in the jam build, then Spanish, Bengali, Hindi; a native-speaker finance review of each region pack (UAE/Gulf first: remittances, zakat and giving, buy-now-pay-later) | $7,500 | 15.6% |
 | 3 | Art and animation | Full monster set, floor backgrounds, knight and Orbit Fund art, rocket and singularity finale, UI polish | $6,000 | 12.5% |
 | 4 | Music and sound | Original loops for each floor, 40 effects, mix for headphones and phone speakers | $3,500 | 7.3% |
 | 5 | Playtesting and learning evaluation | 60 players in 3 rounds, short before and after questions, independent summary report | $5,500 | 11.5% |
@@ -29,7 +29,7 @@ The jam build is complete and playable in a browser: 12-month game, 3 income lev
 | Phase | Months | Goal | Output |
 |---|---|---|---|
 | 1. Teach | 1 | Teacher mode, class codes, discussion prompts for each Codex idea | Version 1.1 and a classroom guide |
-| 2. Reach | 2-3 | Arabic and one more language, regional packs, accessibility audit | Version 1.2 in 3 languages |
+| 2. Reach | 2-3 | Arabic review and one more language, regional packs, accessibility audit | Version 1.2 in 3 languages |
 | 3. Depth | 3-4 | Multi-year career, debt consolidation, minimum-payment trap, more floors | Version 1.3 |
 | 4. Prove | 4-5 | Three playtest rounds with 60 players, before and after questions | Short evaluation report |
 | 5. Release | 6 | Installable web app, trailer, store pages, public launch | Version 2.0 public release |

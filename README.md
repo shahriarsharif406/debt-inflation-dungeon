@@ -39,6 +39,8 @@ You have 12 months. Each month you set a budget, put your free cash to work, the
 | Optional "everyone has one" purchases that feel reasonable | Status spending, and how credit makes it worse |
 | "Income gap" events halve your next paycheck | The risk of a single income |
 | **Skill course** (months 2-7): borrow cheaply (1.5%/mo) or pay cash to raise pay 12%; taken early it pays back, taken late it does not | Good debt vs bad debt, human capital |
+| **Arabic with right-to-left layout** (language button on the title screen) | Authentic regional access, not only a translation |
+| **"What could have been"** on the end screen | Shows the interest and inflation your choices cost |
 | **Gulf pack** (title screen toggle): remittances with hidden fees, pay-in-4 instalments, giving season, Eid hosting | Regional money life, hidden costs |
 | Optional Insurance Shield: a monthly premium (10% of pay) covers 80% of car, medical and phone bills, but not rent rises or parties | Insurance: a small certain cost against a big uncertain one |
 

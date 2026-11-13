@@ -285,7 +285,7 @@ h1 em{background:linear-gradient(90deg,#ffe08a,#ffb347);-webkit-background-clip:
 .help dd{margin:0 0 4px;font-size:13.5px;color:#cfc8f5;line-height:1.45}
 .help ol{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.55;color:#e0dbf8}
 kbd{font:700 12px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-radius:5px;background:#0d0a1a;border:1px solid var(--line)}
-.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media(max-width:820px){
   main{grid-template-columns:1fr}
   #forecast{grid-template-columns:1fr 1fr}
@@ -358,6 +358,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .tier,.opt,.tile{backdrop-filter:blur(4px)}
 @media (prefers-reduced-motion:reduce){.hero h1,.card h1{animation:none;background-position:0 0}}
 .card.hero{background:linear-gradient(180deg,#1d1a3ae6,#0d0a1cf2) padding-box,linear-gradient(140deg,#ffcf5cbb,#6ea8ff66 35%,#b28cffbb 65%,#ff4d6dbb) border-box;border:1.5px solid transparent;box-shadow:0 30px 100px #000c,0 0 70px #6e4cff33}
+#langBtn{display:none;position:fixed;top:10px;inset-inline-start:10px;z-index:60;background:#0b1126cc;color:#e8eeff;border:1px solid #ffffff30;border-radius:999px;padding:6px 14px;font:600 13px Inter,Segoe UI,sans-serif;cursor:pointer;backdrop-filter:blur(6px)}
+body:has(#ov.on .hero) #langBtn{display:block}
+#langBtn:hover,#langBtn:focus-visible{border-color:var(--gold,#ffcf5c);outline:none}
+html[dir=rtl] body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;letter-spacing:0}
+html[dir=rtl] *{letter-spacing:0!important}
+html[dir=rtl] b,html[dir=rtl] strong,html[dir=rtl] .n,html[dir=rtl] [data-num]{unicode-bidi:isolate}
 </style>
 </head>
 <body data-floor="0">
@@ -667,7 +673,7 @@ function newGame(tier,mode){
   if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier+(REGION==="gulf"?"|gulf":""));R=mulberry32(seed)}else R=Math.random;
   const t0=TIERS[tier];
   S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0,orbit:0},mons:[],pp:1,over:false,done:false,
-     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0,skill:0,skillMonth:0,skillLoan:0},
+     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0,skill:0,skillMonth:0,skillLoan:0,waste:0,idle:0},
      status:0,ins:false,life:1,sv:1,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
   addMon("card",t0.debts.card);addMon("student",t0.debts.student);addMon("shark",t0.debts.shark);
   S.hist=[netWorth()];S.lastNW=netWorth();
@@ -815,7 +821,7 @@ function pay(id,all){
   const m=S.mons.find(x=>x.id===id);if(!m)return;
   const amt=Math.min(freeCash(),m.debt,all?Infinity:T().chunk);if(amt<=0)return;
   const maxRate=Math.max(...S.mons.map(x=>x.rate));
-  S.stats.pays++;if(m.rate>=maxRate-1e-9)S.stats.payOK++;
+  S.stats.pays++;if(m.rate>=maxRate-1e-9)S.stats.payOK++;else S.stats.waste+=Math.round(amt*(maxRate-m.rate)*Math.max(1,13-S.month));
   S.cash-=amt;m.debt-=amt;S.stats.acts++;
   const dead=m.debt<=0;if(dead)S.mons=S.mons.filter(x=>x!==m);
   const el=document.getElementById("m"+id);
@@ -998,6 +1004,9 @@ function finish(survived,m){
       <div class="tile"><b>PRESSURE</b>${st.seen?`You gave in to <strong>${st.bought}</strong> of <strong>${st.seen}</strong> status temptations${st.onCard?` (${st.onCard} on credit)`:""}.`:"No status temptations showed up."} ${st.gap?`Income gaps hit <strong>${st.gap}×</strong>.`:""}</div>
     </div>
     ${st.insPaid||st.insHit?`<p class="note"><b>Insurance:</b> you paid <strong>${fmt(st.insPaid)}</strong> in premiums and it covered <strong>${fmt(st.insSaved)}</strong> of bills. ${st.insSaved>=st.insPaid?"This time it paid off. Even when it doesn't, you are buying protection from a crisis, not a profit.":"This time it cost more than it paid back. That is normal: insurance is a price for safety, and it matters most in the one month you can't afford."}</p>`:""}
+    <h2>WHAT COULD HAVE BEEN</h2>
+    <p class="note">${(()=>{const a=[];if(st.waste>=20)a.push(`Paying the fastest-growing debt first would have saved you about <strong>${fmt(st.waste)}</strong> in interest.`);if(st.infl>=50)a.push(`Putting idle cash to work could have recovered part of the <strong>${fmt(st.infl)}</strong> inflation ate.`);if(st.bought>0)a.push(`Skipping the ${st.bought} status ${st.bought>1?"purchases":"purchase"} would have kept that money working for you.`);return a.length?a.join(" "):"You made the main choices well. Little was left on the table this run."})()}</p>
+    <p class="note" style="opacity:.75"><b>Simplified model, not financial advice.</b> Rates, prices and events are simplified to teach ideas. Real products and laws differ, so check your own situation before acting.</p>
     <p class="note"><b>Next time:</b> ${tipFor()}</p>
     ${real}
     <h2>MONEY CODEX · THEORIES YOU PRACTISED <button class="linkb" id="cdxLink">open</button></h2>
@@ -1115,6 +1124,7 @@ function openHelp(){
     <dt>Emergency fund</dt><dd>Cash set aside for surprises so one bad month does not become debt.</dd>
     <dt>Insurance</dt><dd>You pay a small, certain cost so a big, uncertain one cannot wreck you. It will not cover everything (a party or a rent rise is on you).</dd>
     <dt>Diversification</dt><dd>Spreading money across assets so one crash cannot sink you.</dd></dl>
+    <p class="note"><b>Simplified model, not financial advice.</b> This game teaches ideas with simplified numbers. Real products, rates and laws differ.</p>
     <p class="note">Shortcuts: <kbd>1</kbd>–<kbd>9</kbd> pay a monster (<kbd>Shift</kbd> = pay all) · <kbd>I</kbd> insurance · <kbd>Enter</kbd> or <kbd>E</kbd> end month · <kbd>?</kbd> this help</p>
     <button class="go" id="closeHelp">GOT IT</button></div>`;
   o.classList.add("on");o.scrollTop=0;$("#closeHelp").onclick=closeHelp;try{$("#closeHelp").focus({preventScroll:true})}catch(e){}
@@ -1160,6 +1170,191 @@ document.addEventListener("keydown",e=>{
 setSound(A.on);
 window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,setBud,raisePick,budget,freeCash,takeOpp,setRegion:r=>{REGION=r},seed:n=>{R=mulberry32(n)}};
 bgInit();fxInit();newGame("mid",MODE);render();showTitle();
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var LANG="en";try{LANG=localStorage.getItem("lang")||"en"}catch(e){}
+var btn=document.createElement("button");btn.id="langBtn";btn.type="button";
+btn.textContent=LANG==="ar"?"English":"العربية";btn.setAttribute("aria-label",LANG==="ar"?"Switch to English":"التبديل إلى العربية");
+btn.onclick=function(){try{localStorage.setItem("lang",LANG==="ar"?"en":"ar")}catch(e){}location.reload()};
+document.body.appendChild(btn);
+if(LANG!=="ar")return;
+document.documentElement.lang="ar";document.documentElement.dir="rtl";
+/* whole-text templates; # stands for a number/amount token */
+var T={
+"of # · Inflation":"من # · التضخم","Month":"الشهر","MONTH # OF #":"الشهر # من #","CONTINUE TO MONTH # ▶":"◀ تابع إلى الشهر #",
+"Month # report. Net worth #":"تقرير الشهر #. صافي الثروة #","FLOOR # · THE VAULTS":"الطابق # · الأقبية","FLOOR # · THE ABYSS":"الطابق # · الهاوية",
+"next month: +#":"الشهر القادم: +#","PAY #":"سدّد #","PAY ALL #":"سدّد الكل #","Invest #":"استثمر #","Sell #":"بِع #",
+"▲ # / month":"▲ # / شهر","▲ #/month":"▲ #/شهر","▼ #/month":"▼ #/شهر","#/month":"#/شهر",
+"# / month":"# / شهر","# of #":"# من #","$# of $#":"# من #","# / month":"# / شهر","#×":"#×","Costs #/month · covers # of car, medical and phone bills":"يكلّف #/شهر · يغطي # من فواتير السيارة والعلاج والهاتف",
+"#/mo · steady · your emergency fund":"#/شهر · ثابت · صندوق طوارئك","≈ #/mo · some swings":"≈ #/شهر · بعض التقلّبات","≈ #/mo · wild swings":"≈ #/شهر · تقلّبات حادة","≈ #/mo · launches can fail 🚀":"≈ #/شهر · قد تفشل الإطلاقات 🚀",
+"📖 Rule of #: doubles in ~# mo · vs inflation:":"📖 قاعدة #: يتضاعف خلال ~# شهرًا · مقابل التضخم:","# real":"# حقيقي",
+"Tutorial: tap PAY on the fastest-growing debt.":"تعليم: اضغط «سدّد» على الدين الأسرع نموًا.",
+"▼ Inflation # ate your cash":"▼ التضخم # أكل من نقودك","Inflation rises to #/month. An Overdraft Vampire appears (#).":"يرتفع التضخم إلى #/شهر. يظهر مصاص السحب على المكشوف (#).","Inflation rises to #/month. A Medical Hydra appears (#).":"يرتفع التضخم إلى #/شهر. تظهر هيدرا الفواتير الطبية (#).",
+"Your debt hit # in month #.":"بلغ دينك # في الشهر #.","Your savings and cash cleared the last # of debt. Your money is yours again.":"سدّدت مدخراتك ونقودك آخر # من الدين. مالك عاد إليك.","You still owe #. The monsters are still growing.":"ما زلت مدينًا بمبلغ #. والوحوش ما زالت تكبر.",
+"# / # XP to next level":"# / # نقطة خبرة للمستوى التالي","+# XP":"+# نقطة خبرة","Level # ·":"المستوى # ·",
+"Debt charged #   ·   Inflation ate #":"كلفة الدين #   ·   التضخم أكل #",
+"Pay # toward":"سدّد # إلى","Pay all # toward":"سدّد كل # إلى","Month # of #":"الشهر # من #",
+"$ at":"","Month #":"الشهر #","cash":"نقد","Game over. Final net worth #. # stars.":"انتهت اللعبة. صافي الثروة النهائي #. # نجوم.",
+"Shield ON. # a month, paid when the month ends.":"الدرع يعمل. # في الشهر، تُدفع عند نهاية الشهر.",
+"MONTH":"الشهر"
+};
+/* substring terms, longest first at runtime */
+var S={
+"GOOD NEWS":"أخبار سارة","You got a raise":"حصلتَ على علاوة","Your pay rose by":"ارتفع راتبك بمقدار","a month. What do you do with it?":"في الشهر. ماذا ستفعل بها؟",
+"📖 Hedonic treadmill: new comforts feel normal fast, so spending quietly rises to match pay.":"📖 المطحنة المتعية: الرفاهيات الجديدة تصبح عادية بسرعة، فيرتفع الإنفاق بهدوء ليطابق الراتب.",
+"🎭 Upgrade my lifestyle":"🎭 رفع نمط حياتي","Nicer things. Your monthly spending rises by the full":"أشياء أجمل. ينفق شهريًا أكثر بكامل","💰 Save the raise":"💰 ادّخار العلاوة","An extra":"مبلغ إضافي","goes to your Savings Vault every month.":"يذهب إلى خزنة مدخراتك كل شهر.",
+"⚔ Keep life the same":"⚔ إبقاء حياتي كما هي","more free cash each month for debt and goals.":"نقد حر إضافي كل شهر للدين والأهداف.","DEFEATED!":"هُزم!","Defeated":"هُزم",
+"Debt will grow":"سينمو الدين بمقدار","next month.":"الشهر القادم.","defeated.":"هُزم.","You got a":"حصلتَ على","raise":"علاوة","next pay":"الراتب القادم","Reduced paycheck arrives":"وصل راتب مخفّض","debt":"دين","of":"من","savings":"مدخرات","ALL DEBT SLAIN":"قُتلت كل الديون","now guard your cash from inflation":"احمِ نقدك الآن من التضخم","No debt left. Your money is yours again.":"لا دين متبقٍّ. مالك عاد إليك.",
+"GAME OVER":"انتهت اللعبة","LEVEL":"المستوى",
+"What happened":"ماذا حدث","What":"ماذا","happened":"حدث","savings did their job":"المدخرات أدّت مهمتها","You had no safety net!":"لم يكن لديك شبكة أمان!","Medical bills":"فواتير طبية","Medical bill":"فاتورة طبية","Overdraft & fees":"سحب على المكشوف ورسوم",
+"· status ★":"· المكانة ★","status ★":"المكانة ★","STUCK IN ORBIT":"عالق في المدار","STILL PULLING":"ما زال يسحبك","months of living costs.":"أشهر من تكاليف المعيشة.","Nicer things. Your monthly spending rises by the full":"أشياء أجمل. ينفق شهريًا أكثر بكامل","Level":"المستوى",
+"Rookie":"مبتدئ","Saver":"مدّخر","Budgeter":"مخطّط ميزانية","Debt Slayer":"قاتل الديون","Inflation Tamer":"مروّض التضخم","Dungeon Master":"سيّد الزنزانة",
+"Debt-Free":"بلا ديون","Safety Net":"شبكة أمان","Never needed emergency borrowing":"لم تحتج اقتراض الطوارئ","Money Grows":"المال ينمو","Not One Basket":"لا سلة واحدة","Hold 2+ asset types for 3 months":"احتفظ بنوعين أو أكثر من الأصول لـ3 أشهر","Fortress":"حصن","Shielded":"محميّ","Earn 3 stars":"احصل على 3 نجوم","Hold":"احتفظ","asset types for":"أنواع أصول لمدة","months":"أشهر",
+"Bernoulli · \"the eighth wonder\" idea":"برنولي · فكرة «العجيبة الثامنة»","Modigliani · Friedman":"موديلياني · فريدمان","Brickman & Campbell":"بريكمان وكامبل","Avalanche Mind":"عقل الانهيار الجليدي",
+"An extra":"مبلغ إضافي","goes to your":"يذهب إلى","every month.":"كل شهر.","more free cash each month for debt and goals.":"نقد حر إضافي كل شهر للدين والأهداف.",
+"Medical":"طبي","defeated.":"هُزم.","You":"أنت","Free play":"لعب حر",
+"Insurance Shield":"درع التأمين","✓ done":"✓ تم","· ✓ complete":"· ✓ مكتمل","complete":"مكتمل","Tutorial":"تعليم","status purchases":"مشتريات المظهر","a month.":"في الشهر.","Rich or poor":"غنيًا أو فقيرًا",
+"A FINLIT ROGUELITE":"لعبة روجلايت للثقافة المالية","Debt grows. Cash melts.":"الدين ينمو. والنقد يذوب.","Your move.":"دورك الآن.","DEBT":"الدين","INFLATION":"التضخم","DUNGEON":"الزنزانة",
+"Monsters grow bigger every month":"الوحوش تكبر كل شهر","Your money buys less every month":"مالك يشتري أقل كل شهر","Pay, invest or wait. Then end the month.":"سدّد أو استثمر أو انتظر. ثم أنهِ الشهر.",
+"▲ DEBT":"▲ الدين","▼ CASH":"▼ النقد","⚔ YOU":"⚔ أنت",
+"Free play":"لعب حر","random events":"أحداث عشوائية","Daily Dungeon":"زنزانة اليوم","same run for everyone today":"الجولة نفسها للجميع اليوم",
+"Global":"عالمي","universal money life":"الحياة المالية للجميع","Gulf pack · UAE":"حزمة الخليج · الإمارات","remittances, pay-in-4, giving":"التحويلات، الدفع على 4 دفعات، العطاء",
+"no run yet":"لا جولات بعد","How to play":"طريقة اللعب","Made for Zoud GameLab 2026 · a FutureTech.ai game":"صُنعت من أجل Zoud GameLab 2026 · لعبة من FutureTech.ai",
+"This game needs JavaScript. Please enable it to play.":"تحتاج هذه اللعبة إلى JavaScript. يُرجى تفعيله للعب.",
+"LOW INCOME":"دخل منخفض","MIDDLE INCOME":"دخل متوسط","HIGH INCOME":"دخل مرتفع","Small paycheck. One surprise bill can sink you.":"راتب صغير. فاتورة مفاجئة واحدة قد تُغرقك.","The classic dungeon.":"الزنزانة الكلاسيكية.","Big paycheck. Bigger temptations. Same trap.":"راتب كبير. إغراءات أكبر. الفخ نفسه.",
+"/ month":"/ شهر","Money Codex":"موسوعة المال","Toggle sound":"تشغيل/إيقاف الصوت","Escape velocity":"سرعة الإفلات","Game mode":"نمط اللعب","Region pack":"حزمة المنطقة",
+"♪ On":"♪ يعمل","♪ Off":"♪ متوقف","FLOOR":"الطابق","Inflation":"التضخم","/month":"/شهر",
+"The Cellar":"القبو","Prices creep up slowly. Learn the rules.":"الأسعار ترتفع ببطء. تعلّم القواعد.","The Vaults":"الأقبية","Inflation is faster now. Idle cash melts quicker.":"التضخم أسرع الآن. النقد الخامل يذوب أسرع.","The Abyss":"الهاوية","Prices are racing. Cash is a melting ice cube.":"الأسعار تتسابق. النقد قطعة ثلج تذوب.",
+"🛰 ESCAPE VELOCITY":"🛰 سرعة الإفلات","Debt is gravity. Pay it down and build your fund to break free.":"الدين جاذبية. سدّده وابنِ صندوقك لتتحرر منها.",
+"▲ DEBT GROWS BY":"▲ الدين ينمو بمقدار","if you end the month now":"إذا أنهيت الشهر الآن","▼ CASH MELTS BY":"▼ النقد يذوب بمقدار","SAFETY NET":"شبكة الأمان",
+"A surprise bill would hurt":"فاتورة مفاجئة ستؤلمك","Covers one surprise bill":"تغطي فاتورة مفاجئة واحدة","Comfortable buffer":"هامش مريح",
+"Debt monsters grow every month. Hit the fastest one: tap":"وحوش الدين تكبر كل شهر. اضرب الأسرع: اضغط","PAY":"سدّد",
+"Cash loses value every month. Put some into an asset, or skip. Then continue.":"النقد يفقد قيمته كل شهر. ضع بعضه في أصل، أو تخطَّ. ثم تابع.",
+"Happy with your move?":"راضٍ عن حركتك؟","END MONTH":"أنهِ الشهر","and watch what happens.":"وشاهد ما يحدث.",
+"DEBT MONSTERS":"وحوش الدين","▲ they GROW every month":"▲ تنمو كل شهر","Credit Card Wyrm":"تنين البطاقة الائتمانية","Credit card debt":"دين البطاقة الائتمانية",
+"Student Golem":"عملاق القرض الدراسي","Student loan":"قرض دراسي","Loan Shark Imp":"عفريت قرض القرش","Payday loan":"قرض يوم الراتب","▲ FASTEST":"▲ الأسرع","Overdraft Vampire":"مصاص السحب على المكشوف","Medical Hydra":"هيدرا الفواتير الطبية",
+"Skill Loan Sprite":"جنّي قرض المهارات","Debt used to earn more":"دين لزيادة الدخل","Emergency Imp":"عفريت الطوارئ","Emergency borrowing":"اقتراض الطوارئ","Overdraft":"سحب على المكشوف",
+"All debt is gone.":"اختفى كل الدين.","Now keep your money safe from inflation.":"الآن احمِ مالك من التضخم.","nothing to melt":"لا شيء ليذوب","PAY ALL":"سدّد الكل","next month:":"الشهر القادم:",
+"YOUR WALLET":"محفظتك","▼ it SHRINKS every month":"▼ تتقلّص كل شهر","Cash on hand":"النقد المتوفر","buying power of":"القوة الشرائية لـ","your first $1":"أول 1$ لديك",
+"MONTHLY BUDGET":"الميزانية الشهرية","paid at month end":"تُدفع نهاية الشهر","🏠 Needs":"🏠 الاحتياجات","rent · food · travel":"إيجار · طعام · تنقّل","🎭 Lifestyle":"🎭 نمط الحياة","fun · eating out · extras":"ترفيه · مطاعم · كماليات",
+"Frugal":"مقتصد","Comfort":"مريح","Lavish":"مُسرف","💰 Pay yourself first":"💰 ادّخر أولًا","auto-saved to your Savings Vault":"تُدّخر تلقائيًا في خزنة المدخرات","Free to spend on debt and goals":"متاح للدين والأهداف",
+"🏦 Emergency fund goal: 3 months of living costs":"🏦 هدف صندوق الطوارئ: 3 أشهر من تكاليف المعيشة","Insurance Shield":"درع التأمين","Turn on":"تشغيل","Turn off":"إيقاف",
+"Savings Vault":"خزنة المدخرات","Index Totem":"طوطم المؤشر","Dragon Stock":"سهم التنين","Orbit Fund":"صندوق المدار","Net worth":"صافي الثروة","cash + invested − debt":"النقد + المستثمر − الدين",
+"END FINAL MONTH ▶":"أنهِ الشهر الأخير ▶","END MONTH ▶":"أنهِ الشهر ▶","debt grows · cash melts · life happens":"الدين ينمو · النقد يذوب · والحياة تحدث",
+"▲ Debt monsters grew":"▲ كبرت وحوش الدين","🛡 Insurance premium":"🛡 قسط التأمين","💰 Paid yourself first → Savings Vault":"💰 ادّخرت أولًا ← خزنة المدخرات",
+"🏠 Living costs (needs + lifestyle)":"🏠 تكاليف المعيشة (الاحتياجات + نمط الحياة)","🏦 Emergency fund covered the bills":"🏦 صندوق الطوارئ غطّى الفواتير","Not enough cash for living costs: put on the credit card":"لا يكفي النقد للمعيشة: سُجّل على البطاقة الائتمانية",
+"▼ Investments fell":"▼ هبطت الاستثمارات","▲ Investments grew":"▲ نمت الاستثمارات","🏦 Emergency fund complete: 3 months of living costs saved":"🏦 اكتمل صندوق الطوارئ: ادّخرت 3 أشهر من المعيشة","🛡 Shield covered 80% of the bill":"🛡 الدرع غطّى 80% من الفاتورة",
+"🏦 Emergency fund covered":"🏦 صندوق الطوارئ غطّى","of the bill":"من الفاتورة","An Emergency Imp appeared (15%/month)":"ظهر عفريت الطوارئ (15%/شهر)","orbit fund ▲":"صندوق المدار ▲","orbit fund ▼":"صندوق المدار ▼","markets ▲":"الأسواق ▲","markets ▼":"الأسواق ▼",
+"A quiet month":"شهر هادئ","🎉 You got a raise!":"🎉 حصلت على علاوة!","Paycheck arrives":"وصل الراتب","Your debt hit":"بلغ دينك","in month":"في الشهر",
+"Car breaks down":"تعطّلت السيارة","Repair bill":"فاتورة إصلاح","Unexpected clinic visit":"زيارة عيادة غير متوقعة","Rent goes up":"ارتفع الإيجار","Extra housing cost":"تكلفة سكن إضافية","Phone dies":"تعطّل الهاتف","Replacement needed":"يلزم استبداله",
+"Surprise bonus":"مكافأة مفاجئة","Work bonus":"مكافأة عمل","Side gig":"عمل جانبي","Weekend job pays":"عمل نهاية الأسبوع يدفع","Market boom":"ازدهار السوق","Market crash":"انهيار السوق","Investments jump":"الاستثمارات تقفز","Investments tumble":"الاستثمارات تنهار",
+"Launch window":"نافذة إطلاق","A space mission succeeds, orbit stocks surge":"نجحت مهمة فضائية وارتفعت أسهم المدار","Launch failure":"فشل إطلاق","A rocket explodes on the pad":"انفجر صاروخ على منصة الإطلاق",
+"Big celebration":"احتفال كبير","Family event everyone expects you to fund":"مناسبة عائلية يتوقع الجميع أن تموّلها","Income gap":"فجوة دخل","One paycheck covers everything, and next month's is half":"راتب واحد يغطي كل شيء، وراتب الشهر القادم نصفه",
+"Money sent home":"مال مُرسل للأهل","Family back home needs support. A fee-heavy transfer takes extra":"الأهل في الوطن يحتاجون دعمًا. تحويل مرتفع الرسوم يأخذ مبلغًا إضافيًا","Pay-in-4 instalments land":"استحقت أقساط الدفع على 4","Four small payments you forgot about all fall due":"أربع دفعات صغيرة نسيتها استحقت كلها",
+"Hidden exchange margin":"هامش صرف مخفي","A ZERO FEE transfer hid its cost in the exchange rate":"تحويل «بلا رسوم» أخفى تكلفته في سعر الصرف","Eid gifts and hosting":"هدايا العيد والضيافة","Giving season":"موسم العطاء","Annual charity or zakat. Planned savings make this painless":"صدقة أو زكاة سنوية. الادخار المخطط يجعلها سهلة",
+"Year-end bonus":"مكافأة نهاية العام","A bonus arrives. Plan it before it plans you":"وصلت مكافأة. خطّط لها قبل أن تخطّط هي لك",
+"EVERYONE AROUND YOU HAS ONE · OPTIONAL":"الجميع من حولك يملكه · اختياري","OPPORTUNITY · OPTIONAL · DEBT THAT CAN PAY YOU BACK":"فرصة · اختيارية · دين قد يعود عليك بالربح",
+"Friday brunch with everyone":"برانش الجمعة مع الجميع","Luxury watch for status":"ساعة فاخرة للمظهر","Weekend desert-resort trip":"رحلة نهاية أسبوع إلى منتجع صحراوي","Latest flagship phone":"أحدث هاتف رائد","Designer outfit":"ملابس ماركة","Luxury dinner for everyone":"عشاء فاخر للجميع","Car upgrade":"ترقية السيارة","Big party to impress":"حفلة كبيرة للإعجاب","Smart-home gadget bundle":"حزمة أجهزة المنزل الذكي",
+"Skill course: +12% pay for life":"دورة مهارات: +12% راتبًا مدى الحياة","📖 Human capital (Becker): spending on skills can earn more than it costs, if enough months remain. A 1.5%/mo loan is cheap next to a 4% card.":"📖 رأس المال البشري (بيكر): الإنفاق على المهارات قد يدرّ أكثر مما يكلّف إذا بقيت أشهر كافية. قرض 1.5%/شهر رخيص بجانب بطاقة 4%.",
+"📖 Social proof · Present bias · Opportunity cost":"📖 الإثبات الاجتماعي · الانحياز للحاضر · تكلفة الفرصة","Pay with cash":"ادفع نقدًا","Take a skill loan (1.5%/mo)":"خذ قرض مهارات (1.5%/شهر)","Skip it":"تخطَّ","Buy with cash":"اشترِ نقدًا","Put it on credit":"سجّلها على البطاقة",
+"Bought on credit. The Wyrm just grew.":"اشتريت بالائتمان. التنين كبر للتو.","Bought with cash. Status +10, wealth +0.":"اشتريت نقدًا. المكانة +10، الثروة +0.","Lifestyle upgraded. The raise is already spent.":"رفعت نمط حياتك. العلاوة صُرفت بالفعل.","The raise now goes straight to savings.":"العلاوة تذهب الآن مباشرة إلى المدخرات.","Same life, more free cash.":"الحياة نفسها، ونقد حر أكثر.",
+"Shield OFF. Disasters are on you.":"الدرع متوقف. الكوارث عليك.","New skill! Your pay rises 12% from the next paycheck.":"مهارة جديدة! يرتفع راتبك 12% من الراتب القادم.","Skipped. Not every offer is worth taking.":"تم التخطي. ليس كل عرض يستحق القبول.","Skipped. Future you says thanks.":"تم التخطي. نفسك المستقبلية تشكرك.",
+"Shield ON.":"الدرع يعمل.","a month, paid when the month ends.":"في الشهر، تُدفع عند نهاية الشهر.",
+
+"The debt":"الدين","devoured":"التهمك","cleared":"أنهيتَ","the dungeon":"الزنزانة","survived":"نجوتَ","Barely.":"بصعوبة.",
+"The debt devoured you":"الدين التهمك","You cleared the dungeon":"أنهيتَ الزنزانة","You survived. Barely.":"نجوتَ. بالكاد.",
+"PULLED INTO THE DEBT SINGULARITY":"سُحبتَ إلى ثقب الدين الأسود","ESCAPE VELOCITY REACHED":"بلغتَ سرعة الإفلات","NEW BEST":"رقم قياسي جديد","final net worth":"صافي الثروة النهائي","LEVEL UP!":"ترقية!","Max level reached":"بلغتَ أعلى مستوى",
+"Daily goal:":"هدف اليوم:","✗ not this time":"✗ ليس هذه المرة","YOUR FINLIT REPORT CARD":"بطاقة تقريرك المالي","DEBT COST":"كلفة الدين","Your debts charged":"فرضت ديونك","about":"أي نحو","of everything you earned.":"من كل ما كسبته.",
+"Idle cash lost":"خسر النقد الخامل","of buying power.":"من القوة الشرائية.","METHOD":"الأسلوب","of your payments hit the fastest-growing debt.":"من دفعاتك ذهبت إلى الدين الأسرع نموًا.","You made no payments.":"لم تسدّد أي دفعة.",
+"SAVINGS":"المدخرات","You saved":"ادّخرتَ","automatically":"تلقائيًا","of pay":"من الراتب","and used":"واستخدمتَ","of it in emergencies instead of borrowing":"منها في الطوارئ بدل الاقتراض","Fund:":"الصندوق:",
+"LIFESTYLE":"نمط الحياة","Living costs took":"استهلكت المعيشة","of your pay.":"من راتبك.","Of":"من","raises, you put":"علاوات، وجّهتَ","toward savings or debt.":"إلى المدخرات أو الدين.",
+"PRESSURE":"الضغط","You gave in to":"استسلمتَ لـ","status temptations":"إغراءات مظهرية","(on credit)":"(بالائتمان)","No status temptations showed up.":"لم تظهر إغراءات مظهرية.","Income gaps hit":"فجوات الدخل ضربت",
+"WHAT COULD HAVE BEEN":"ماذا كان يمكن أن يكون","Paying the fastest-growing debt first would have saved you about":"سداد الدين الأسرع نموًا أولًا كان سيوفّر عليك نحو","in interest.":"من الفوائد.",
+"Putting idle cash to work could have recovered part of the":"تشغيل النقد الخامل كان سيسترد جزءًا من","inflation ate.":"التي أكلها التضخم.","Skipping the":"تجنّب","status purchases":"مشتريات المظهر","status purchase":"عملية شراء مظهرية","would have kept that money working for you.":"كان سيُبقي ذلك المال يعمل لصالحك.",
+"You made the main choices well. Little was left on the table this run.":"أحسنتَ الخيارات الرئيسية. لم يضِع الكثير في هذه الجولة.",
+"Simplified model, not financial advice.":"نموذج مبسّط، وليس نصيحة مالية.","Rates, prices and events are simplified to teach ideas. Real products and laws differ, so check your own situation before acting.":"الأسعار والمعدلات والأحداث مبسّطة لتعليم الأفكار. المنتجات والقوانين الحقيقية تختلف، فتحقّق من وضعك قبل التصرف.",
+"This game teaches ideas with simplified numbers. Real products, rates and laws differ.":"تعلّم هذه اللعبة الأفكار بأرقام مبسّطة. المنتجات والمعدلات والقوانين الحقيقية تختلف.",
+"Next time:":"في المرة القادمة:","Real-world note:":"ملاحظة من الواقع:","Insurance:":"التأمين:","you paid":"دفعتَ","in premiums and it covered":"أقساطًا وغطّى","of bills.":"من الفواتير.",
+"This time it paid off. Even when it doesn't, you are buying protection from a crisis, not a profit.":"هذه المرة أجدى. وحتى حين لا يجدي، فأنت تشتري الحماية من الأزمة لا الربح.","This time it cost more than it paid back. That is normal: insurance is a price for safety, and it matters most in the one month you can't afford.":"هذه المرة كلّف أكثر مما أعاد. هذا طبيعي: التأمين ثمن الأمان، وأهميته القصوى في الشهر الذي لا تحتمل فيه الخسارة.",
+"even in high-income places like the UAE, financial advisers and officials describe status spending, weak budgeting and heavy card use as common reasons households end up in debt. High pay doesn't remove the trap.":"حتى في أماكن الدخل المرتفع مثل الإمارات، يصف المستشارون الماليون والمسؤولون الإنفاق المظهري وضعف الميزانية والإفراط في البطاقات بأنها أسباب شائعة لوقوع الأسر في الدين. الراتب المرتفع لا يزيل الفخ.",
+"MONEY CODEX · THEORIES YOU PRACTISED":"موسوعة المال · نظريات مارستها","open":"افتح","INSIGHTS UNLOCKED":"رؤى مفتوحة","SHARE RESULT":"شارك النتيجة","PLAY AGAIN ▶":"العب مجددًا ▶","Rich or poor, the debt trap works the same way.":"غنيًا أو فقيرًا، فخ الدين يعمل بالطريقة نفسها.","It catches every income level, but smart decisions get you out.":"يصيب كل مستويات الدخل، لكن القرارات الذكية تُخرجك منه.",
+"You spent more than you earned and the credit card paid the difference. Cut lifestyle first, because bills come before wants.":"أنفقتَ أكثر مما كسبت وسدّدت البطاقة الفرق. اخفض نمط الحياة أولًا، فالفواتير قبل الرغبات.",
+"A raise is the best moment to save. Spend it on lifestyle and it vanishes, which is how high earners stay stuck.":"العلاوة أفضل لحظة للادخار. أنفقها على نمط الحياة فتختفي، وهكذا يبقى أصحاب الدخل المرتفع عالقين.",
+"Pay yourself first. Even 10% of pay into savings turns the next surprise bill into a non-event.":"ادّخر أولًا. حتى 10% من الراتب في المدخرات تجعل الفاتورة المفاجئة القادمة أمرًا عابرًا.",
+"Keep roughly one surprise bill in cash. Without it, a single shock becomes a 15%-a-month Emergency Imp.":"احتفظ بما يعادل فاتورة مفاجئة نقدًا. بدونه تتحول صدمة واحدة إلى عفريت طوارئ بفائدة 15% شهريًا.",
+"Pay the fastest-growing debt first (the “avalanche” method). It saves the most money.":"سدّد الدين الأسرع نموًا أولًا (طريقة «الانهيار الجليدي»). فهي توفّر أكبر قدر من المال.",
+"Status purchases felt normal each time, yet they were the trap. Wait a day before buying to keep up.":"بدت المشتريات المظهرية طبيعية كل مرة، لكنها كانت الفخ. انتظر يومًا قبل الشراء لمجاراة الآخرين.",
+"Idle cash lost more than your debts charged. Money that sits still gets cheaper every month.":"خسر النقد الخامل أكثر مما فرضته ديونك. المال الساكن يرخص كل شهر.",
+"Debt interest and inflation both work against you every month. Small, early moves beat big, late ones.":"فائدة الدين والتضخم يعملان ضدك كل شهر. الخطوات الصغيرة المبكرة تتفوق على الكبيرة المتأخرة.",
+"Compound Interest":"الفائدة المركبة","Interest is charged on interest, so balances snowball.":"تُحتسب الفائدة على الفائدة، فتتضخم الأرصدة كالكرة الثلجية.","Opportunity Cost":"تكلفة الفرصة","Friedrich von Wieser":"فريدريش فون فيزر","Every dollar spent on one thing cannot do another job, like killing a monster.":"كل دولار يُنفق على شيء لا يمكنه أداء عمل آخر، كقتل وحش.",
+"Real vs Nominal Return":"العائد الحقيقي مقابل الاسمي","Irving Fisher":"إيرفينغ فيشر","What matters is your return minus inflation, not the headline number.":"المهم هو عائدك بعد خصم التضخم، لا الرقم المعلن.","Harry Markowitz · Modern Portfolio Theory":"هاري ماركويتز · نظرية المحفظة الحديثة","Do not put all your eggs in one basket. Mixing assets cuts risk.":"لا تضع كل بيضك في سلة واحدة. تنويع الأصول يقلّل المخاطر.",
+"Behavioural Economics":"الاقتصاد السلوكي","Kahneman & Tversky · Prospect Theory":"كانيمان وتفيرسكي · نظرية الاحتمالات","Social proof and present bias make bad purchases feel normal.":"الإثبات الاجتماعي والانحياز للحاضر يجعلان المشتريات السيئة تبدو عادية.","Consumption Smoothing":"تمهيد الاستهلاك","Save in good months so shocks do not become debt.":"ادّخر في الأشهر الجيدة حتى لا تتحول الصدمات إلى ديون.",
+"Hedonic Treadmill":"المطحنة المتعية","New comforts become normal, so spending rises with pay (lifestyle creep).":"الرفاهيات الجديدة تصبح عادية، فيرتفع الإنفاق مع الراتب (زحف نمط الحياة).","Rule of 72":"قاعدة الـ72","A classic compounding shortcut":"اختصار كلاسيكي للفائدة المركبة","72 ÷ rate % gives the months it takes to double. It works for debt too.":"72 ÷ المعدل % تعطي عدد الأشهر اللازمة للتضاعف. وتصلح للدين أيضًا.",
+"Black Swan Risk":"مخاطر البجعة السوداء","Nassim Taleb":"نسيم طالب","Rare shocks hit hardest when you have no buffer or protection.":"الصدمات النادرة تؤلم أكثر حين لا يكون لديك هامش أو حماية.","Human Capital":"رأس المال البشري","Gary Becker · Theodore Schultz":"غاري بيكر · ثيودور شولتز",
+"Skills are an asset. Borrowing cheaply to raise your pay is good debt; borrowing to consume is bad debt.":"المهارات أصل. الاقتراض الرخيص لرفع دخلك دين جيد؛ والاقتراض للاستهلاك دين سيئ.","Rational Choice":"الاختيار العقلاني","Classical economics · debt avalanche":"الاقتصاد الكلاسيكي · انهيار الدين الجليدي","Pay the most expensive debt first. It is the cheapest path to freedom.":"سدّد الدين الأغلى أولًا. إنه أرخص طريق إلى الحرية.",
+"Finish with zero debt":"أنهِ بلا ديون","Avalanche Mind":"عقل الانهيار الجليدي","Hit the fastest-growing debt first (80%+ of payments)":"اضرب الدين الأسرع نموًا أولًا (80%+ من الدفعات)","Status Resister":"مقاوم المظاهر","Skip every status purchase":"تجنّب كل مشتريات المظهر","Finish with net investment gains":"أنهِ بأرباح استثمارية صافية",
+"Pay Yourself First":"ادّخر أولًا","Saved from your paycheck 10+ months":"ادّخرتَ من راتبك 10 أشهر أو أكثر","Built a 3-month emergency fund":"بنيتَ صندوق طوارئ لـ3 أشهر","Creep Crusher":"سحّاق الزحف","Took both raises without raising your lifestyle":"أخذتَ العلاوتين دون رفع نمط حياتك","Insurance paid out when disaster struck":"دفع التأمين عند وقوع الكارثة",
+"Debt Slayer":"قاتل الديون","Inflation Tamer":"مروّض التضخم","Dungeon Master":"سيّد الزنزانة","Finish without buying a single status item":"أنهِ دون شراء أي غرض مظهري","Never fall into emergency borrowing":"لا تقع في اقتراض الطوارئ","Finish completely debt-free":"أنهِ خاليًا تمامًا من الديون","Hit the fastest-growing debt with 80%+ of your payments":"وجّه 80%+ من دفعاتك للدين الأسرع نموًا","Keep the Insurance Shield on and let it pay out":"أبقِ درع التأمين يعمل ودعه يدفع","Build a full 3-month emergency fund":"ابنِ صندوق طوارئ كاملًا لـ3 أشهر","Pay yourself first in 10 or more months":"ادّخر أولًا في 10 أشهر أو أكثر","Finish with positive investment gains":"أنهِ بأرباح استثمارية إيجابية",
+"HOW TO PLAY":"طريقة اللعب","Survive":"انجُ","12 months":"12 شهرًا","Debt monsters grow":"وحوش الدين تكبر","by the % shown, every month. Pay them down with cash.":"بالنسبة المعروضة كل شهر. سدّدها بالنقد.","Cash melts.":"النقد يذوب.","Inflation makes idle money buy less. Investing can fight it, but prices swing.":"التضخم يجعل المال الخامل يشتري أقل. الاستثمار قد يقاومه لكن الأسعار تتأرجح.",
+"Set a monthly budget.":"ضع ميزانية شهرية.","Needs are fixed. Choose your lifestyle, and pay yourself first. Whatever is left is free cash.":"الاحتياجات ثابتة. اختر نمط حياتك وادّخر أولًا. وما يتبقى فهو نقد حر.","Build an emergency fund.":"ابنِ صندوق طوارئ.","Savings cover surprise bills. With none, you get an Emergency Imp (15% a month).":"المدخرات تغطي الفواتير المفاجئة. بدونها يظهر عفريت الطوارئ (15% شهريًا).",
+"Status temptations":"الإغراءات المظهرية","are optional and always feel reasonable. They are how the trap catches everyone.":"اختيارية وتبدو دائمًا معقولة. بها يصيد الفخ الجميع.","Finish before your debt hits the doom line. ★ survive · ★★ debt-free · ★★★ debt-free and wealthy.":"أنهِ قبل أن يبلغ دينك خط الهلاك. ★ نجاة · ★★ بلا ديون · ★★★ بلا ديون وثري.",
+"WORDS WORTH KNOWING":"كلمات تستحق المعرفة","Budget":"الميزانية","Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.":"الاحتياجات أولًا، ثم نمط الحياة، ثم الادخار. وما يتبقى متاح لمحاربة الدين.","Pay yourself first":"ادّخر أولًا","Move savings out the moment you are paid, before you can spend it.":"انقل المدخرات فور تقاضي الراتب قبل أن تنفقه.",
+"Lifestyle creep":"زحف نمط الحياة","When pay rises, spending quietly rises with it, so you never get ahead.":"حين يرتفع الراتب يرتفع الإنفاق معه بهدوء، فلا تتقدم أبدًا.","Interest":"الفائدة","The price of borrowing. It is charged on the whole balance, so it compounds.":"ثمن الاقتراض. تُحتسب على الرصيد كله فتتراكم.","Prices rise, so each dollar buys less. Cash loses value even while it sits still.":"الأسعار ترتفع فيشتري كل دولار أقل. النقد يفقد قيمته حتى وهو ساكن.",
+"Avalanche method":"طريقة الانهيار الجليدي","Pay the highest-rate debt first. It costs the least interest.":"سدّد الدين الأعلى فائدة أولًا. فهو الأقل كلفة.","Emergency fund":"صندوق الطوارئ","Cash set aside for surprises so one bad month does not become debt.":"نقد مخصّص للمفاجآت حتى لا يتحول شهر سيئ إلى دين.",
+"You pay a small, certain cost so a big, uncertain one cannot wreck you. It will not cover everything (a party or a rent rise is on you).":"تدفع تكلفة صغيرة مؤكدة حتى لا تحطمك تكلفة كبيرة غير مؤكدة. لن يغطي كل شيء (الحفلة وارتفاع الإيجار عليك).","Diversification":"التنويع","Spreading money across assets so one crash cannot sink you.":"توزيع المال على أصول حتى لا يُغرقك انهيار واحد.",
+"Shortcuts:":"اختصارات:","pay a monster":"سدّد وحشًا","= pay all":"= سدّد الكل","insurance":"التأمين","end month":"إنهاء الشهر","this help":"هذه المساعدة","GOT IT":"فهمت",
+"Money Codex ·":"موسوعة المال ·","CLOSE":"إغلاق","Close":"إغلاق","Can you beat it?":"هل تستطيع التغلب عليه؟","The debt won. Can you do better?":"فاز الدين. هل تستطيع أن تفعل أفضل؟",
+"Month":"الشهر","/mo":"/شهر",
+};
+var keys=Object.keys(S).sort(function(a,b){return b.length-a.length});
+var NUM=/[−+\-]?\$?\d[\d,]*(?:\.\d+)?[%×]?/g;
+var AR=/[؀-ۿ]/;
+function norm(s){return s.replace(/[ \s]+/g," ").trim()}
+var RX={};
+function rep(r,q,v){
+ var first=/[A-Za-z]/.test(q.charAt(0)),last=/[A-Za-z]/.test(q.charAt(q.length-1));
+ if(!first&&!last)return r.split(q).join(v);
+ var re=RX[q];if(!re){re=RX[q]=new RegExp((first?"(?<![A-Za-z])":"")+q.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&")+(last?"(?![A-Za-z])":""),"g")}
+ return r.replace(re,function(){return v});
+}
+function tr(s){
+ if(!s||AR.test(s)||s.indexOf("\u2066")>-1)return s;
+ if(!/[A-Za-z]/.test(s))return s.replace(NUM,function(m){return"\u2066"+m+"\u2069"});
+ var lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0],core=norm(s);
+ if(!core)return s;
+ var toks=[];var key=core.replace(NUM,function(m){toks.push(m);return"#"});
+ var r=null;
+ if(T[core]!==undefined)r=T[core];
+ else if(T[key]!==undefined){var i=0;r=T[key].replace(/#/g,function(){return toks[i++]!==undefined?toks[i-1]:""})}
+ if(r===null){
+  r=core;
+  for(var k=0;k<keys.length;k++){var q=keys[k];if(r.indexOf(q)>-1)r=rep(r,q,S[q])}
+ }
+ r=r.replace(NUM,function(m){return"\u2066"+m+"\u2069"});
+ return lead+r+trail;
+}
+window.__tr=tr;
+function node(n){
+ if(n.nodeType===3){var p=n.parentNode;if(p&&(p.tagName==="SCRIPT"||p.tagName==="STYLE"))return;var v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;return}
+ if(n.nodeType!==1)return;
+ if(n.tagName==="SCRIPT"||n.tagName==="STYLE"||n.tagName==="svg")return;
+ ["aria-label","title"].forEach(function(a){var v=n.getAttribute&&n.getAttribute(a);if(v){var t=tr(v);if(t!==v)n.setAttribute(a,t)}});
+ for(var c=n.firstChild;c;c=c.nextSibling)node(c);
+}
+var busy=false;
+var mo=new MutationObserver(function(ms){
+ if(busy)return;busy=true;
+ try{ms.forEach(function(m){
+  if(m.type==="childList")m.addedNodes.forEach(node);
+  else if(m.type==="characterData")node(m.target);
+  else if(m.type==="attributes")node(m.target);
+ })}finally{busy=false}
+});
+node(document.body);document.title="سجن الدين والتضخم · Debt & Inflation Dungeon";
+mo.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["aria-label","title"]});
 })();
 </script>
 </body>
