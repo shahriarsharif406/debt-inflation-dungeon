@@ -48,7 +48,9 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 | Insurance Shield | Optional. Premium 10% of pay each month; covers 80% of car, medical and phone bills (not rent rises or celebrations). Roughly break-even over a run; its value is avoiding the one bad month. | Insurance, risk transfer |
 | Orbit Fund | 4th asset, ≈+3%/mo, 7% chance of a launch failure; "Launch window" and "Launch failure" events move it. | High-risk, high-reward sectors |
 | Escape Velocity | 70% debt paid down + 30% assets progress. Debt-free ends in a rocket launch; debt remaining shows "stuck in orbit"; losing shows a black hole. | Net worth as escape from gravity |
-| Money Codex | Ten economic theories (Bernoulli compounding, Wieser opportunity cost, Fisher, Markowitz, Kahneman & Tversky, Modigliani/Friedman, Brickman & Campbell, Rule of 72, Taleb, classical rational choice). Tagged on temptations, raises and assets; unlocked by play; +15 XP each. | Economics theory in practice |
+| Money Codex | Eleven economic theories (Becker human capital, Bernoulli compounding, Wieser opportunity cost, Fisher, Markowitz, Kahneman & Tversky, Modigliani/Friedman, Brickman & Campbell, Rule of 72, Taleb, classical rational choice). Tagged on temptations, raises and assets; unlocked by play; +15 XP each. | Economics theory in practice |
+| Skill course | Months 2-7 offer: pay cash or a 1.5%/mo Skill Loan for +12% pay. Early it repays itself; late it does not. | Good vs bad debt, human capital (Becker) |
+| Gulf pack | Optional region toggle adding UAE-flavoured events (remittance with fees, pay-in-4, giving season, Eid hosting, hidden exchange margin) and temptations. Daily seed includes the region. | Regional adaptation |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 
 **Income tiers:** Low ($350/mo), Middle ($600), High ($1,500). All values scale together so the dynamics are identical.
@@ -87,7 +89,7 @@ Single-file HTML/CSS/JS, no dependencies, hosted statically. Canvas (particles, 
 
 ## 10. Current scope (delivered in the jam build)
 
-Full 12-month game, 6 monsters, 4 assets (incl. space-tech Orbit Fund), Escape Velocity finale, 10-theory Money Codex, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon with a daily goal, XP and levels, tutorial, report card, 11 insights, share image, help screen, responsive layout.
+Full 12-month game, 6 monsters, 4 assets (incl. space-tech Orbit Fund), Escape Velocity finale, 11-theory Money Codex, insurance, 10 events, 6 status temptations, 3 income tiers, Daily Dungeon with a daily goal, XP and levels, tutorial, report card, 11 insights, share image, help screen, responsive layout.
 
 ## 11. Roadmap if funded
 
@@ -105,4 +107,4 @@ Full 12-month game, 6 monsters, 4 assets (incl. space-tech Orbit Fund), Escape V
 
 ## 13. Budget
 
-See [BUDGET_DRAFT.md](BUDGET_DRAFT.md) (placeholders to fill in) and the video plan in [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
+See [BUDGET.md](BUDGET.md) and the video plan in [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).

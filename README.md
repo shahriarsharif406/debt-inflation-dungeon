@@ -35,9 +35,11 @@ You have 12 months. Each month you set a budget, put your free cash to work, the
 | Two raises (months 4 and 8): upgrade your lifestyle, save it, or keep life the same | Lifestyle creep |
 | Four assets: steady, mixed, wild, and the space-tech **Orbit Fund** (launch windows surge, launch failures crash) | Risk vs. return and diversification |
 | **Escape Velocity** meter: debt is gravity; paying it down and building a fund lifts your rocket. Finale: rocket launch, stuck in orbit, or pulled into the debt singularity | Net-worth thinking, shown as a physical metaphor |
-| **Money Codex**: ten real economic ideas (compound interest, opportunity cost, Fisher real returns, Markowitz diversification, Kahneman behavioural bias, consumption smoothing, hedonic treadmill, Rule of 72, Taleb black swans, rational choice) tagged in play and unlocked by how you play | Theory made practical |
+| **Money Codex**: eleven real economic ideas (compound interest, opportunity cost, Fisher real returns, Markowitz diversification, Kahneman behavioural bias, consumption smoothing, hedonic treadmill, Rule of 72, Taleb black swans, Becker human capital, rational choice) tagged in play and unlocked by how you play | Theory made practical |
 | Optional "everyone has one" purchases that feel reasonable | Status spending, and how credit makes it worse |
 | "Income gap" events halve your next paycheck | The risk of a single income |
+| **Skill course** (months 2-7): borrow cheaply (1.5%/mo) or pay cash to raise pay 12%; taken early it pays back, taken late it does not | Good debt vs bad debt, human capital |
+| **Gulf pack** (title screen toggle): remittances with hidden fees, pay-in-4 instalments, giving season, Eid hosting | Regional money life, hidden costs |
 | Optional Insurance Shield: a monthly premium (10% of pay) covers 80% of car, medical and phone bills, but not rent rises or parties | Insurance: a small certain cost against a big uncertain one |
 
 ### Three paychecks, one trap
@@ -92,7 +94,8 @@ Expected shape: doing nothing loses; lavish living plus status purchases loses; 
 
 - [Game design document](docs/GDD.md)
 - [2-minute video script](docs/VIDEO_SCRIPT.md)
-- [Budget draft](docs/BUDGET_DRAFT.md)
+- [Game budget and production plan](docs/BUDGET.md)
+- [Submission pack](docs/SUBMISSION.md)
 
 ## Credits
 

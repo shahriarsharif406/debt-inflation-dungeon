@@ -422,6 +422,7 @@ const MON={
   shark:{name:"Loan Shark Imp",tag:"Payday loan",debt:300,rate:.10,color:"#b388ff",kind:"imp"},
   vamp:{name:"Overdraft Vampire",tag:"Overdraft & fees",debt:600,rate:.07,color:"#4dd0e1",kind:"vamp"},
   hydra:{name:"Medical Hydra",tag:"Medical bills",debt:1000,rate:.03,color:"#7bd88f",kind:"hydra"},
+  skill:{name:"Skill Loan Sprite",tag:"Debt used to earn more",debt:0,rate:.015,color:"#4de2a1",kind:"golem"},
   emerg:{name:"Emergency Imp",tag:"Emergency borrowing",debt:0,rate:.15,color:"#ff8a3d",kind:"emerg"}
 };
 const ASSETS={
@@ -444,6 +445,17 @@ const EVENTS=[
   {name:"Big celebration",txt:"Family event everyone expects you to fund",cash:-350,t:"bad"},
   {name:"Income gap",txt:"One paycheck covers everything, and next month's is half",salary:.5,t:"bad"}
 ];
+const GULF_EVENTS=[
+  {name:"Money sent home",txt:"Family back home needs support. A fee-heavy transfer takes extra",cash:-190,t:"bad"},
+  {name:"Pay-in-4 instalments land",txt:"Four small payments you forgot about all fall due",cash:-230,t:"bad"},
+  {name:"Hidden exchange margin",txt:"A ZERO FEE transfer hid its cost in the exchange rate",cash:-110,t:"bad"},
+  {name:"Eid gifts and hosting",txt:"Family event everyone expects you to fund",cash:-260,t:"bad"},
+  {name:"Giving season",txt:"Annual charity or zakat. Planned savings make this painless",cash:-140,t:"bad"},
+  {name:"Year-end bonus",txt:"A bonus arrives. Plan it before it plans you",cash:230,t:"good"}
+];
+const GULF_TEMPT=[{name:"Friday brunch with everyone",base:180},{name:"Luxury watch for status",base:550},{name:"Weekend desert-resort trip",base:420}];
+const evPool=()=>REGION==="gulf"?EVENTS.concat(GULF_EVENTS):EVENTS;
+const tpPool=()=>REGION==="gulf"?TEMPT.concat(GULF_TEMPT):TEMPT;
 const TEMPT=[
   {name:"Latest flagship phone",base:300},{name:"Designer outfit",base:200},{name:"Luxury dinner for everyone",base:150},
   {name:"Car upgrade",base:600},{name:"Big party to impress",base:500},{name:"Smart-home gadget bundle",base:250}
@@ -483,7 +495,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 let R=Math.random;
 function gauss(){let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
-let S,MODE=store.get("mode")==="daily"?"daily":"free";
+let S,MODE=store.get("mode")==="daily"?"daily":"free",REGION=store.get("region")==="gulf"?"gulf":"global";
 const T=()=>TIERS[S.tier];
 const sc=n=>Math.round(n*T().scale/10)*10;
 const totalDebt=()=>S.mons.reduce((a,m)=>a+m.debt,0);
@@ -652,17 +664,21 @@ function addMon(key,debt){
 function newGame(tier,mode){
   tier=tier||(S&&S.tier)||"mid";mode=mode||MODE;
   let seed=0,label="";
-  if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier);R=mulberry32(seed)}else R=Math.random;
+  if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier+(REGION==="gulf"?"|gulf":""));R=mulberry32(seed)}else R=Math.random;
   const t0=TIERS[tier];
   S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0,orbit:0},mons:[],pp:1,over:false,done:false,
-     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0},
+     stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0,skill:0,skillMonth:0,skillLoan:0},
      status:0,ins:false,life:1,sv:1,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
   addMon("card",t0.debts.card);addMon("student",t0.debts.student);addMon("shark",t0.debts.shark);
   S.hist=[netWorth()];S.lastNW=netWorth();
 }
 function rollTemptation(){
-  S.temp=null;if(S.month<2||R()>T().tempFreq)return;
-  const t=TEMPT[Math.floor(R()*TEMPT.length)];S.temp={name:t.name,cost:sc(t.base)};S.stats.seen++;
+  S.temp=null;
+  if(!S.opp&&!S.stats.skill&&S.month>=2&&S.month<=7&&R()<.4)S.opp={cost:sc(450),gain:.12};
+  else if(S.month>7)S.opp=null;
+  if(S.opp&&S.month>=2)return;
+  if(S.month<2||R()>T().tempFreq)return;
+  const t=tpPool()[Math.floor(R()*tpPool().length)];S.temp={name:t.name,cost:sc(t.base)};S.stats.seen++;
 }
 function buyTemp(onCard){
   if(S.busy||S.over||!S.temp)return;const c=S.temp.cost;
@@ -693,6 +709,13 @@ function raisePick(k){
 }
 const premium=()=>Math.max(1,Math.round(T().salary*.10));
 function toggleIns(){if(S.busy||S.over)return;S.ins=!S.ins;S.stats.acts++;sfx.coin();toast(S.ins?`Shield ON. ${fmt(premium())} a month, paid when the month ends.`:"Shield OFF. Disasters are on you.");render()}
+function takeOpp(mode){
+  if(S.busy||S.over||!S.opp)return;const c=S.opp.cost;
+  if(mode==="cash"){if(freeCash()<c)return;S.cash-=c}else{addMon("skill",c);S.stats.skillLoan=1}
+  S.sal=Math.round(S.sal*(1+S.opp.gain));S.stats.skill=1;S.stats.skillMonth=S.month;S.stats.acts++;S.opp=null;sfx.win();flash("#4de2a1");
+  toast("New skill! Your pay rises 12% from the next paycheck.");render();
+}
+function skipOpp(){if(S.busy||S.over||!S.opp)return;S.opp=null;S.stats.acts++;sfx.coin();toast("Skipped. Not every offer is worth taking.");render()}
 function skipTemp(){if(S.busy||S.over||!S.temp)return;S.temp=null;S.stats.acts++;sfx.coin();toast("Skipped. Future you says thanks.");render()}
 
 /* ---------- render ---------- */
@@ -753,6 +776,12 @@ function render(){
       ${seg("sv",["0%","10%","20%"],S.sv)}
       <div class="free"><span>Free to spend on debt and goals</span><b>${fmt(fr)}</b></div>
       <div class="goal"><span>🏦 Emergency fund goal: 3 months of living costs</span><div class="meter"><i style="width:${fp.toFixed(0)}%"></i></div><small>${fmt(fund)} of ${fmt(tgt)}${S.fortress?" · ✓ complete":""}</small></div></div>`})()}
+    ${S.opp?`<div class="tempt opp"><small>OPPORTUNITY · OPTIONAL · DEBT THAT CAN PAY YOU BACK</small>
+      <div class="tn"><span>Skill course: +12% pay for life</span><b>${fmt(S.opp.cost)}</b></div>
+      <div class="ctag">📖 Human capital (Becker): spending on skills can earn more than it costs, if enough months remain. A 1.5%/mo loan is cheap next to a 4% card.</div>
+      <div class="tb"><button class="btn" data-obuy="cash" ${freeCash()<S.opp.cost?"disabled":""}>Pay with cash</button>
+      <button class="btn" data-obuy="loan">Take a skill loan (1.5%/mo)</button>
+      <button class="btn" data-oskip="1">Skip it</button></div></div>`:""}
     ${S.temp?`<div class="tempt"><small>EVERYONE AROUND YOU HAS ONE · OPTIONAL</small>
       <div class="tn"><span>${S.temp.name}</span><b>${fmt(S.temp.cost)}</b></div>
       <div class="ctag">📖 Social proof · Present bias · Opportunity cost</div>
@@ -824,7 +853,7 @@ function endMonth(){
   const rep=[],inf=curInf();let badHit=false;
   let di=0;S.mons.forEach(m=>{const d=Math.round(m.debt*m.rate);m.debt+=d;di+=d});S.stats.interest+=di;
   if(di>0)rep.push(["r","▲ Debt monsters grew",`+${fmt(di)}`]);
-  const ev=R()<T().evFreq?EVENTS[Math.floor(R()*EVENTS.length)]:null;
+  const ev=R()<T().evFreq?evPool()[Math.floor(R()*evPool().length)]:null;
   if(S.ins){const pr=Math.min(premium(),Math.max(0,S.cash));S.cash-=pr;S.stats.insPaid+=pr;rep.push(["a","🛡 Insurance premium",`−${fmt(pr)}`])}
   {const b=budget();
     const sv=Math.min(b.save,Math.max(0,S.cash));
@@ -1035,6 +1064,10 @@ function showTitle(){
       <button data-mode="free" class="${MODE==="free"?"on":""}">Free play<small>random events</small></button>
       <button data-mode="daily" class="${MODE==="daily"?"on":""}">Daily Dungeon<small>same run for everyone today</small></button>
     </div>
+    <div class="seg" role="group" aria-label="Region pack">
+      <button data-region="global" class="${REGION==="global"?"on":""}">Global<small>universal money life</small></button>
+      <button data-region="gulf" class="${REGION==="gulf"?"on":""}">Gulf pack · UAE<small>remittances, pay-in-4, giving</small></button>
+    </div>
     <div class="tiers">${["low","mid","high"].map(k=>`<button class="tier t-${k}" data-tier="${k}"><b>${TIERS[k].label}</b><span>${TIERS[k].sub}</span><em>${fmt(TIERS[k].salary)} / month${best(k)}</em></button>`).join("")}</div>
     <div class="links"><button id="helpLink">How to play</button><span>Made for Zoud GameLab 2026 · a FutureTech.ai game</span></div>
   </div>`;
@@ -1051,12 +1084,13 @@ const CODEX=[
  {id:"treadmill",n:"Hedonic Treadmill",w:"Brickman & Campbell",d:"New comforts become normal, so spending rises with pay (lifestyle creep).",ok:(st)=>st.raises>0&&st.raiseLife===0},
  {id:"r72",n:"Rule of 72",w:"A classic compounding shortcut",d:"72 ÷ rate % gives the months it takes to double. It works for debt too.",ok:(st)=>st.inv>0},
  {id:"swan",n:"Black Swan Risk",w:"Nassim Taleb",d:"Rare shocks hit hardest when you have no buffer or protection.",ok:(st,v)=>v&&st.shocks>=2&&st.emerg===0},
+ {id:"humancap",n:"Human Capital",w:"Gary Becker · Theodore Schultz",d:"Skills are an asset. Borrowing cheaply to raise your pay is good debt; borrowing to consume is bad debt.",ok:(st,v)=>v&&st.skill>0&&st.skillMonth<=6},
  {id:"rational",n:"Rational Choice",w:"Classical economics · debt avalanche",d:"Pay the most expensive debt first. It is the cheapest path to freedom.",ok:(st)=>st.pays>=3&&st.payOK/st.pays>=.7}
 ];
 function codexUnlocked(survived,debt){return CODEX.filter(c=>c.ok(S.stats,survived,debt)).map(c=>c.id)}
 function openCodex(){
   const had=(store.get("cdx")||"").split(",").filter(Boolean),o=$("#ov2");
-  o.innerHTML=`<div class="card help"><div class="kick">MONEY CODEX</div><h1>Ten ideas that <em>run money</em></h1>
+  o.innerHTML=`<div class="card help"><div class="kick">MONEY CODEX</div><h1>Eleven ideas that <em>run money</em></h1>
     <p class="tg">Real economic theories live inside this dungeon. Practise them in play to unlock each one (${had.length}/${CODEX.length}).</p>
     <div class="cdx">${CODEX.map(c=>`<div class="${had.includes(c.id)?"on":""}"><b>${had.includes(c.id)?"✓ ":"◇ "}${c.n}</b><em>${c.w}</em><br>${c.d}</div>`).join("")}</div>
     <p class="note">Simplified for play. Not financial advice.</p><button class="go" id="closeHelp">CLOSE</button></div>`;
@@ -1097,10 +1131,13 @@ document.addEventListener("click",e=>{
   else if(t.dataset.sell)sell(t.dataset.sell);
   else if(t.dataset.tbuy)buyTemp(t.dataset.tbuy==="card");
   else if(t.dataset.tskip)skipTemp();
+  else if(t.dataset.obuy)takeOpp(t.dataset.obuy);
+  else if(t.dataset.oskip)skipOpp();
   else if(t.dataset.ins)toggleIns();
   else if(t.dataset.life!==undefined)setBud("life",+t.dataset.life);
   else if(t.dataset.sv!==undefined)setBud("sv",+t.dataset.sv);
   else if(t.dataset.raise)raisePick(t.dataset.raise);
+  else if(t.dataset.region){REGION=t.dataset.region;store.set("region",REGION);showTitle()}
   else if(t.dataset.mode){MODE=t.dataset.mode;store.set("mode",MODE);showTitle()}
   else if(t.dataset.tier){$("#ov").classList.remove("on");newGame(t.dataset.tier,MODE);render();beep(440,.1,"triangle");if(!store.get("tut"))say("Tutorial: tap PAY on the fastest-growing debt.")}
   else if(t.id==="helpLink"||t.id==="help")openHelp();
@@ -1121,7 +1158,7 @@ document.addEventListener("keydown",e=>{
   const n=parseInt(e.key,10);if(n>=1&&n<=S.mons.length)pay(S.mons[n-1].id,e.shiftKey);
 });
 setSound(A.on);
-window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,setBud,raisePick,budget,freeCash,seed:n=>{R=mulberry32(n)}};
+window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,setBud,raisePick,budget,freeCash,takeOpp,setRegion:r=>{REGION=r},seed:n=>{R=mulberry32(n)}};
 bgInit();fxInit();newGame("mid",MODE);render();showTitle();
 })();
 </script>

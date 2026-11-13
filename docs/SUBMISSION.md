@@ -1,0 +1,26 @@
+# Submission pack: paste-ready text and checklist
+
+## "Making FinLit Fun" write-up (for the itch.io submission box)
+
+Debt & Inflation Dungeon turns the two forces that quietly drain every budget, interest and inflation, into things you can see. Debt is a monster that grows by a visible percentage every month. Your cash melts as prices rise. Each month you set a budget (needs first, lifestyle, pay yourself first), fight debt with the highest rate first, build an emergency fund, and decide whether a tempting purchase, a raise, a skill course or an investment is worth it. The same rules apply at low, middle and high income, because the debt trap does not care how much you earn. Nothing is taught by a quiz: every idea is a choice with a consequence. Eleven real economic ideas (compound interest, opportunity cost, Fisher's real returns, Markowitz diversification, Kahneman and Tversky's behavioural bias, consumption smoothing, the hedonic treadmill, the Rule of 72, Taleb's black swans, Becker's human capital, rational choice) are practised in play and collected in a Money Codex. Clear your debt and a rocket reaches escape velocity. An optional Gulf pack adds remittances, pay-in-4 instalments, hidden transfer margins and giving season for the UAE and Arab region. Balance is checked with thousands of automated games, and a Daily Dungeon gives everyone the same run to compare.
+
+## Short pitch line
+Debt monsters grow, cash melts, a rocket to escape. Eleven real economic ideas inside.
+
+## How it maps to the judging rubric
+| Criterion | Evidence |
+|---|---|
+| Prototype and gameplay (25) | Complete 12-month game, 3 income levels, tutorial, sound, accessibility, stable single file, balance checked by automated play |
+| Financial literacy integration (25) | Budget, saving, emergency fund, good vs bad debt, lifestyle creep, insurance, risk, diversification are mechanics, not text |
+| Educational impact (15) | Report card from your own choices, Money Codex, "next time" tip, optional discussion via the Daily Dungeon |
+| Creativity (15) | Debt monsters with inflation, space-tech escape-velocity metaphor, theory-driven Codex |
+| Development and commercial potential (20) | docs/BUDGET.md: $48,000 plan, 6 phases, revenue paths, risks |
+| Localisation bonus (5) | Optional Gulf pack with region-specific events and temptations, not a translation (Arabic and right-to-left are budgeted in docs/BUDGET.md) |
+
+## Submission checklist
+- [ ] Upload `debt-inflation-dungeon-itch.zip`, tick "This file will be played in the browser", size 1280×800 or fullscreen
+- [ ] Paste the write-up above, add 5 screenshots
+- [ ] Upload or link the Concept Doc (docs/GDD.md as PDF) and the Budget (docs/BUDGET.md as PDF)
+- [ ] Record and link the 2-minute gameplay video (docs/VIDEO_SCRIPT.md)
+- [ ] Play it once on a phone and once on desktop
+- [ ] Submit before **Nov 15, 11:59 pm AoE** (= Nov 16, 5:59 pm in Dhaka)
