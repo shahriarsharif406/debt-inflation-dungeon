@@ -53,6 +53,7 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 | Arabic | Full Arabic interface with right-to-left layout, chosen with a button on the title screen and remembered. Numbers and amounts stay readable inside Arabic text. | Access for Arabic-speaking players |
 | What could have been | End-screen note estimating avoidable interest (payments that missed the fastest-growing debt), idle-cash inflation loss and status purchases | Learning from your own choices |
 | Simplified-model note | End screen and help state that numbers are simplified and not financial advice | Honesty about limits |
+| Debrief and transfer | End screen adds one real-life action and one discussion question chosen from the player's weakest habit, in English and Arabic. | Reflection and real-world transfer |
 | Gulf pack | Optional region toggle adding UAE-flavoured events (remittance with fees, pay-in-4, giving season, Eid hosting, hidden exchange margin) and temptations. Daily seed includes the region. | Regional adaptation |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 

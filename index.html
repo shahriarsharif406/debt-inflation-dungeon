@@ -957,6 +957,22 @@ function tipFor(){
   if(st.infl>st.interest)return"Idle cash lost more than your debts charged. Money that sits still gets cheaper every month.";
   return"Debt interest and inflation both work against you every month. Small, early moves beat big, late ones.";
 }
+function challengeFor(){
+  const st=S.stats;
+  let k=7;
+  if(st.billDebt>0)k=0;else if(st.raises>=1&&st.raiseLife>=1)k=1;else if(st.saved===0&&st.emerg>0)k=2;else if(st.emerg>0)k=3;else if(st.pays>=3&&st.payOK/st.pays<.8)k=4;else if(st.bought>=3)k=5;else if(st.infl>st.interest)k=6;
+  const C=[
+   ["Write down last month's spending. Mark each item need or want.","If a bill came tomorrow, which want would you cut first, and why?"],
+   ["Next time your pay rises, move half of the raise to savings the same day.","Why does spending quietly rise to match pay?"],
+   ["Set up an automatic transfer to savings for the day you are paid, even a small amount.","What would 10% of your pay become in a year?"],
+   ["Count how many months of bills your savings could cover today.","What would you do in the first week of a sudden job loss?"],
+   ["List your debts with their interest rates. Which one grows fastest?","Is the cheapest debt to pay really the one that feels the biggest?"],
+   ["Before your next non-essential purchase, wait 24 hours.","Who were you trying to impress, and did they notice?"],
+   ["Check where your idle cash sits and what it earns compared with prices rising.","Is saving always safe if prices keep rising?"],
+   ["Pick one habit from this run and try it for a month.","What surprised you most about your own choices?"]
+  ];
+  return C[k];
+}
 function settle(){
   let pool=Math.max(0,S.cash)+S.assets.vault,used=0;
   S.mons.slice().sort((x,y)=>y.rate-x.rate).forEach(m=>{const a=Math.min(pool,m.debt);if(a>0){m.debt-=a;pool-=a;used+=a}});
@@ -1008,6 +1024,7 @@ function finish(survived,m){
     <p class="note">${(()=>{const a=[];if(st.waste>=20)a.push(`Paying the fastest-growing debt first would have saved you about <strong>${fmt(st.waste)}</strong> in interest.`);if(st.infl>=50)a.push(`Putting idle cash to work could have recovered part of the <strong>${fmt(st.infl)}</strong> inflation ate.`);if(st.bought>0)a.push(`Skipping the ${st.bought} status ${st.bought>1?"purchases":"purchase"} would have kept that money working for you.`);return a.length?a.join(" "):"You made the main choices well. Little was left on the table this run."})()}</p>
     <p class="note" style="opacity:.75"><b>Simplified model, not financial advice.</b> Rates, prices and events are simplified to teach ideas. Real products and laws differ, so check your own situation before acting.</p>
     <p class="note"><b>Next time:</b> ${tipFor()}</p>
+    ${(()=>{const c=challengeFor();return`<p class="note"><b>Try it in real life:</b> ${c[0]}</p><p class="note"><b>Talk about it:</b> ${c[1]}</p>`})()}
     ${real}
     <h2>MONEY CODEX · THEORIES YOU PRACTISED <button class="linkb" id="cdxLink">open</button></h2>
     <div class="chips">${CODEX.map(c=>`<span class="${cdxNow.includes(c.id)?"on":""}${cdxNew.includes(c.id)?" nw":""}">${cdxNow.includes(c.id)?"✓ ":""}${c.n}</span>`).join("")}</div>
@@ -1018,7 +1035,7 @@ function finish(survived,m){
   </div>`;
   const ov=$("#ov");ov.classList.add("on");ov.scrollTop=0;render();
   $("#again").onclick=()=>showTitle();$("#share").onclick=shareResult;
-  say(`Game over. Final net worth ${fmt(nw)}. ${stars} stars.`);
+  say(`Game over. Final net worth ${fmt(nw)}. ${stars} ${stars===1?"star":"stars"}.`);
 }
 
 /* ---------- share card ---------- */
@@ -1114,6 +1131,8 @@ function openHelp(){
     <li><b>Build an emergency fund.</b> Savings cover surprise bills. With none, you get an Emergency Imp (15% a month).</li>
     <li><b>Status temptations</b> are optional and always feel reasonable. They are how the trap catches everyone.</li>
     <li>Finish before your debt hits the doom line. ★ survive · ★★ debt-free · ★★★ debt-free and wealthy.</li></ol>
+    <h2>WHAT YOU WILL PRACTISE</h2>
+    <p class="note">Budget your pay · pay the right debt first · build an emergency fund · tell good debt from bad · resist lifestyle creep · protect cash from inflation.</p>
     <h2>WORDS WORTH KNOWING</h2>
     <dl><dt>Budget</dt><dd>Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.</dd>
     <dt>Pay yourself first</dt><dd>Move savings out the moment you are paid, before you can spend it.</dd>
@@ -1277,6 +1296,15 @@ var S={
 "You made the main choices well. Little was left on the table this run.":"أحسنتَ الخيارات الرئيسية. لم يضِع الكثير في هذه الجولة.",
 "Simplified model, not financial advice.":"نموذج مبسّط، وليس نصيحة مالية.","Rates, prices and events are simplified to teach ideas. Real products and laws differ, so check your own situation before acting.":"الأسعار والمعدلات والأحداث مبسّطة لتعليم الأفكار. المنتجات والقوانين الحقيقية تختلف، فتحقّق من وضعك قبل التصرف.",
 "This game teaches ideas with simplified numbers. Real products, rates and laws differ.":"تعلّم هذه اللعبة الأفكار بأرقام مبسّطة. المنتجات والمعدلات والقوانين الحقيقية تختلف.",
+"Try it in real life:":"جرّبه في حياتك الواقعية:","Talk about it:":"ناقش الأمر:",
+"Write down last month's spending. Mark each item need or want.":"دوّن إنفاقك في الشهر الماضي. وسِم كل بند بأنه حاجة أو رغبة.","If a bill came tomorrow, which want would you cut first, and why?":"لو جاءت فاتورة غدًا، فأي رغبة ستقطعها أولًا، ولماذا؟",
+"Next time your pay rises, move half of the raise to savings the same day.":"في المرة القادمة التي يزيد فيها راتبك، انقل نصف الزيادة إلى المدخرات في اليوم نفسه.","Why does spending quietly rise to match pay?":"لماذا يرتفع الإنفاق بهدوء ليطابق الراتب؟",
+"Set up an automatic transfer to savings for the day you are paid, even a small amount.":"أنشئ تحويلًا تلقائيًا إلى المدخرات في يوم الراتب، ولو كان المبلغ صغيرًا.","What would 10% of your pay become in a year?":"ماذا يصبح 10% من راتبك بعد سنة؟",
+"Count how many months of bills your savings could cover today.":"احسب كم شهرًا من الفواتير تغطيه مدخراتك اليوم.","What would you do in the first week of a sudden job loss?":"ماذا ستفعل في أول أسبوع بعد فقدان مفاجئ للوظيفة؟",
+"List your debts with their interest rates. Which one grows fastest?":"اكتب ديونك مع معدلات فائدتها. أيها ينمو أسرع؟","Is the cheapest debt to pay really the one that feels the biggest?":"هل الدين الأرخص سدادًا هو فعلًا الذي يبدو الأكبر؟",
+"Before your next non-essential purchase, wait 24 hours.":"قبل شرائك القادم غير الضروري، انتظر 24 ساعة.","Who were you trying to impress, and did they notice?":"من كنتَ تحاول إبهاره، وهل لاحظ ذلك؟",
+"Check where your idle cash sits and what it earns compared with prices rising.":"تحقّق من مكان نقدك الخامل وما يربحه مقارنةً بارتفاع الأسعار.","Is saving always safe if prices keep rising?":"هل الادخار آمن دائمًا إذا استمرت الأسعار في الارتفاع؟",
+"Pick one habit from this run and try it for a month.":"اختر عادة واحدة من هذه الجولة وجرّبها لمدة شهر.","What surprised you most about your own choices?":"ما أكثر ما فاجأك في خياراتك أنت؟",
 "Next time:":"في المرة القادمة:","Real-world note:":"ملاحظة من الواقع:","Insurance:":"التأمين:","you paid":"دفعتَ","in premiums and it covered":"أقساطًا وغطّى","of bills.":"من الفواتير.",
 "This time it paid off. Even when it doesn't, you are buying protection from a crisis, not a profit.":"هذه المرة أجدى. وحتى حين لا يجدي، فأنت تشتري الحماية من الأزمة لا الربح.","This time it cost more than it paid back. That is normal: insurance is a price for safety, and it matters most in the one month you can't afford.":"هذه المرة كلّف أكثر مما أعاد. هذا طبيعي: التأمين ثمن الأمان، وأهميته القصوى في الشهر الذي لا تحتمل فيه الخسارة.",
 "even in high-income places like the UAE, financial advisers and officials describe status spending, weak budgeting and heavy card use as common reasons households end up in debt. High pay doesn't remove the trap.":"حتى في أماكن الدخل المرتفع مثل الإمارات، يصف المستشارون الماليون والمسؤولون الإنفاق المظهري وضعف الميزانية والإفراط في البطاقات بأنها أسباب شائعة لوقوع الأسر في الدين. الراتب المرتفع لا يزيل الفخ.",
@@ -1301,7 +1329,7 @@ var S={
 "HOW TO PLAY":"طريقة اللعب","Survive":"انجُ","12 months":"12 شهرًا","Debt monsters grow":"وحوش الدين تكبر","by the % shown, every month. Pay them down with cash.":"بالنسبة المعروضة كل شهر. سدّدها بالنقد.","Cash melts.":"النقد يذوب.","Inflation makes idle money buy less. Investing can fight it, but prices swing.":"التضخم يجعل المال الخامل يشتري أقل. الاستثمار قد يقاومه لكن الأسعار تتأرجح.",
 "Set a monthly budget.":"ضع ميزانية شهرية.","Needs are fixed. Choose your lifestyle, and pay yourself first. Whatever is left is free cash.":"الاحتياجات ثابتة. اختر نمط حياتك وادّخر أولًا. وما يتبقى فهو نقد حر.","Build an emergency fund.":"ابنِ صندوق طوارئ.","Savings cover surprise bills. With none, you get an Emergency Imp (15% a month).":"المدخرات تغطي الفواتير المفاجئة. بدونها يظهر عفريت الطوارئ (15% شهريًا).",
 "Status temptations":"الإغراءات المظهرية","are optional and always feel reasonable. They are how the trap catches everyone.":"اختيارية وتبدو دائمًا معقولة. بها يصيد الفخ الجميع.","Finish before your debt hits the doom line. ★ survive · ★★ debt-free · ★★★ debt-free and wealthy.":"أنهِ قبل أن يبلغ دينك خط الهلاك. ★ نجاة · ★★ بلا ديون · ★★★ بلا ديون وثري.",
-"WORDS WORTH KNOWING":"كلمات تستحق المعرفة","Budget":"الميزانية","Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.":"الاحتياجات أولًا، ثم نمط الحياة، ثم الادخار. وما يتبقى متاح لمحاربة الدين.","Pay yourself first":"ادّخر أولًا","Move savings out the moment you are paid, before you can spend it.":"انقل المدخرات فور تقاضي الراتب قبل أن تنفقه.",
+"WHAT YOU WILL PRACTISE":"ما ستتدرّب عليه","Budget your pay · pay the right debt first · build an emergency fund · tell good debt from bad · resist lifestyle creep · protect cash from inflation.":"ضع ميزانية لراتبك · سدّد الدين الصحيح أولًا · ابنِ صندوق طوارئ · فرّق بين الدين الجيد والسيئ · قاوم زحف نمط الحياة · احمِ نقدك من التضخم.","WORDS WORTH KNOWING":"كلمات تستحق المعرفة","Budget":"الميزانية","Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.":"الاحتياجات أولًا، ثم نمط الحياة، ثم الادخار. وما يتبقى متاح لمحاربة الدين.","Pay yourself first":"ادّخر أولًا","Move savings out the moment you are paid, before you can spend it.":"انقل المدخرات فور تقاضي الراتب قبل أن تنفقه.",
 "Lifestyle creep":"زحف نمط الحياة","When pay rises, spending quietly rises with it, so you never get ahead.":"حين يرتفع الراتب يرتفع الإنفاق معه بهدوء، فلا تتقدم أبدًا.","Interest":"الفائدة","The price of borrowing. It is charged on the whole balance, so it compounds.":"ثمن الاقتراض. تُحتسب على الرصيد كله فتتراكم.","Prices rise, so each dollar buys less. Cash loses value even while it sits still.":"الأسعار ترتفع فيشتري كل دولار أقل. النقد يفقد قيمته حتى وهو ساكن.",
 "Avalanche method":"طريقة الانهيار الجليدي","Pay the highest-rate debt first. It costs the least interest.":"سدّد الدين الأعلى فائدة أولًا. فهو الأقل كلفة.","Emergency fund":"صندوق الطوارئ","Cash set aside for surprises so one bad month does not become debt.":"نقد مخصّص للمفاجآت حتى لا يتحول شهر سيئ إلى دين.",
 "You pay a small, certain cost so a big, uncertain one cannot wreck you. It will not cover everything (a party or a rent rise is on you).":"تدفع تكلفة صغيرة مؤكدة حتى لا تحطمك تكلفة كبيرة غير مؤكدة. لن يغطي كل شيء (الحفلة وارتفاع الإيجار عليك).","Diversification":"التنويع","Spreading money across assets so one crash cannot sink you.":"توزيع المال على أصول حتى لا يُغرقك انهيار واحد.",

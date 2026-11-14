@@ -24,3 +24,12 @@ Debt monsters grow, cash melts, a rocket to escape. Eleven real economic ideas i
 - [ ] Record and link the 2-minute gameplay video (docs/VIDEO_SCRIPT.md)
 - [ ] Play it once on a phone and once on desktop
 - [ ] Submit before **Nov 15, 11:59 pm AoE** (= Nov 16, 5:59 pm in Dhaka)
+
+## Design choices backed by research
+
+A 2026 scoping review of 91 financial-education games (Suna and Aprea, University of Mannheim) found that few state learning objectives, that credit cards and insurance are rarely covered, and that reflection and real-life transfer are not assessed. This game answers each gap:
+
+- **Stated objectives:** the Help screen lists what you practise (budgeting, avalanche, emergency fund, good vs bad debt, lifestyle creep, inflation).
+- **Credit cards and insurance are core mechanics**, not side topics.
+- **Reflection and transfer:** the end screen gives "What could have been", a "Try it in real life" action and a "Talk about it" question chosen from your own weakest habit.
+- **No ads, no purchases, no violence.**
