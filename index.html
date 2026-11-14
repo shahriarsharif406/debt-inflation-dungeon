@@ -1027,14 +1027,14 @@ function drawCard(){
   const survived=S.done,stars=starsFor(survived),nw=netWorth(),st=S.stats;
   let g=x.createLinearGradient(0,0,1200,630);g.addColorStop(0,"#120b2e");g.addColorStop(1,"#2a0d1f");x.fillStyle=g;x.fillRect(0,0,1200,630);
   g=x.createRadialGradient(950,120,10,950,120,520);g.addColorStop(0,"rgba(255,77,109,.35)");g.addColorStop(1,"rgba(255,77,109,0)");x.fillStyle=g;x.fillRect(0,0,1200,630);
-  x.fillStyle="#a49dcc";x.font="700 26px Inter,Segoe UI,sans-serif";x.fillText("A FINLIT ROGUELITE",64,86);
-  x.fillStyle="#fff";x.font="900 70px Inter,Segoe UI,sans-serif";x.fillText("DEBT & INFLATION",64,168);x.fillStyle="#ffcf5c";x.fillText("DUNGEON",64,242);
-  x.fillStyle="#ffcf5c";x.font="900 64px Inter,Segoe UI,sans-serif";x.fillText("★".repeat(stars)+"☆".repeat(3-stars),64,340);
-  x.fillStyle=nw>=0?"#4de2a1":"#ff4d6d";x.font="900 110px Inter,Segoe UI,sans-serif";x.fillText(fmt(nw),64,455);
-  x.fillStyle="#a49dcc";x.font="600 28px Inter,Segoe UI,sans-serif";x.fillText(`final net worth · ${T().label.toLowerCase()}${S.mode==="daily"?" · daily "+S.label:""}`,64,498);
-  x.fillStyle="#f5f2ff";x.font="700 30px Inter,Segoe UI,sans-serif";
+  x.fillStyle="#a49dcc";x.font="700 26px system-ui,Segoe UI,Arial,sans-serif";x.fillText("A FINLIT ROGUELITE",64,86);
+  x.fillStyle="#fff";x.font="900 70px system-ui,Segoe UI,Arial,sans-serif";x.fillText("DEBT & INFLATION",64,168);x.fillStyle="#ffcf5c";x.fillText("DUNGEON",64,242);
+  x.fillStyle="#ffcf5c";x.font="900 64px system-ui,Segoe UI,Arial,sans-serif";x.fillText("★".repeat(stars)+"☆".repeat(3-stars),64,340);
+  x.fillStyle=nw>=0?"#4de2a1":"#ff4d6d";x.font="900 110px system-ui,Segoe UI,Arial,sans-serif";x.fillText(fmt(nw),64,455);
+  x.fillStyle="#a49dcc";x.font="600 28px system-ui,Segoe UI,Arial,sans-serif";x.fillText(`final net worth · ${T().label.toLowerCase()}${S.mode==="daily"?" · daily "+S.label:""}`,64,498);
+  x.fillStyle="#f5f2ff";x.font="700 30px system-ui,Segoe UI,Arial,sans-serif";
   x.fillText(`Debt charged ${fmt(st.interest)}   ·   Inflation ate ${fmt(st.infl)}`,64,560);
-  x.fillStyle="#6ea8ff";x.font="700 26px Inter,Segoe UI,sans-serif";x.fillText(survived?"Can you beat it?":"The debt won. Can you do better?",64,600);
+  x.fillStyle="#6ea8ff";x.font="700 26px system-ui,Segoe UI,Arial,sans-serif";x.fillText(survived?"Can you beat it?":"The debt won. Can you do better?",64,600);
   return c;
 }
 function shareText(){
