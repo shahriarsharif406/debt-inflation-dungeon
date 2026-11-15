@@ -196,7 +196,24 @@ export function buildCellar(stage,scene,opt){
   const N=90,pos=new Float32Array(N*3),sp=[];const r=rng(77);for(let i=0;i<N;i++){pos[i*3]=-16+r()*32;pos[i*3+1]=.4+r()*7;pos[i*3+2]=wallZ+1+r()*9;sp.push([.05+r()*.12,r()*6.28,.2+r()*.5])}
   const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
   const dust=new THREE.Points(pg,new THREE.PointsMaterial({map:glowTex([[0,'rgba(255,240,210,1)'],[.4,'rgba(255,230,190,.4)'],[1,'rgba(255,220,180,0)']],32),size:.16,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,fog:false}));dust.frustumCulled=false;scene.add(dust);
-  ctl.tick=(t,dt)=>{const p=pg.attributes.position.array;for(let i=0;i<N;i++){const s=sp[i];p[i*3+1]+=s[0]*dt;p[i*3]+=Math.sin(t*.4+s[1])*dt*.12;if(p[i*3+1]>7.4)p[i*3+1]=.4}pg.attributes.position.needsUpdate=true};
+  // ---- per-floor atmosphere: Vaults = cold steel, Abyss = basalt + lava cracks + embers
+  const lavaC=document.createElement('canvas');lavaC.width=1024;lavaC.height=512;{const x=lavaC.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,1024,512);const r=rng(55);x.lineCap='round';
+    for(let k=0;k<26;k++){let cx=r()*1024,cy=r()*512,a0=r()*6.28;const pts=[[cx,cy]];for(let i=0;i<22;i++){a0+=(r()-.5)*1.1;cx+=Math.cos(a0)*26;cy+=Math.sin(a0)*18;pts.push([cx,cy])}
+      [[14,'rgba(255,60,10,.18)'],[6,'rgba(255,110,30,.5)'],[2,'rgba(255,220,140,.95)']].forEach(([w,c])=>{x.strokeStyle=c;x.lineWidth=w;x.beginPath();pts.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.stroke()})}}
+  const lavaT=new THREE.CanvasTexture(lavaC);lavaT.colorSpace=THREE.SRGBColorSpace;
+  const lava=new THREE.Mesh(new THREE.PlaneGeometry(40,11),new THREE.MeshBasicMaterial({map:lavaT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.0,fog:false}));
+  lava.rotation.x=-Math.PI/2;lava.position.set(0,.045,wallZ+6);lava.renderOrder=2;lava.visible=false;scene.add(lava);
+  const lavaGlow=new THREE.PointLight(0xff5a1e,0,16,1.8);lavaGlow.position.set(0,.8,wallZ+6);scene.add(lavaGlow);
+  const FT=[{tint:0xffffff,ember:0xfff0d2,lava:0},{tint:0x7a98cc,ember:0xbcd8ff,lava:0},{tint:0x8c6a64,ember:0xff7a3a,lava:1}];
+  ctl.mats.forEach(m=>{if(m.color)m.userData.base=m.color.clone()});
+  ctl.floor=0;
+  ctl.setFloor=i=>{const f=FT[i]||FT[0];ctl.floor=i;
+    ctl.mats.forEach(m=>{if(m.color&&m.userData.base){m.color.copy(m.userData.base).multiply(new THREE.Color(f.tint))}});
+    dust.material.color.set(f.ember);dust.material.size=i===2?.22:.16;dust.material.opacity=i===2?.9:.6;
+    lava.visible=!!f.lava;lavaGlow.intensity=f.lava?14:0};
+  const baseTick=(t,dt)=>{const p=pg.attributes.position.array;for(let i=0;i<N;i++){const s=sp[i];p[i*3+1]+=s[0]*dt*(ctl.floor===2?3:1);p[i*3]+=Math.sin(t*.4+s[1])*dt*.12;if(p[i*3+1]>7.4)p[i*3+1]=.4}pg.attributes.position.needsUpdate=true;
+    if(lava.visible){const k=.5+.5*Math.sin(t*1.3);lava.material.opacity=.36+.26*k;lavaGlow.intensity=11+7*k}};
+  ctl.tick=baseTick;const _unused=(t,dt)=>{const p=pg.attributes.position.array;for(let i=0;i<N;i++){const s=sp[i];p[i*3+1]+=s[0]*dt;p[i*3]+=Math.sin(t*.4+s[1])*dt*.12;if(p[i*3+1]>7.4)p[i*3+1]=.4}pg.attributes.position.needsUpdate=true};
   return ctl}
 
 export function cashStack(key){

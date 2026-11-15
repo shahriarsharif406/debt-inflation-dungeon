@@ -53,6 +53,7 @@ function applyTheme(i){
   if(stat.theme===i)return;stat.theme=i;const t=THEME[i]||THEME[0];
   scene.fog.color.set(t.fog);scene.background=new THREE.Color(t.fog);torches.forEach(l=>l.color.set(t.torch));
   scene.children[0].color.set(t.amb);
+  if(cellar&&cellar.setFloor)cellar.setFloor(i);
 }
 function blob(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:stat.blob,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.y=.02;m.scale.set(w,w*.55,1);return m}
 function setupAnim(o,g){
