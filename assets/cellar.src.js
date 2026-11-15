@@ -34,12 +34,12 @@ function masonry(o){
         const X=((px%W)+W)%W,Y=py%Ht;const dx=Math.min(px-x,x+bw-1-px),dy=Math.min(py-y0,y1-1-py);const d=Math.min(dx,dy);
         const n=nz(X/38,Y/38),n2=nz2(X/9,Y/9),n3=nz(X/150+3,Y/150+5);
         let hh,rr,gg,bb,ro;
-        if(d<mort){hh=0;const m=.55+n2*.35;rr=pal[0]*.2*m;gg=pal[1]*.19*m;bb=pal[2]*.18*m;ro=250}
+        if(d<mort){hh=0;const m=.55+n2*.35;rr=pal[0]*.12*m;gg=pal[1]*.12*m;bb=pal[2]*.12*m;ro=250}
         else{const b=Math.min(1,(d-mort)/o.bevel);const bs=b*b*(3-2*b);
           hh=.42+.5*bs+hOff+(n-.5)*.34+(n2-.5)*.1;
           const sh=.74+.4*bs;let t=tone*sh*(.82+n*.42)*(.94+n2*.12);
           // damp / grime towards the bottom of the tile and low-frequency stains
-          const stain=Math.max(0,n3-.52)*1.4;t*=1-stain*.55;
+          const stain=Math.max(0,n3-.45)*1.7;t*=1-stain*.62;
           rr=pal[0]*t*(1+warm);gg=pal[1]*t;bb=pal[2]*t*(1-warm);
           if(o.moss&&n3>.6&&n>.5){const m=Math.min(1,(n3-.6)*4);rr*=1-.25*m;gg*=1+.05*m;bb*=1-.3*m}
           ro=185+n2*60}
@@ -49,6 +49,8 @@ function masonry(o){
   // chips & pits
   for(let k=0;k<o.chips;k++){const cx=Math.floor(rnd()*W),cy=Math.floor(rnd()*Ht),cr=2+Math.floor(rnd()*5);
     for(let y=-cr;y<=cr;y++)for(let x=-cr;x<=cr;x++){const dd=Math.hypot(x,y);if(dd<cr){const X=(cx+x+W)%W,Y=(cy+y+Ht)%Ht;hgt[Y*W+X]-= (1-dd/cr)*.35;const i=(Y*W+X)*4;col[i]*=.8;col[i+1]*=.8;col[i+2]*=.8}}}
+  for(let k=0;k<(o.cracks||0);k++){let cx=rnd()*W,cy=rnd()*Ht,a=rnd()*6.28;const len=40+rnd()*110;for(let i=0;i<len;i++){a+=(rnd()-.5)*.5;cx+=Math.cos(a)*1.4;cy+=Math.sin(a)*1.4;const X=((Math.floor(cx)%W)+W)%W,Y=((Math.floor(cy)%Ht)+Ht)%Ht;
+    for(let q=0;q<2;q++){const XX=(X+q)%W,idx=Y*W+XX;hgt[idx]-=.45;const ci=idx*4;col[ci]*=.45;col[ci+1]*=.45;col[ci+2]*=.45}}}
   const nrm=normalFrom(hgt,W,Ht,o.relief);
   return{map:toTex(col,W,Ht,true),normal:toTex(nrm,W,Ht,false),rough:toTex(rgh,W,Ht,false)}}
 
@@ -70,9 +72,9 @@ function webTex(){const c=document.createElement('canvas');c.width=c.height=128;
 
 export function buildCellar(stage,scene,opt){
   const wallZ=opt.wallZ,torches=opt.torches;const ctl={mats:[],tick:null};
-  const stonePal=[[128,122,114],[116,110,104],[138,126,112],[106,104,106],[132,118,100]];
-  const wallT=masonry({W:1024,H:512,rows:12,bw:[75,125],mortar:4,bevel:9,pal:stonePal,seed:11,rowJit:0,relief:2.6,chips:320,moss:true});
-  const floorT=masonry({W:1024,H:1024,rows:10,bw:[110,210],mortar:6,bevel:14,pal:[[112,106,100],[102,98,96],[124,114,102],[96,94,98]],seed:23,rowJit:0,relief:1.8,chips:320,moss:false});
+  const stonePal=[[98,95,92],[86,85,86],[106,98,90],[78,79,84],[94,88,80]];
+  const wallT=masonry({W:1024,H:512,rows:11,bw:[70,170],mortar:3,bevel:5,pal:stonePal,seed:11,rowJit:0,relief:3.4,chips:620,cracks:26,moss:true});
+  const floorT=masonry({W:1024,H:1024,rows:9,bw:[110,240],mortar:5,bevel:8,pal:[[78,75,72],[70,69,70],[86,80,74],[62,62,66]],seed:23,rowJit:0,relief:2.6,chips:700,cracks:20,moss:false});
   const woodA=woodTex(41,256,256,[150,100,58]);const woodB=woodTex(57,256,256,[96,64,38]);
   const tex=(t,rx,ry)=>{const m=t.map.clone(),n=t.normal.clone(),r=t.rough&&t.rough.clone();[m,n,r].forEach(q=>{if(q){q.repeat.set(rx,ry);q.needsUpdate=true}});return{m,n,r}};
   const stoneMat=(rx,ry,tint)=>{const q=tex(wallT,rx,ry);const m=new THREE.MeshStandardMaterial({map:q.m,normalMap:q.n,roughnessMap:q.r,roughness:1,metalness:0,normalScale:new THREE.Vector2(1.1,1.1),color:tint||0xffffff});ctl.mats.push(m);return m};
@@ -104,7 +106,7 @@ export function buildCellar(stage,scene,opt){
   const alT=glowTex([[0,'rgba(255,190,110,.55)'],[.45,'rgba(255,150,60,.22)'],[1,'rgba(255,120,30,0)']],128);
   const coreGeo=new THREE.CylinderGeometry(.075,.075,.58,10);coreGeo.rotateX(Math.PI/2);const coreM=new THREE.MeshStandardMaterial({color:0x3a2a16,roughness:1});const n0=c=>c.reduce((a,b)=>a+b,0);
   function alcove(cx,half,hs){
-    const ag=new THREE.Sprite(new THREE.SpriteMaterial({map:alT,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false,opacity:.6}));ag.scale.set(half*3.2,half*3.2,1);ag.position.set(cx,hs*.8,wallZ+.85);ag.renderOrder=3;scene.add(ag);
+    const ag=new THREE.Sprite(new THREE.SpriteMaterial({map:alT,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false,opacity:.3}));ag.scale.set(half*3.2,half*3.2,1);ag.position.set(cx,hs*.8,wallZ+.85);ag.renderOrder=3;scene.add(ag);
     const t=.42,R=half+t;
     const sh=new THREE.Shape();sh.moveTo(-R,0);sh.lineTo(-R,hs);sh.absarc(0,hs,R,Math.PI,0,true);sh.lineTo(R,0);sh.lineTo(-R,0);
     const hole=new THREE.Path();hole.moveTo(-half,0);hole.lineTo(-half,hs);hole.absarc(0,hs,half,Math.PI,0,true);hole.lineTo(half,0);hole.lineTo(-half,0);sh.holes.push(hole);
@@ -131,7 +133,7 @@ export function buildCellar(stage,scene,opt){
     return n}
   alcove(-10.3,1.85,3.3);alcove(0,1.85,3.3);alcove(10.3,1.85,3.3);
   // ---- grain sacks, clay storage jars, crates
-  const sackM=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#b8996a';x.fillRect(0,0,128,128);const r=rng(9);for(let i=0;i<900;i++){x.fillStyle=`rgba(${r()<.5?'90,66,36':'214,188,140'},${.12+r()*.18})`;x.fillRect(r()*128,r()*128,r()<.5?1:12,r()<.5?12:1)}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;return new THREE.MeshStandardMaterial({map:t,roughness:1,color:0xe6d2aa})})();
+  const sackM=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#b8996a';x.fillRect(0,0,128,128);const r=rng(9);for(let i=0;i<900;i++){x.fillStyle=`rgba(${r()<.5?'90,66,36':'214,188,140'},${.12+r()*.18})`;x.fillRect(r()*128,r()*128,r()<.5?1:12,r()<.5?12:1)}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;return new THREE.MeshStandardMaterial({map:t,roughness:1,color:0xb8a888})})();
   const ropeM=new THREE.MeshStandardMaterial({color:0x5a4228,roughness:1});
   const sackGeo=new THREE.SphereGeometry(.62,20,16);
   function sack(x,y,z,s,ry,lean){const g=new THREE.Group();const b=new THREE.Mesh(sackGeo,sackM);b.scale.set(1,1.15,.78);b.position.y=.68;g.add(b);
@@ -139,7 +141,7 @@ export function buildCellar(stage,scene,opt){
     const tp=new THREE.Mesh(new THREE.ConeGeometry(.26,.28,12),sackM);tp.position.y=1.66;tp.rotation.z=.2;g.add(tp);
     const rp=new THREE.Mesh(new THREE.TorusGeometry(.24,.04,6,14),ropeM);rp.rotation.x=Math.PI/2;rp.position.y=1.28;g.add(rp);
     g.position.set(x,y,z);g.rotation.y=ry||0;g.rotation.z=lean||0;g.scale.setScalar(s||1);stage.add(g)}
-  const clayM=new THREE.MeshStandardMaterial({color:0xa5583a,roughness:.78,metalness:0});
+  const clayM=new THREE.MeshStandardMaterial({color:0x6e4430,roughness:.85,metalness:0});
   const clayDark=new THREE.MeshStandardMaterial({color:0x5a2e1e,roughness:.9});
   const jarProf=[[.0,0],[.34,0],[.5,.2],[.62,.55],[.56,.95],[.34,1.2],[.26,1.38],[.34,1.5],[.3,1.55]].map(p=>new THREE.Vector2(p[0],p[1]));
   const jarGeo=new THREE.LatheGeometry(jarProf,22);
@@ -177,8 +179,8 @@ export function buildCellar(stage,scene,opt){
     const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:haloT,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));hl.scale.set(3.2,3.2,1);hl.position.set(x,y+.66,fz+.6);scene.add(hl);
     L.userData.glow=fl;L.userData.halo=hl;
     // light pools on wall & floor
-    const pw=new THREE.Mesh(new THREE.PlaneGeometry(8.5,8.5),new THREE.MeshBasicMaterial({map:poolT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:lit?1:.55}));pw.position.set(x,y+.3,wallZ+.03);pw.renderOrder=2;scene.add(pw);
-    const pf=new THREE.Mesh(new THREE.PlaneGeometry(9,5),new THREE.MeshBasicMaterial({map:poolT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:lit?.8:.35}));pf.rotation.x=-Math.PI/2;pf.position.set(x,.04,wallZ+3.6);pf.renderOrder=2;scene.add(pf);
+    const pw=new THREE.Mesh(new THREE.PlaneGeometry(8.5,8.5),new THREE.MeshBasicMaterial({map:poolT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:lit?.85:.4}));pw.position.set(x,y+.3,wallZ+.03);pw.renderOrder=2;scene.add(pw);
+    const pf=new THREE.Mesh(new THREE.PlaneGeometry(9,5),new THREE.MeshBasicMaterial({map:poolT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:lit?.5:.22}));pf.rotation.x=-Math.PI/2;pf.position.set(x,.04,wallZ+3.6);pf.renderOrder=2;scene.add(pf);
     pw.userData.p=pf.userData.p=L;ctl.mats.pools=(ctl.mats.pools||[]).concat([pw,pf])});
   // cobwebs high in the corners
   const wt=webTex();[[-14.7,cornY-.6,1],[14.7,cornY-.6,-1],[-4.55,cornY-.6,1],[4.55,cornY-.6,-1]].forEach(([x,y,s])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.5),new THREE.MeshBasicMaterial({map:wt,transparent:true,depthWrite:false,opacity:.55}));m.scale.x=s;m.position.set(x+s*.8,y-.75,wallZ+1.3);m.rotation.z=0;m.renderOrder=3;scene.add(m)});
@@ -199,7 +201,7 @@ export function cashStack(key){
   x.fillStyle='#d9ecc9';x.font='bold 13px system-ui,Arial';x.fillText('100',24,32);x.fillText('100',104,32);
   const top=new THREE.CanvasTexture(c);top.colorSpace=THREE.SRGBColorSpace;top.anisotropy=4;
   const side=new THREE.MeshStandardMaterial({color:0x8e9c7a,roughness:.95});
-  const topM=new THREE.MeshStandardMaterial({map:top,roughness:.8,color:0x8fb48f});
+  const topM=new THREE.MeshStandardMaterial({map:top,roughness:.8,color:0x7a9c7e});
   const mats=[side,side,topM,side,side,side];
   const band=new THREE.MeshStandardMaterial({color:0x9c8c66,roughness:.9});
   const layers=key==='cs'?[2,1]:key==='cm'?[3,2,1]:[4,3,2,1];const bh=.3,bw=1.0,bd=.5;

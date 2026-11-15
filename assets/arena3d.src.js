@@ -9,7 +9,7 @@ const A={ready:false,failed:false,onready:null};
 window.Arena3D=A;
 const M={};let cellar=null,renderer,scene,cam,canvas,hall=null,clock,torches=[],running=false,lastTime=0;
 const inst={},stat={};let knight=null,coins=null,prevSum=null,floorTheme=0;
-const THEME=[{fog:0x2a3466,amb:0x8a9ad0,torch:0xffa24d,tint:0x8fa0d8},{fog:0x3a2618,amb:0xb89070,torch:0xff9438,tint:0xd8a070},{fog:0x3a1620,amb:0xb06a78,torch:0xff6a3a,tint:0xd87080}];
+const THEME=[{fog:0x161b30,amb:0x7482b0,torch:0xffa24d,tint:0x8fa0d8},{fog:0x2a1a10,amb:0x9a7a60,torch:0xff9438,tint:0xd8a070},{fog:0x2a1018,amb:0x906070,torch:0xff6a3a,tint:0xd87080}];
 const KIND={wyrm:{m:"demon"},golem:{m:"orc"},imp:{m:"blue"},vamp:{m:"creep"},hydra:{m:"blue",tint:0x3ddc84},emerg:{m:"demon",tint:0xff8a3d}};
 const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",creep:"creep.glb"};
 const ESSENTIAL=["knight","demon","blue","orc"];
@@ -28,13 +28,13 @@ function fit(grp){const o=grp.userData.o,w=grp.userData.inner,h=grp.userData.h;o
 function build(){
   canvas=document.createElement("canvas");canvas.className="a3d";
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
-  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.65;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,innerWidth<700?1.25:1.6));
-  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x2a3466,.022);
+  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x161b30,.028);
   cam=new THREE.PerspectiveCamera(17,4.4,.5,120);
   clock=new THREE.Clock();
   // lights
-  scene.add(new THREE.HemisphereLight(0xc4d0ff,0x6a5040,1.15));
+  scene.add(new THREE.HemisphereLight(0xaab6e0,0x4a3a30,.8));
   const key=new THREE.DirectionalLight(0xfff0d0,2.1);key.position.set(-6,9,10);scene.add(key);
   const rim=new THREE.DirectionalLight(0x9fc0ff,1.3);rim.position.set(8,5,-6);scene.add(rim);
   const stage=new THREE.Group();scene.add(stage);
@@ -64,7 +64,7 @@ function idle(I){const a=I.idleA;if(!a)return;a.reset().setLoop(THREE.LoopRepeat
 function mkChar(modelKey,tint,h){
   const g=M[modelKey]||M.blue;const grp=norm(g,h);
   const inner=grp.userData.inner;
-  if(tint)grp.traverse(o=>{if(o.isMesh){o.material=o.material.clone();if(o.material.color)o.material.color.lerp(new THREE.Color(tint),.5)}});
+  grp.traverse(o=>{if(o.isMesh){o.material=o.material.clone();if(o.material.color){if(tint)o.material.color.lerp(new THREE.Color(tint),.5);o.material.color.multiplyScalar(modelKey==='knight'?.92:.8)}}});
   const I=setupAnim(grp.children[0],g);I.grp=grp;I.root=new THREE.Group();I.root.add(grp);I.root.add(blob(1.6));
   I.idleA=pick(I.acts,/^idle1?(_action)?$/i)||pick(I.acts,/idle/i)||Object.values(I.acts)[0];idle(I);I.mx.update(.3+Math.random()*1.5);fit(grp);
   scene.add(I.root);return I;
