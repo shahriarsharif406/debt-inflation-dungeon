@@ -116,16 +116,22 @@ export function buildCellar(stage,scene,opt){
     const ks=new THREE.Mesh(new THREE.BoxGeometry(.5,.62,.7),stoneMat(.5/16,.62/8,0xefe6d8));ks.position.set(cx,hs+R-.28,wallZ+.35);stage.add(ks);
     // recessed back panel
     const bp=new THREE.Mesh(new THREE.ShapeGeometry((()=>{const s=new THREE.Shape();s.moveTo(-half,0);s.lineTo(-half,hs);s.absarc(0,hs,half,Math.PI,0,true);s.lineTo(half,0);s.lineTo(-half,0);return s})(),18),backM);bp.position.set(cx,0,wallZ+.06);stage.add(bp);
-    // lattice rack + bottles (end-on)
-    const rows=Math.floor((hs+half*.55)/.5),cols=Math.max(3,Math.floor(half*2/.46));
-    const insts=glassM.map(m=>new THREE.InstancedMesh(bottleGeo,m,rows*cols)),cnt=[0,0,0,0];const dm=new THREE.Object3D();
-    for(let r=0;r<rows;r++){const y=.5+r*.5;const off=(r%2)*.23;
-      for(let c=0;c<cols;c++){const x=-half+.35+c*.46+off;if(Math.abs(x)>half-.2)continue;
-        const inArch=y>hs?(Math.hypot(x,y-hs)<half-.22):true;if(!inArch)continue;
-        const k=(r*5+c*3+((r*c)%3))%4;dm.position.set(cx+x,y,wallZ+.36);dm.rotation.set(0,0,0);dm.scale.set(.92+((r*7+c*3)%5)*.03,.92+((r*7+c*3)%5)*.03,1);dm.updateMatrix();insts[k].setMatrixAt(cnt[k]++,dm.matrix)}}
-    insts.forEach((q,k)=>{q.count=cnt[k];q.instanceMatrix.needsUpdate=true;scene.add(q)});
-    const core=new THREE.InstancedMesh(coreGeo,coreM,n0(cnt));let ci=0;insts.forEach((q,k)=>{for(let i=0;i<cnt[k];i++){q.getMatrixAt(i,dm.matrix);dm.matrix.decompose(dm.position,dm.quaternion,dm.scale);dm.position.z+=.02;dm.scale.set(1,1,1);dm.updateMatrix();core.setMatrixAt(ci++,dm.matrix)}});core.count=ci;scene.add(core);
-    const n=cnt[0]+cnt[1]+cnt[2]+cnt[3];
+    // shelves of ledger books standing upright
+    const rows=Math.floor((hs+half*.55)/.5);
+    const bookGeo=new THREE.BoxGeometry(1,1,1);
+    const bookM=new THREE.MeshStandardMaterial({roughness:.7,metalness:.05,color:0xffffff});
+    const cap=Math.ceil(rows*Math.ceil(half*2/.07));
+    const books=new THREE.InstancedMesh(bookGeo,bookM,cap);const dm=new THREE.Object3D();
+    const cols=[0x4a1f1c,0x2f3b2a,0x23304a,0x5a4326,0x3a2420,0x2a2a38,0x4c3a22,0x1f3a3a];const br=rng(31+Math.round(cx*3));let bn=0;
+    for(let r=0;r<rows;r++){const y0=.285+r*.5;let x=-half+.14;
+      while(x<half-.14&&bn<cap-1){
+        if(br()<.07){x+=.1+br()*.18;continue}
+        const w=.07+br()*.09,h=.3+br()*.12,d=.3+br()*.04,xc=x+w/2,yc=y0+h/2;
+        if(y0+h>hs&&Math.hypot(xc,y0+h-hs)>half-.1)break;
+        dm.position.set(cx+xc,yc,wallZ+.34);dm.rotation.set(0,0,br()<.08?(br()-.5)*.25:0);dm.scale.set(w,h,d);dm.updateMatrix();books.setMatrixAt(bn,dm.matrix);
+        const cc=new THREE.Color(cols[Math.floor(br()*cols.length)]);cc.multiplyScalar(.75+br()*.5);books.setColorAt(bn,cc);bn++;x+=w+.008}}
+    books.count=bn;books.instanceMatrix.needsUpdate=true;if(books.instanceColor)books.instanceColor.needsUpdate=true;scene.add(books);
+    const n=bn;
     // slats
     for(let r=0;r<=rows;r++){const y=.25+r*.5;if(y>hs+half-.5)break;const wlen=y>hs?2*Math.sqrt(Math.max(.01,half*half-(y-hs)*(y-hs))):half*2;
       const s=new THREE.Mesh(new THREE.BoxGeometry(wlen,.07,.5),rackWood);s.position.set(cx,y,wallZ+.3);stage.add(s)}
@@ -200,10 +206,10 @@ export function cashStack(key){
   x.fillStyle='#d9ecc9';x.beginPath();x.arc(64,32,15,0,6.3);x.fill();x.fillStyle='#2f6a40';x.font='bold 22px system-ui,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('$',64,33);
   x.fillStyle='#d9ecc9';x.font='bold 13px system-ui,Arial';x.fillText('100',24,32);x.fillText('100',104,32);
   const top=new THREE.CanvasTexture(c);top.colorSpace=THREE.SRGBColorSpace;top.anisotropy=4;
-  const side=new THREE.MeshStandardMaterial({color:0x8e9c7a,roughness:.95});
-  const topM=new THREE.MeshStandardMaterial({map:top,roughness:.8,color:0x7a9c7e});
+  const side=new THREE.MeshStandardMaterial({color:0x56664a,roughness:.95});
+  const topM=new THREE.MeshStandardMaterial({map:top,roughness:.8,color:0x5f8463});
   const mats=[side,side,topM,side,side,side];
-  const band=new THREE.MeshStandardMaterial({color:0x9c8c66,roughness:.9});
+  const band=new THREE.MeshStandardMaterial({color:0x6e6246,roughness:.9});
   const layers=key==='cs'?[2,1]:key==='cm'?[3,2,1]:[4,3,2,1];const bh=.3,bw=1.0,bd=.5;
   const grp=new THREE.Group();let n=0;
   layers.forEach((cnt,li)=>{for(let i=0;i<cnt;i++){const b=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,bd),mats);
