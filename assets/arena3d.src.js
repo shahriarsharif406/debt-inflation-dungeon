@@ -27,14 +27,14 @@ function fit(grp){const o=grp.userData.o,w=grp.userData.inner,h=grp.userData.h;o
 function build(){
   canvas=document.createElement("canvas");canvas.className="a3d";
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
-  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.45;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,innerWidth<700?1.25:1.6));
-  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0c1020,.05);
+  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0c1020,.04);
   cam=new THREE.PerspectiveCamera(17,4.4,.5,120);
   clock=new THREE.Clock();
   // lights
-  scene.add(new THREE.HemisphereLight(0x8a96c8,0x2a1c14,.5));
-  const key=new THREE.DirectionalLight(0xffe2b8,1.05);key.position.set(-6,9,10);scene.add(key);
+  scene.add(new THREE.HemisphereLight(0x9aa6d8,0x3a2a20,.85));
+  const key=new THREE.DirectionalLight(0xffe2b8,1.5);key.position.set(-6,9,10);scene.add(key);
   const rim=new THREE.DirectionalLight(0x7fa8ff,.9);rim.position.set(8,5,-6);scene.add(rim);
   // measure tile sizes
   const fb=new THREE.Box3().setFromObject(M.floor.scene);const ft=Math.max(fb.max.x-fb.min.x,fb.max.z-fb.min.z)||4;
