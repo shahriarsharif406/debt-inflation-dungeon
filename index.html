@@ -682,7 +682,14 @@ function musicBar(c,dest,t,bar,fl,mood,bpm){
 const MU={bar:0,next:0,timer:null,mood:"play",moodUntil:0,gain:null};
 function musicStart(){
   const c=A.ctx;if(!c||MU.timer)return;
-  MU.gain=c.createGain();MU.gain.gain.value=1.35;MU.gain.connect(A.master);MU.next=c.currentTime+.2;
+  MU.gain=c.createGain();MU.gain.gain.value=1.35;MU.gain.connect(A.master);
+  try{ // cathedral-style reverb: generated impulse, wet send only
+    const len=Math.floor(c.sampleRate*2.6),ir=c.createBuffer(2,len,c.sampleRate);
+    for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/len,2.6)}
+    const cv=c.createConvolver();cv.buffer=ir;const wl=c.createBiquadFilter();wl.type="lowpass";wl.frequency.value=3200;
+    const wg=c.createGain();wg.gain.value=.55;MU.gain.connect(cv);cv.connect(wl);wl.connect(wg);wg.connect(A.master);
+  }catch(e){}
+MU.next=c.currentTime+.2;
   const tick=()=>{if(!A.ctx||A.ctx.state!=="running")return;
     while(MU.next<c.currentTime+.6){
       const fl=floorOf(S?S.month:1),bpm=MUS.base[fl]+Math.min(10,(S?S.month:1)*.8)+(MU.mood==="lose"?-16:0)+(MU.mood==="win"?10:0);
