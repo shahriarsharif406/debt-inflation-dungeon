@@ -15,7 +15,7 @@ Debt monsters grow, cash melts, a rocket to escape. Nineteen real economic ideas
 | Educational impact (15) | Report card from your own choices, Money Codex, "next time" tip, optional discussion via the Daily Dungeon |
 | Creativity (15) | Debt monsters with inflation, space-tech escape-velocity metaphor, theory-driven Codex |
 | Development and commercial potential (20) | docs/BUDGET.md: $48,000 plan, 6 phases, revenue paths, risks |
-| Localisation bonus (5) | Full Arabic interface with right-to-left layout. Optional Gulf pack: amounts in AED, rent cheques, end-of-service gratuity, a credit-report check, remittance fees and hidden exchange margins, pay-in-4 instalments, Eid hosting, zakat (2.5% of qualifying savings) and an interest-free family loan (qard hasan, 0%) as an alternative to a 4% card. Native-speaker review of the Arabic is budgeted in docs/BUDGET.md |
+| Localisation bonus (5) | Full Arabic interface with right-to-left layout. Optional Gulf pack: amounts in AED, rent cheques, end-of-service gratuity, an AECB-style credit score (300-900), a credit-report check, remittance fees and hidden exchange margins, pay-in-4 instalments, Eid hosting, zakat (2.5% of qualifying savings) and an interest-free family loan (qard hasan, 0%) as an alternative to a 4% card. Native-speaker review of the Arabic is budgeted in docs/BUDGET.md |
 | Inclusivity and accessibility bonus (5) | Accessibility panel (button on the top bar): text size (3 levels), high contrast, colour-blind-safe colours (orange and blue), reduce motion, sound captions, plain-language mode. Full keyboard play, screen-reader labels, English and Arabic, three income levels, no stereotypes, no reading of quizzes to progress |
 
 ## Submission checklist
