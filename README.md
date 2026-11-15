@@ -102,3 +102,6 @@ Expected shape: doing nothing loses; lavish living plus status purchases loses; 
 ## Credits
 
 Design and code: Shahariar / FutureTech.ai. No open-source licence has been chosen yet. Zoud holds the jam's non-commercial display licence for the version submitted to Zoud GameLab; ownership remains with the creator.
+
+## Credits
+3D monster art is rendered from CC0 models by [Quaternius](https://quaternius.com) (Demon, BlueDemon, Orc, CreepCreature). Dungeon backdrop, lighting, UI, code and music are original.
