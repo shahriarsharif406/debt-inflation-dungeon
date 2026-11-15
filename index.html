@@ -448,6 +448,8 @@ html.a-rm .esc::before{animation:none}
 @media (prefers-reduced-motion:reduce){.pip.now{animation:none}.ib{transition:none}}
 html.a-rm .pip.now{animation:none}
 .tempt.scam{border-color:#ff8a3d88;background:linear-gradient(180deg,#2a1608,#170d10)}.tempt.scam small{color:#ffb070}
+.continue{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin:2px 0 12px;padding:14px 16px;border-radius:16px;border:1px solid #4de2a1aa;background:linear-gradient(180deg,#123a2e,#0c261f);color:#eafff6;text-align:left;box-shadow:0 0 24px #4de2a133,inset 0 1px 0 #ffffff22;min-height:56px}
+.continue b{font-size:16px}.continue span{font-size:12.5px;color:#9fe9c8;font-weight:700}.continue:hover{transform:translateY(-1px)}
 </style>
 </head>
 <body data-floor="0">
@@ -476,7 +478,7 @@ html.a-rm .pip.now{animation:none}
   <div id="top">
     <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M16 76Q8 42 34 34Q50 27 66 34Q92 42 84 76Q50 92 16 76Z" fill="#ff4d6d"/><circle cx="38" cy="52" r="8" fill="#fff"/><circle cx="62" cy="52" r="8" fill="#fff"/><circle cx="40" cy="54" r="4" fill="#14091a"/><circle cx="60" cy="54" r="4" fill="#14091a"/></svg><span><b>DEBT</b> &amp; <b>INFLATION</b> DUNGEON</span></div>
     <div id="track" aria-hidden="true"></div>
-    <div class="hudb"><button class="ib" id="acc" aria-label="Accessibility settings">♿</button><button class="ib" id="codex" aria-label="Money Codex">📖</button><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
+    <div class="hudb"><button class="ib" id="menu" aria-label="Menu: save and leave this run">🏠</button><button class="ib" id="acc" aria-label="Accessibility settings">♿</button><button class="ib" id="codex" aria-label="Money Codex">📖</button><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
   </div>
   <div id="floor"></div>
   <div id="plain" class="plain" role="note">In plain words: debt grows every month. Pay the debt with the biggest % first. Keep some cash for surprises. Skip things you do not need.</div>
@@ -1176,6 +1178,7 @@ function endMonth(){
   if(S.scam){S.stats.scamOK=(S.stats.scamOK||0)+1}
   rollScam();rollTemptation();S.hist.push(netWorth());
   if(m0===1)store.set("tut","1");
+  saveRun();
   showReport(m0,rep,fc);
 }
 function showReport(m,rep,fc){
@@ -1241,7 +1244,22 @@ function settle(){
   let take=used;const fromCash=Math.min(take,Math.max(0,S.cash));S.cash-=fromCash;take-=fromCash;S.assets.vault-=take;
   S.mons=S.mons.filter(m=>m.debt>0);return used;
 }
-function finish(survived,m){
+/* ---------- save and continue ---------- */
+function saveRun(){
+  try{if(!S||S.over||S.month<2)return;
+    const c=JSON.parse(JSON.stringify(S));c.busy=false;c.tok=0;
+    store.set("run",JSON.stringify({v:1,region:REGION,mode:MODE,s:c,t:Date.now()}))}catch(e){}
+}
+function clearRun(){store.set("run","")}
+function savedRun(){try{const r=JSON.parse(store.get("run")||"null");return r&&r.v===1&&r.s&&r.s.month>=2&&!r.s.over?r:null}catch(e){return null}}
+function continueRun(){
+  const r=savedRun();if(!r)return;
+  REGION=r.region==="gulf"?"gulf":"global";store.set("region",REGION);MODE=r.mode==="daily"?"daily":"free";
+  S=r.s;S.busy=false;S.over=false;S.tok=(S.tok||0)+1;
+  R=S.mode==="daily"?mulberry32((S.seed||1)+S.month*7919):Math.random;
+  document.body.classList.toggle("gulf",REGION==="gulf");
+  $("#ov").classList.remove("on");render();beep(440,.1,"triangle")}
+function finish(survived,m){clearRun();
   S.over=true;S.busy=false;S.done=survived;S.tok++;
   S.settled=survived?settle():0;
   const debt=totalDebt(),nw=netWorth(),st=S.stats,stars=starsFor(survived);
@@ -1361,6 +1379,7 @@ function showTitle(){
       <button data-region="global" class="${REGION==="global"?"on":""}" aria-pressed="${REGION==="global"}"><b>🌍 Global edition</b><span>Dollars. Everyday money life anywhere.</span></button>
       <button data-region="gulf" class="g ${REGION==="gulf"?"on":""}" aria-pressed="${REGION==="gulf"}"><span class="tagn">NEW · UAE</span><b>🇦🇪 Gulf edition</b><span>Dirhams · rent cheques · end-of-service gratuity · remittances · pay-in-4 · zakat · interest-free family loan · credit report</span></button>
     </div>
+    ${(()=>{const r=savedRun();if(!r)return"";const nm=r.s.tier&&TIERS[r.s.tier]?TIERS[r.s.tier].label:"";return`<button class="continue" data-continue="1"><b>▶ Continue your run</b><span>Month ${r.s.month} of ${LAST}${nm?" · "+nm:""}</span></button>`})()}
     <div class="tiers">${["low","mid","high"].map(k=>`<button class="tier t-${k}" data-tier="${k}"><b>${TIERS[k].label}</b><span>${TIERS[k].sub}</span><em>${fmt(TIERS[k].salary)} / month${best(k)}</em></button>`).join("")}</div>
     <div class="links"><button id="helpLink">How to play</button><span>Made for Zoud GameLab 2026 · a FutureTech.ai game</span></div>
   </div>`;
@@ -1471,6 +1490,8 @@ document.addEventListener("click",e=>{
   else if(t.dataset.tier){$("#ov").classList.remove("on");newGame(t.dataset.tier,MODE);render();beep(440,.1,"triangle");if(!store.get("tut"))say("Tutorial: tap PAY on the fastest-growing debt.")}
   else if(t.dataset.acc){const k=t.dataset.acc;if(k==="ts")ACC.ts=+t.dataset.v;else ACC[k]=ACC[k]?0:1;store.set("acc",JSON.stringify(ACC));accApply();openAccess();try{$("#ov2").querySelector(`[data-acc="${k}"]`).focus()}catch(e){}}
   else if(t.id==="acc")openAccess();
+  else if(t.dataset.continue)continueRun();
+  else if(t.id==="menu"){saveRun();showTitle()}
   else if(t.id==="helpLink"||t.id==="help")openHelp();
   else if(t.id==="codex"||t.id==="cdxLink")openCodex();
 });
@@ -1505,6 +1526,7 @@ if(LANG!=="ar")return;
 document.documentElement.lang="ar";document.documentElement.dir="rtl";
 /* whole-text templates; # stands for a number/amount token */
 var T={
+"Month # of # · #":"الشهر # من # · #","Month # of #":"الشهر # من #",
 "Islamic instalment: murabaha, fixed profit (total #)":"تقسيط إسلامي: مرابحة بربح ثابت (الإجمالي #)",
 "of # · Inflation":"من # · التضخم","Month":"الشهر","MONTH # OF #":"الشهر # من #","CONTINUE TO MONTH # ▶":"◀ تابع إلى الشهر #",
 "Month # report. Net worth #":"تقرير الشهر #. صافي الثروة #","FLOOR # · THE VAULTS":"الطابق # · الأقبية","FLOOR # · THE ABYSS":"الطابق # · الهاوية",
@@ -1641,6 +1663,7 @@ var S={
 "Month":"الشهر","/mo":"/شهر",
 };
 Object.assign(S,{
+"▶ Continue your run":"▶ تابع لعبتك","Menu: save and leave this run":"القائمة: احفظ وغادر هذه اللعبة",
 "Murabaha Contract":"عقد مرابحة","Islamic finance: fixed profit, never grows":"تمويل إسلامي: ربح ثابت لا يزداد","Islamic Finance: Risk-Sharing":"التمويل الإسلامي: تقاسم المخاطر","Murabaha · takaful · qard hasan":"مرابحة · تكافل · قرض حسن","Money is not rented for compounding interest (riba). Costs are fixed and agreed up front, risk is shared, and kindness-loans stay interest-free.":"لا يُؤجَّر المال بفائدة مركّبة (ربا). التكاليف ثابتة ومتفق عليها مسبقًا، والمخاطر مشتركة، والقروض الحسنة بلا فوائد.","Takaful Shield":"درع التكافل","📖 Islamic finance avoids riba (interest that compounds): in a murabaha the bank sells you the item at an agreed price, so the cost is fixed up front. Qard hasan is an interest-free loan from family. Both are still debt, and both have limits.":"📖 يتجنب التمويل الإسلامي الربا (الفائدة المركّبة): في المرابحة يبيعك البنك السلعة بسعر متفق عليه، فتكون التكلفة ثابتة مقدمًا. القرض الحسن قرض عائلي بلا فوائد. كلاهما دَين وله حدود.","Murabaha":"مرابحة","Islamic finance: the bank buys the item and sells it to you at an agreed, fixed profit. The total never grows, but it is still debt.":"تمويل إسلامي: يشتري البنك السلعة ويبيعها لك بربح ثابت متفق عليه. المبلغ الإجمالي لا يزداد، لكنه يبقى دَينًا.","Takaful":"تكافل","Cooperative cover: members pool money and share the cost of losses, instead of paying a company for insurance.":"تغطية تعاونية: يجمع الأعضاء المال ويتقاسمون كلفة الخسائر بدل دفع قسط لشركة تأمين.","Riba":"ربا","Interest that compounds. Islamic finance avoids it, which is why costs are fixed up front.":"فائدة مركّبة. يتجنبها التمويل الإسلامي، لذلك تكون التكاليف ثابتة مقدمًا.","Murabaha: the bank buys it and sells it to you at a fixed profit. The total is agreed up front and never grows.":"مرابحة: يشتريها البنك ويبيعها لك بربح ثابت. المبلغ الإجمالي متفق عليه مسبقًا ولا يزداد.","ON · members pool contributions to cover 80% of car, medical and phone bills":"مفعّل · يجمع الأعضاء الاشتراكات لتغطية 80% من فواتير السيارة والعلاج والهاتف",
 "⚠ SUSPICIOUS MESSAGE · YOUR CALL":"⚠ رسالة مشبوهة · القرار لك","Bank text: 'account blocked'":"رسالة بنك: «حسابك محظور»","A text says your account is frozen and asks for the code (OTP) it just sent you. A caller waits on the line.":"رسالة تقول إن حسابك مجمّد وتطلب الرمز (OTP) الذي وصلك للتو. وهناك متصل ينتظر على الخط.","Prize message: 'pay a small fee'":"رسالة جائزة: «ادفع رسمًا بسيطًا»","You 'won' a prize, but must first pay a processing fee to claim it.":"«ربحت» جائزة لكن عليك أولًا دفع رسوم معالجة لاستلامها.","Task job: 'like videos, earn daily'":"وظيفة مهام: «أعجب بالفيديوهات واربح يوميًا»","A chat offers easy money for liking videos, after you deposit your 'starter balance'.":"محادثة تعرض مالًا سهلًا مقابل الإعجاب بالفيديوهات بعد إيداع «رصيد البداية».","Investment tip: 'guaranteed 30%'":"نصيحة استثمار: «ربح مضمون 30%»","A stranger in a group chat promises guaranteed returns if you send money today.":"شخص غريب في مجموعة يعد بعوائد مضمونة إذا أرسلت المال اليوم.","Fake toll fine (Salik-style SMS)":"مخالفة سالك مزيفة (رسالة نصية)","A text says you owe a toll fine and must pay through a link in the next hour.":"رسالة تقول إن عليك غرامة رسوم طريق ويجب الدفع عبر رابط خلال ساعة.","Fake rental listing":"إعلان إيجار مزيف","A great flat at a low rent. The agent asks for a deposit before you can view it.":"شقة رائعة بإيجار منخفض. يطلب الوسيط وديعة قبل أن تعاينها.","📖 Scams use urgency and fear. Stop, verify through the official app or number, never share a code.":"📖 تعتمد الاحتيالات على الاستعجال والخوف. توقف وتحقق عبر التطبيق أو الرقم الرسمي ولا تشارك أي رمز.","Ignore and report it":"تجاهل وأبلغ عنها","Do what it says":"افعل ما تطلبه","Fraud and Social Engineering":"الاحتيال والهندسة الاجتماعية","Behavioural security · phishing":"الأمن السلوكي · التصيّد","Con artists use urgency, fear and greed. Verify through the official channel and never share a code.":"يستغل المحتالون الاستعجال والخوف والطمع. تحقق عبر القناة الرسمية ولا تشارك أي رمز.","SCAMS":"الاحتيال","Good call. Real banks never ask for your code, and 'guaranteed' returns do not exist.":"قرار سليم. البنوك الحقيقية لا تطلب رمزك، ولا وجود لعوائد «مضمونة».","It was a scam. The money is gone and cannot be recovered.":"كان احتيالًا. ضاع المال ولا يمكن استرداده.",
 "📈 AECB credit score":"📈 التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)","AECB credit score":"التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)",
