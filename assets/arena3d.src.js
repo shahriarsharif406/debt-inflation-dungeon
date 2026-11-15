@@ -8,7 +8,7 @@ const A={ready:false,failed:false,onready:null};
 window.Arena3D=A;
 const M={};let renderer,scene,cam,canvas,hall=null,clock,torches=[],running=false,lastTime=0;
 const inst={},stat={};let knight=null,coins=null,prevSum=null,floorTheme=0;
-const THEME=[{fog:0x0c1020,amb:0x6a7aa8,torch:0xffa24d,tint:0x8fa0d8},{fog:0x160e0a,amb:0x9a7a60,torch:0xff9438,tint:0xd8a070},{fog:0x1a0a0e,amb:0x9a5560,torch:0xff6a3a,tint:0xd87080}];
+const THEME=[{fog:0x2a3466,amb:0x8a9ad0,torch:0xffa24d,tint:0x8fa0d8},{fog:0x3a2618,amb:0xb89070,torch:0xff9438,tint:0xd8a070},{fog:0x3a1620,amb:0xb06a78,torch:0xff6a3a,tint:0xd87080}];
 const KIND={wyrm:{m:"demon"},golem:{m:"orc"},imp:{m:"blue"},vamp:{m:"creep"},hydra:{m:"blue",tint:0x3ddc84},emerg:{m:"demon",tint:0xff8a3d}};
 const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",wall:"wall.glb",floor:"floor_tile_large.glb",column:"column.glb",torch:"torch_mounted.glb",cs:"coin_stack_small.glb",cm:"coin_stack_medium.glb",cl:"coin_stack_large.glb",barrel:"barrel_large.glb",crates:"crates_stacked.glb",rubble:"rubble_half.glb",banner:"banner_shield_red.glb",chest:"chest_gold.glb",creep:"creep.glb"};
 const ESSENTIAL=["knight","demon","blue","orc","wall","floor","column","torch","cl","cm","cs"];
@@ -27,15 +27,15 @@ function fit(grp){const o=grp.userData.o,w=grp.userData.inner,h=grp.userData.h;o
 function build(){
   canvas=document.createElement("canvas");canvas.className="a3d";
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
-  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.45;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.9;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,innerWidth<700?1.25:1.6));
-  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0c1020,.04);
+  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x2a3466,.022);
   cam=new THREE.PerspectiveCamera(17,4.4,.5,120);
   clock=new THREE.Clock();
   // lights
-  scene.add(new THREE.HemisphereLight(0x9aa6d8,0x3a2a20,.85));
-  const key=new THREE.DirectionalLight(0xffe2b8,1.5);key.position.set(-6,9,10);scene.add(key);
-  const rim=new THREE.DirectionalLight(0x7fa8ff,.9);rim.position.set(8,5,-6);scene.add(rim);
+  scene.add(new THREE.HemisphereLight(0xc4d0ff,0x6a5040,1.35));
+  const key=new THREE.DirectionalLight(0xfff0d0,2.1);key.position.set(-6,9,10);scene.add(key);
+  const rim=new THREE.DirectionalLight(0x9fc0ff,1.3);rim.position.set(8,5,-6);scene.add(rim);
   // measure tile sizes
   const fb=new THREE.Box3().setFromObject(M.floor.scene);const ft=Math.max(fb.max.x-fb.min.x,fb.max.z-fb.min.z)||4;
   const wb=new THREE.Box3().setFromObject(M.wall.scene);const ww=wb.max.x-wb.min.x||4,wh=wb.max.y-wb.min.y||4;
@@ -49,7 +49,7 @@ function build(){
   for(let i=-6;i<=6;i++){const c=skClone(M.column.scene);c.position.set(i*ww*2-ww*.5,0,wallZ+.8);c.scale.setScalar(1.15);stage.add(c)}
   const tpos=[-7,-2.2,2.6,7.4];
   tpos.forEach((x,i)=>{const t=skClone(M.torch.scene);t.position.set(x*ww/4*1.4,wh*.55,wallZ+.35);stage.add(t);
-    const L=new THREE.PointLight(0xffa24d,60,26,1.6);L.position.set(t.position.x,t.position.y+.5,t.position.z+1.2);L.userData.seed=Math.random()*9;if(i===1||i===2){scene.add(L)}else{L.intensity=0;L.visible=false}torches.push(L);const gc=document.createElement('canvas');gc.width=gc.height=64;const gx=gc.getContext('2d');const gg=gx.createRadialGradient(32,32,1,32,32,32);gg.addColorStop(0,'rgba(255,230,160,1)');gg.addColorStop(.25,'rgba(255,150,50,.7)');gg.addColorStop(1,'rgba(255,100,20,0)');gx.fillStyle=gg;gx.fillRect(0,0,64,64);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));sp.scale.set(1.5,1.5,1);sp.position.set(t.position.x,t.position.y+1.05,t.position.z+.5);scene.add(sp);L.userData.glow=sp});
+    const L=new THREE.PointLight(0xffa24d,60,26,1.6);L.position.set(t.position.x,t.position.y+.5,t.position.z+1.2);L.userData.seed=Math.random()*9;if(i===1||i===2){scene.add(L)}else{L.intensity=0;L.visible=false}torches.push(L);const gc=document.createElement('canvas');gc.width=gc.height=64;const gx=gc.getContext('2d');const gg=gx.createRadialGradient(32,32,1,32,32,32);gg.addColorStop(0,'rgba(255,214,120,.9)');gg.addColorStop(.3,'rgba(255,140,40,.35)');gg.addColorStop(1,'rgba(255,100,20,0)');gx.fillStyle=gg;gx.fillRect(0,0,64,64);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));sp.scale.set(1.0,1.0,1);sp.position.set(t.position.x,t.position.y+1.05,t.position.z+.5);scene.add(sp);L.userData.glow=sp});
   // props
   const addP=(k,x,z,s,ry)=>{if(!M[k])return;const p=skClone(M[k].scene);p.position.set(x,0,z);p.scale.setScalar(s||1);p.rotation.y=ry||0;stage.add(p)};
   addP("barrel",-13.5,-2.6,1.2,.4);addP("crates",13.5,-2.4,1.2,-.3);addP("rubble",-9.2,-2,.45,0);addP("rubble",10.4,-1.6,.4,2);
