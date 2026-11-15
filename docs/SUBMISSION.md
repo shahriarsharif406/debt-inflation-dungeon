@@ -11,7 +11,7 @@ Debt monsters grow, cash melts, a rocket to escape. Eleven real economic ideas i
 | Criterion | Evidence |
 |---|---|
 | Prototype and gameplay (25) | Complete 12-month game, 3 income levels, tutorial, sound, accessibility, stable single file, balance checked by automated play |
-| Financial literacy integration (25) | Budget, saving, emergency fund, good vs bad debt, lifestyle creep, insurance, risk, diversification are mechanics, not text |
+| Financial literacy integration (25) | Budget, saving, emergency fund, good vs bad debt, credit score, retirement account with employer match, pre-tax saving (tax relief), lifestyle creep, insurance, risk, diversification are mechanics, not text |
 | Educational impact (15) | Report card from your own choices, Money Codex, "next time" tip, optional discussion via the Daily Dungeon |
 | Creativity (15) | Debt monsters with inflation, space-tech escape-velocity metaphor, theory-driven Codex |
 | Development and commercial potential (20) | docs/BUDGET.md: $48,000 plan, 6 phases, revenue paths, risks |

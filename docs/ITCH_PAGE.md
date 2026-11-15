@@ -42,3 +42,5 @@ Tap or click. Keyboard: 1 to 9 pay a monster (Shift = pay all), I insurance, Ent
 ---
 Add to the page description: "Real-time 3D dungeon, animated knight and monsters, and an original procedural soundtrack that changes with each floor. Sound can be muted top right."
 Screenshots to upload: itch-screenshot-3d-game.png, itch-screenshot-3d-arena.png, itch-screenshot-codex.png, itch-screenshot-budget.png, itch-screenshot-title.png.
+
+- Credit score, tax relief and a retirement account with employer match (free money) are part of the monthly budget.

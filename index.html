@@ -469,7 +469,7 @@ const TIERS={
   high:{label:"HIGH INCOME",sub:"Big paycheck. Bigger temptations. Same trap.",salary:1500,cash:1500,chunk:250,scale:2.4,doom:10700,
        debts:{card:1760,student:3040,shark:560},later:{vamp:900,hydra:1200},star3:3700,tempFreq:.9,evFreq:.8}
 };
-const BUD={need:.30,wants:[.06,.14,.28],save:[0,.10,.20]};
+const BUD={need:.30,wants:[.06,.14,.28],save:[0,.10,.20],ret:[0,.05,.10]},RET={match:.5,matchCap:.05,tax:.10,grow:.008};
 const FLOORS=[
   {name:"The Cellar",inf:0.01,blurb:"Prices creep up slowly. Learn the rules."},
   {name:"The Vaults",inf:0.025,blurb:"Inflation is faster now. Idle cash melts quicker."},
@@ -565,7 +565,7 @@ const T=()=>TIERS[S.tier];
 const sc=n=>Math.round(n*T().scale/10)*10;
 const totalDebt=()=>S.mons.reduce((a,m)=>a+m.debt,0);
 const totalAssets=()=>S.assets.vault+S.assets.index+S.assets.dragon+S.assets.orbit;
-const netWorth=()=>S.cash+totalAssets()-totalDebt();
+const netWorth=()=>S.cash+totalAssets()+(S.ret||0)-totalDebt();
 const curInf=()=>FLOORS[floorOf(S.month)].inf;
 const shockSize=()=>Math.round(T().salary*.5);
 function forecast(){return{di:S.mons.reduce((a,m)=>a+Math.round(m.debt*m.rate),0),cl:Math.round(S.cash*curInf())}}
@@ -834,7 +834,7 @@ function newGame(tier,mode){
   const t0=TIERS[tier];
   S={tier,mode,label,seed,month:1,cash:t0.cash,assets:{vault:0,index:0,dragon:0,orbit:0},mons:[],pp:1,over:false,done:false,
      stats:{interest:0,infl:0,inv:0,seen:0,bought:0,onCard:0,gap:0,pays:0,payOK:0,emerg:0,divMonths:0,acts:0,insPaid:0,insSaved:0,insHit:0,saved:0,saveMonths:0,fundUsed:0,raiseLife:0,raises:0,living:0,billDebt:0,shocks:0,orbitMonths:0,skill:0,skillMonth:0,skillLoan:0,waste:0,idle:0},
-     status:0,ins:false,life:1,sv:1,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
+     status:0,ins:false,life:1,sv:1,rt:0,ret:0,cs:640,csd:0,pm:0,wantsX:0,saveX:0,sal:t0.salary,raise:null,fortress:false,temp:null,salaryMult:1,nid:1,busy:false,hist:[],income:t0.cash,lastNW:0,tok:0};
   addMon("card",t0.debts.card);addMon("student",t0.debts.student);addMon("shark",t0.debts.shark);
   S.hist=[netWorth()];S.lastNW=netWorth();
 }
@@ -853,10 +853,11 @@ function buyTemp(m){
   S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");
   toast(onCard?"Bought on credit. The Wyrm just grew.":"Bought with cash. Status +10, wealth +0.");render();
 }
-function budget(){const b=T().salary;return{needs:Math.round(b*BUD.need),wants:Math.round(b*BUD.wants[S.life])+S.wantsX,save:Math.round(S.sal*BUD.save[S.sv])+S.saveX}}
-const reserve=()=>{const b=budget();return b.needs+b.wants+b.save+(S.ins?premium():0)};
+const csLabel=()=>S.cs>=740?"Excellent: lenders offer their best rates":S.cs>=700?"Good":S.cs>=620?"Fair: lenders see some risk":"Poor: borrowing gets expensive";
+function budget(){const b=T().salary;return{needs:Math.round(b*BUD.need),wants:Math.round(b*BUD.wants[S.life])+S.wantsX,save:Math.round(S.sal*BUD.save[S.sv])+S.saveX,ret:Math.round(S.sal*BUD.ret[S.rt||0])}}
+const reserve=()=>{const b=budget();return b.needs+b.wants+b.save+b.ret+(S.ins?premium():0)};
 const freeCash=()=>Math.max(0,S.cash-reserve());
-function setBud(k,i){if(S.busy||S.over)return;if(k==="life")S.life=i;else S.sv=i;S.stats.acts++;sfx.coin();render()}
+function setBud(k,i){if(S.busy||S.over)return;if(k==="life")S.life=i;else if(k==="rt")S.rt=i;else S.sv=i;S.stats.acts++;sfx.coin();render()}
 function raiseCard(){
   const r=S.raise,ov=$("#ov");if(!r)return;
   ov.innerHTML=`<div class="card"><div class="kick">GOOD NEWS</div><h1>You got a <em>raise</em></h1>
@@ -944,6 +945,9 @@ function render(){
       ${seg("life",["Frugal","Comfort","Lavish"],S.life)}
       <div class="bl"><span>💰 Pay yourself first<small>auto-saved to your Savings Vault</small></span><b>${fmt(b.save)}</b></div>
       ${seg("sv",["0%","10%","20%"],S.sv)}
+      <div class="bl"><span>🌅 Retirement account<small>pre-tax · employer adds 50% of the first 5% · locked until the end</small></span><b>${fmt(b.ret)}</b></div>
+      ${seg("rt",["0%","5%","10%"],S.rt||0)}
+      <div class="bl"><span>📈 Credit score<small>${csLabel()}</small></span><b style="color:${S.cs>=700?"var(--green)":S.cs>=620?"var(--amber,#ffb347)":"var(--red)"}">${S.cs}</b></div>
       <div class="free"><span>Free to spend on debt and goals</span><b>${fmt(fr)}</b></div>
       <div class="goal"><span>🏦 Emergency fund goal: 3 months of living costs</span><div class="meter"><i style="width:${fp.toFixed(0)}%"></i></div><small>${fmt(fund)} of ${fmt(tgt)}${S.fortress?" · ✓ complete":""}</small></div></div>`})()}
     ${S.opp?`<div class="tempt opp"><small>OPPORTUNITY · OPTIONAL · DEBT THAT CAN PAY YOU BACK</small>
@@ -1037,6 +1041,13 @@ function endMonth(){
     if(short>0){const used=Math.min(short,S.assets.vault);
       if(used>0){S.assets.vault-=used;S.stats.fundUsed+=used;short-=used;rep.push(["g","🏦 Emergency fund covered the bills",`−${fmt(used)} savings`])}
       if(short>0){addMon("card",short);S.stats.billDebt+=short;rep.push(["r","Not enough cash for living costs: put on the credit card",`+${fmt(short)} debt`]);badHit=true}}}
+  {const b=budget();
+    if(S.ret>0||b.ret>0){
+      const c=Math.min(b.ret,Math.max(0,S.cash));
+      if(c>0){S.cash-=c;const m=Math.round(Math.min(c,S.sal*RET.matchCap)*RET.match),tx=Math.round(c*RET.tax);S.cash+=tx;S.ret+=c+m;S.stats.retIn=(S.stats.retIn||0)+c;S.stats.match=(S.stats.match||0)+m;S.stats.taxBack=(S.stats.taxBack||0)+tx;
+        rep.push(["g","🌅 Retirement account: you added "+fmt(c)+", employer added "+fmt(m),"+"+fmt(c+m)]);
+        rep.push(["g","🧾 Tax relief: contributions are taken before tax","+"+fmt(tx)])}
+      const g=Math.round(S.ret*RET.grow);S.ret+=g;S.stats.retGain=(S.stats.retGain||0)+g}}
   const loss=Math.round(S.cash*inf);S.cash-=loss;S.pp*=(1-inf);S.stats.infl+=loss;
   rep.push(["a",`▼ Inflation ${pct(inf)} ate your cash`,`−${fmt(loss)}`]);
   let gain=0;Object.keys(S.assets).forEach(k=>{const v=S.assets[k];if(v<=0)return;const nv=Math.round(v*(1+assetReturn(k,ev)));gain+=nv-v;S.assets[k]=nv});
@@ -1069,6 +1080,14 @@ function endMonth(){
   if(S.assets.orbit>0)S.stats.orbitMonths++;
   if(badHit)S.stats.shocks++;
   if(badHit){sfx.bad();shake();flash("#ff4d6d");buzz(80)}else flash(gain>0?"#4de2a1":"#ffb347");
+  {const lim=Math.max(1,S.sal*3),cd=S.mons.filter(x=>x.key==="card").reduce((a,x)=>a+x.debt,0),u=cd/lim;let d=0;
+    d+=(S.stats.pays>S.pm)?3:0;S.pm=S.stats.pays;
+    d+=u<.10?3:u<.30?1:u<.50?-4:-9;
+    if(S.stats.billDebt>(S.bd||0))d-=12;S.bd=S.stats.billDebt;
+    if(S.stats.emerg>(S.em||0))d-=12;S.em=S.stats.emerg;
+    d+=badHit?-2:2;
+    const o=S.cs;S.cs=Math.max(300,Math.min(850,S.cs+d));S.csd=S.cs-o;S.stats.csMin=Math.min(S.stats.csMin||999,S.cs);
+    rep.push([S.csd>=0?"g":"r","📈 Credit score "+S.cs+(u>=.3?" (card is "+Math.round(u*100)+"% of its limit)":""),(S.csd>=0?"+":"−")+Math.abs(S.csd)])}
   const m0=S.month;
   if(totalDebt()>=T().doom)return finish(false,m0);
   if(m0===LAST)return finish(true,m0);
@@ -1183,6 +1202,8 @@ function finish(survived,m){
       <div class="tile"><b>INFLATION</b>Idle cash lost <strong>${fmt(st.infl)}</strong> of buying power.</div>
       <div class="tile"><b>METHOD</b>${st.pays?`<strong>${Math.round(st.payOK/st.pays*100)}%</strong> of your payments hit the fastest-growing debt.`:"You made no payments."}</div>
       <div class="tile"><b>SAVINGS</b>You saved <strong>${fmt(st.saved)}</strong> automatically (<strong>${S.income?Math.round(st.saved/S.income*100):0}%</strong> of pay)${st.fundUsed?` and used <strong>${fmt(st.fundUsed)}</strong> of it in emergencies instead of borrowing`:""}. Fund: <strong>${(S.assets.vault/Math.max(1,budget().needs+budget().wants)).toFixed(1)}</strong> months of living costs.</div>
+      <div class="tile"><b>CREDIT SCORE</b>Ended at <strong>${S.cs}</strong> (${csLabel().split(":")[0].toLowerCase()}). Paying on time and keeping the card under 30% of its limit raises it.</div>
+      <div class="tile"><b>RETIREMENT AND TAX</b>${S.stats.retIn?`You put in <strong>${fmt(S.stats.retIn)}</strong>, your employer added <strong>${fmt(S.stats.match)}</strong> of free money, tax relief returned <strong>${fmt(S.stats.taxBack)}</strong>, and it grew by <strong>${fmt(S.stats.retGain)}</strong>. Pot: <strong>${fmt(S.ret)}</strong>.`:"You saved nothing for retirement, so you missed the employer match and the tax relief. Free money is the best return there is."}</div>
       <div class="tile"><b>LIFESTYLE</b>Living costs took <strong>${S.income?Math.round(st.living/S.income*100):0}%</strong> of your pay.${st.raises?` Of ${st.raises} raises, you put <strong>${st.raises-st.raiseLife}</strong> toward savings or debt.`:""}</div>
       <div class="tile"><b>PRESSURE</b>${st.seen?`You gave in to <strong>${st.bought}</strong> of <strong>${st.seen}</strong> status temptations${st.onCard?` (${st.onCard} on credit)`:""}.`:"No status temptations showed up."} ${st.gap?`Income gaps hit <strong>${st.gap}×</strong>.`:""}</div>
     </div>
@@ -1303,6 +1324,9 @@ function openHelp(){
     <h2>WORDS WORTH KNOWING</h2>
     <dl><dt>Budget</dt><dd>Needs come first, then lifestyle, then saving. Whatever is left is free to fight debt.</dd>
     <dt>Pay yourself first</dt><dd>Move savings out the moment you are paid, before you can spend it.</dd>
+    <dt>Credit score</dt><dd>A number lenders use to judge you. Paying on time and keeping card use low raises it; missed bills and maxed cards lower it.</dd>
+    <dt>Retirement account</dt><dd>Money locked away for later. Your employer adds a match (free money) and contributions are taken before tax, so you pay less tax now.</dd>
+    <dt>Tax</dt><dd>Part of your pay goes to the state. Pre-tax savings cut that bill.</dd>
     <dt>Lifestyle creep</dt><dd>When pay rises, spending quietly rises with it, so you never get ahead.</dd>
     <dt>Interest</dt><dd>The price of borrowing. It is charged on the whole balance, so it compounds.</dd>
     <dt>Inflation</dt><dd>Prices rise, so each dollar buys less. Cash loses value even while it sits still.</dd>
@@ -1347,6 +1371,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.ins)toggleIns();
   else if(t.dataset.life!==undefined)setBud("life",+t.dataset.life);
   else if(t.dataset.sv!==undefined)setBud("sv",+t.dataset.sv);
+  else if(t.dataset.rt!==undefined)setBud("rt",+t.dataset.rt);
   else if(t.dataset.raise)raisePick(t.dataset.raise);
   else if(t.dataset.region){REGION=t.dataset.region;store.set("region",REGION);showTitle()}
   else if(t.dataset.mode){MODE=t.dataset.mode;store.set("mode",MODE);showTitle()}
@@ -1522,6 +1547,7 @@ var S={
 "Month":"الشهر","/mo":"/شهر",
 };
 Object.assign(S,{
+"🌅 Retirement account":"🌅 حساب التقاعد","pre-tax · employer adds 50% of the first 5% · locked until the end":"قبل الضريبة · صاحب العمل يضيف 50% من أول 5% · مقفل حتى النهاية","📈 Credit score":"📈 التصنيف الائتماني","Excellent: lenders offer their best rates":"ممتاز: المقرضون يقدمون أفضل أسعارهم","Good":"جيد","Fair: lenders see some risk":"مقبول: يرى المقرضون بعض المخاطر","Poor: borrowing gets expensive":"ضعيف: الاقتراض يصبح مكلفًا","CREDIT SCORE":"التصنيف الائتماني","RETIREMENT AND TAX":"التقاعد والضريبة","🧾 Tax relief: contributions are taken before tax":"🧾 إعفاء ضريبي: تُخصم المساهمات قبل الضريبة","You saved nothing for retirement, so you missed the employer match and the tax relief. Free money is the best return there is.":"لم تدّخر شيئًا للتقاعد، فخسرت مساهمة صاحب العمل والإعفاء الضريبي. المال المجاني هو أفضل عائد.","Credit score":"التصنيف الائتماني","A number lenders use to judge you. Paying on time and keeping card use low raises it; missed bills and maxed cards lower it.":"رقم يستخدمه المقرضون للحكم عليك. السداد في الموعد وقلة استخدام البطاقة يرفعانه، والفواتير المتأخرة والبطاقات المستنفدة تخفضانه.","Retirement account":"حساب التقاعد","Money locked away for later. Your employer adds a match (free money) and contributions are taken before tax, so you pay less tax now.":"مال محفوظ للمستقبل. يضيف صاحب العمل مساهمة (مال مجاني) وتُخصم المساهمات قبل الضريبة فتدفع ضريبة أقل الآن.","Tax":"الضريبة","Part of your pay goes to the state. Pre-tax savings cut that bill.":"جزء من راتبك يذهب للدولة. الادخار قبل الضريبة يخفض هذه الفاتورة.",
 "Rent cheque due":"استحقاق شيك الإيجار","Your landlord's post-dated rent cheque clears. The cash must be there":"يُصرف شيك الإيجار المؤجَّل لمالك العقار. يجب أن يكون المبلغ متوفرًا",
 "End-of-service gratuity":"مكافأة نهاية الخدمة","A UAE employer pays a gratuity when a job ends. Plan it before it plans you":"يدفع صاحب العمل في الإمارات مكافأة عند انتهاء العمل. خطّط لها قبل أن تُنفق",
 "Credit report check":"فحص التقرير الائتماني","A late card payment sat on your credit report, and a bank charged a higher loan fee":"ظهر تأخر سداد البطاقة في تقريرك الائتماني، فرفع بنك رسوم القرض",

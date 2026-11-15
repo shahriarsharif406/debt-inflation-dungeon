@@ -55,6 +55,7 @@ Most money games teach one concept at a time. Real money problems arrive togethe
 | Simplified-model note | End screen and help state that numbers are simplified and not financial advice | Honesty about limits |
 | Debrief and transfer | End screen adds one real-life action and one discussion question chosen from the player's weakest habit, in English and Arabic. | Reflection and real-world transfer |
 | Gulf pack | Optional region toggle adding UAE-flavoured events (remittance with fees, pay-in-4, giving season, Eid hosting, hidden exchange margin) and temptations. Daily seed includes the region. | Regional adaptation |
+| Retirement, tax and credit score | Optional retirement account (0/5/10% of pay, taken before tax). Employer adds 50% of the first 5%, tax relief returns 10% of contributions, pot grows 0.8%/mo and is locked until the end (counts in net worth, cannot clear debt). Credit score 300-850 moves each month with on-time payments, card use under 30% of its limit, emergency borrowing and bill shortfalls. | Employer match, tax-advantaged saving, credit score |
 | Floors | Months 1–4 Cellar, 5–8 Vaults, 9–12 Abyss. New monsters appear and inflation rises. | Changing conditions |
 
 **Income tiers:** Low ($350/mo), Middle ($600), High ($1,500). All values scale together so the dynamics are identical.
