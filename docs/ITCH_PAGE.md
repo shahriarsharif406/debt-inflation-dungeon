@@ -20,7 +20,7 @@ Every debt is a monster that grows by a visible percentage every month. Every do
 - Good debt vs bad debt (a cheap skill-course loan against a 4%-a-month card)
 - Lifestyle creep when your pay rises
 - Investing against inflation: steady, volatile and a space-tech Orbit Fund
-- Twenty real economic ideas in the Money Codex, from compound interest to human capital
+- Twenty-one real economic ideas in the Money Codex, from compound interest to human capital
 
 **Features**
 - Three income levels: low, middle and high. Rich or poor, the debt trap works the same way
@@ -43,6 +43,7 @@ Tap or click. Keyboard: 1 to 9 pay a monster (Shift = pay all), I insurance, Ent
 Add to the page description: "Real-time 3D dungeon, animated knight and monsters, and an original procedural soundtrack that changes with each floor. Sound can be muted top right."
 Screenshots to upload: itch-screenshot-3d-game.png, itch-screenshot-3d-arena.png, itch-screenshot-codex.png, itch-screenshot-budget.png, itch-screenshot-title.png.
 
+- Islamic finance in the Gulf edition: murabaha (fixed-profit instalment), qard hasan, takaful, zakat, set against a compounding credit card.
 - Scam alerts (fake bank texts, prize fees, task jobs, fake investments) teach you to verify before you pay.
 - Credit score, tax relief and a retirement account with employer match (free money) are part of the monthly budget.
 

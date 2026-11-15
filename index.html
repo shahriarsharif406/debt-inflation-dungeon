@@ -531,6 +531,7 @@ const MON={
   shark:{name:"Loan Shark Imp",tag:"Payday loan",debt:300,rate:.10,color:"#b388ff",kind:"imp"},
   vamp:{name:"Overdraft Vampire",tag:"Overdraft & fees",debt:600,rate:.07,color:"#4dd0e1",kind:"vamp"},
   hydra:{name:"Medical Hydra",tag:"Medical bills",debt:1000,rate:.03,color:"#7bd88f",kind:"hydra"},
+  murabaha:{name:"Murabaha Contract",tag:"Islamic finance: fixed profit, never grows",debt:0,rate:0,color:"#4fd1c5",kind:"golem"},
   qard:{name:"Family Qard Hasan",tag:"Interest-free loan from family",debt:0,rate:0,color:"#7bd88f",kind:"golem"},
   skill:{name:"Skill Loan Sprite",tag:"Debt used to earn more",debt:0,rate:.015,color:"#4de2a1",kind:"golem"},
   emerg:{name:"Emergency Imp",tag:"Emergency borrowing",debt:0,rate:.15,color:"#ff8a3d",kind:"emerg"}
@@ -898,6 +899,7 @@ function rollTemptation(){
 }
 function buyTemp(m){
   if(S.busy||S.over||!S.temp)return;const c=S.temp.cost;const mode=m===true?"card":m===false?"cash":m,onCard=mode==="card";
+  if(mode==="murabaha"){const tot=Math.round(c*(1+MURA));if(!gulf()||murRoom()<tot)return;addMon("murabaha",tot);S.stats.murabaha=(S.stats.murabaha||0)+1;S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");toast("Murabaha: the bank buys it and sells it to you at a fixed profit. The total is agreed up front and never grows.");render();return}
   if(mode==="qard"){if(!gulf()||qardRoom()<c)return;addMon("qard",c);S.stats.qard=(S.stats.qard||0)+1;S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");toast("Borrowed from family at 0%. It never grows, but it must be repaid.");render();return}
   if(onCard){addMon("card",c);S.stats.onCard++}else{if(freeCash()<c)return;S.cash-=c}
   S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");
@@ -926,6 +928,7 @@ function raisePick(k){
   else toast("Same life, more free cash.");
   S.raise=null;sfx.coin();$("#ov").classList.remove("on");render();
 }
+const MURA=.12,murRoom=()=>{const ex=S.mons.find(m=>m.key==="murabaha");return Math.max(0,Math.round(T().salary*2.5)-(ex?ex.debt:0))};
 const qardRoom=()=>{const ex=S.mons.find(m=>m.key==="qard");return Math.max(0,Math.round(T().salary*.8)-(ex?ex.debt:0))};
 const premium=()=>Math.max(1,Math.round(T().salary*.10));
 function toggleIns(){if(S.busy||S.over)return;S.ins=!S.ins;S.stats.acts++;sfx.coin();toast(S.ins?`Shield ON. ${fmt(premium())} a month, paid when the month ends.`:"Shield OFF. Disasters are on you.");render()}
@@ -1025,10 +1028,11 @@ function render(){
     ${S.temp?`<div class="tempt"><small>EVERYONE AROUND YOU HAS ONE · OPTIONAL</small>
       <div class="tn"><span>${S.temp.name}</span><b>${fmt(S.temp.cost)}</b></div>
       <div class="ctag">📖 Social proof · Present bias · Opportunity cost</div>
-      ${gulf()?`<div class="ctag">📖 Qard hasan is an interest-free loan: you repay only what you borrowed. It is still debt, and family can lend only so much.</div>`:""}
+      ${gulf()?`<div class="ctag">📖 Islamic finance avoids riba (interest that compounds): in a murabaha the bank sells you the item at an agreed price, so the cost is fixed up front. Qard hasan is an interest-free loan from family. Both are still debt, and both have limits.</div>`:""}
       <div class="tb"><button class="btn" data-tbuy="cash" ${freeCash()<S.temp.cost?"disabled":""}>Buy with cash</button>
       <button class="btn" data-tbuy="card">Put it on credit</button>
-      ${gulf()?`<button class="btn" data-tbuy="qard" ${qardRoom()<S.temp.cost?"disabled":""}>Borrow from family, 0% (qard hasan)</button>`:""}
+      ${gulf()?`<button class="btn" data-tbuy="murabaha" ${murRoom()<Math.round(S.temp.cost*(1+MURA))?"disabled":""}>Islamic instalment: murabaha, fixed profit (total ${fmt(Math.round(S.temp.cost*(1+MURA)))})</button>
+      <button class="btn" data-tbuy="qard" ${qardRoom()<S.temp.cost?"disabled":""}>Borrow from family, 0% (qard hasan)</button>`:""}
       <button class="btn" data-tskip="1">Skip it</button></div></div>`:""}
     ${S.scam?`<div class="tempt scam"><small>⚠ SUSPICIOUS MESSAGE · YOUR CALL</small>
       <div class="tn"><span>${S.scam.n}</span><b>${fmt(S.scam.loss)}</b></div>
@@ -1036,7 +1040,7 @@ function render(){
       <div class="ctag">📖 Scams use urgency and fear. Stop, verify through the official app or number, never share a code.</div>
       <div class="tb"><button class="btn" data-scam="ignore">Ignore and report it</button>
       <button class="btn" data-scam="fall">Do what it says</button></div></div>`:""}
-    <div class="shield ${S.ins?"on":""}"><div class="si">${S.ins?"🛡":"◇"}</div><div class="st"><b>Insurance Shield</b><small>${S.ins?"ON · covers 80% of car, medical and phone bills":"Costs "+fmt(premium())+"/month · covers 80% of car, medical and phone bills"}</small></div>
+    <div class="shield ${S.ins?"on":""}"><div class="si">${S.ins?"🛡":"◇"}</div><div class="st"><b>${gulf()?"Takaful Shield":"Insurance Shield"}</b><small>${S.ins?(gulf()?"ON · members pool contributions to cover 80% of car, medical and phone bills":"ON · covers 80% of car, medical and phone bills"):"Costs "+fmt(premium())+"/month · covers 80% of car, medical and phone bills"}</small></div>
       <button class="btn" data-ins="1" aria-pressed="${S.ins}">${S.ins?"Turn off":"Turn on"}</button></div>
     <div class="assets">${Object.keys(ASSETS).map(k=>{
       const a=ASSETS[k],v=S.assets[k],r=real(k),can=Math.min(freeCash(),T().chunk),sell=Math.min(v,T().chunk);
@@ -1382,6 +1386,7 @@ const CODEX=[
  ,{id:"signal",n:"Information and Credit Scores",w:"Akerlof · Stiglitz & Weiss",d:"Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.",ok:()=>S.cs>=700}
  ,{id:"risk",n:"Risk Pooling",w:"Kenneth Arrow · insurance",d:"A small certain premium protects you from a large uncertain loss.",ok:(st)=>st.insPaid>0}
  ,{id:"scarcity",n:"Scarcity and Bandwidth",w:"Mullainathan & Shafir",d:"Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.",ok:(st,v)=>v&&S.tier==="low"}
+ ,{id:"islamic",n:"Islamic Finance: Risk-Sharing",w:"Murabaha · takaful · qard hasan",d:"Money is not rented for compounding interest (riba). Costs are fixed and agreed up front, risk is shared, and kindness-loans stay interest-free.",ok:(st)=>(st.murabaha||0)>0||(st.qard||0)>0}
  ,{id:"fraud",n:"Fraud and Social Engineering",w:"Behavioural security · phishing",d:"Con artists use urgency, fear and greed. Verify through the official channel and never share a code.",ok:(st)=>(st.scamOK||0)>=1&&!(st.scamLost)}
  ,{id:"taxinc",n:"Tax Incentives",w:"Public finance · tax-advantaged saving",d:"Pre-tax saving lowers your tax bill, so the state helps you save.",ok:(st)=>(st.taxBack||0)>0}
 ];
@@ -1416,6 +1421,9 @@ function openHelp(){
     <dt>Inflation</dt><dd>Prices rise, so each dollar buys less. Cash loses value even while it sits still.</dd>
     <dt>Avalanche method</dt><dd>Pay the highest-rate debt first. It costs the least interest.</dd>
     <dt>Emergency fund</dt><dd>Cash set aside for surprises so one bad month does not become debt.</dd>
+    <dt>Murabaha</dt><dd>Islamic finance: the bank buys the item and sells it to you at an agreed, fixed profit. The total never grows, but it is still debt.</dd>
+    <dt>Takaful</dt><dd>Cooperative cover: members pool money and share the cost of losses, instead of paying a company for insurance.</dd>
+    <dt>Riba</dt><dd>Interest that compounds. Islamic finance avoids it, which is why costs are fixed up front.</dd>
     <dt>Insurance</dt><dd>You pay a small, certain cost so a big, uncertain one cannot wreck you. It will not cover everything (a party or a rent rise is on you).</dd>
     <dt>Diversification</dt><dd>Spreading money across assets so one crash cannot sink you.</dd></dl>
     <p class="note"><b>Simplified model, not financial advice.</b> This game teaches ideas with simplified numbers. Real products, rates and laws differ.</p>
@@ -1497,6 +1505,7 @@ if(LANG!=="ar")return;
 document.documentElement.lang="ar";document.documentElement.dir="rtl";
 /* whole-text templates; # stands for a number/amount token */
 var T={
+"Islamic instalment: murabaha, fixed profit (total #)":"تقسيط إسلامي: مرابحة بربح ثابت (الإجمالي #)",
 "of # · Inflation":"من # · التضخم","Month":"الشهر","MONTH # OF #":"الشهر # من #","CONTINUE TO MONTH # ▶":"◀ تابع إلى الشهر #",
 "Month # report. Net worth #":"تقرير الشهر #. صافي الثروة #","FLOOR # · THE VAULTS":"الطابق # · الأقبية","FLOOR # · THE ABYSS":"الطابق # · الهاوية",
 "next month: +#":"الشهر القادم: +#","PAY #":"سدّد #","PAY ALL #":"سدّد الكل #","Invest #":"استثمر #","Sell #":"بِع #",
@@ -1632,6 +1641,7 @@ var S={
 "Month":"الشهر","/mo":"/شهر",
 };
 Object.assign(S,{
+"Murabaha Contract":"عقد مرابحة","Islamic finance: fixed profit, never grows":"تمويل إسلامي: ربح ثابت لا يزداد","Islamic Finance: Risk-Sharing":"التمويل الإسلامي: تقاسم المخاطر","Murabaha · takaful · qard hasan":"مرابحة · تكافل · قرض حسن","Money is not rented for compounding interest (riba). Costs are fixed and agreed up front, risk is shared, and kindness-loans stay interest-free.":"لا يُؤجَّر المال بفائدة مركّبة (ربا). التكاليف ثابتة ومتفق عليها مسبقًا، والمخاطر مشتركة، والقروض الحسنة بلا فوائد.","Takaful Shield":"درع التكافل","📖 Islamic finance avoids riba (interest that compounds): in a murabaha the bank sells you the item at an agreed price, so the cost is fixed up front. Qard hasan is an interest-free loan from family. Both are still debt, and both have limits.":"📖 يتجنب التمويل الإسلامي الربا (الفائدة المركّبة): في المرابحة يبيعك البنك السلعة بسعر متفق عليه، فتكون التكلفة ثابتة مقدمًا. القرض الحسن قرض عائلي بلا فوائد. كلاهما دَين وله حدود.","Murabaha":"مرابحة","Islamic finance: the bank buys the item and sells it to you at an agreed, fixed profit. The total never grows, but it is still debt.":"تمويل إسلامي: يشتري البنك السلعة ويبيعها لك بربح ثابت متفق عليه. المبلغ الإجمالي لا يزداد، لكنه يبقى دَينًا.","Takaful":"تكافل","Cooperative cover: members pool money and share the cost of losses, instead of paying a company for insurance.":"تغطية تعاونية: يجمع الأعضاء المال ويتقاسمون كلفة الخسائر بدل دفع قسط لشركة تأمين.","Riba":"ربا","Interest that compounds. Islamic finance avoids it, which is why costs are fixed up front.":"فائدة مركّبة. يتجنبها التمويل الإسلامي، لذلك تكون التكاليف ثابتة مقدمًا.","Murabaha: the bank buys it and sells it to you at a fixed profit. The total is agreed up front and never grows.":"مرابحة: يشتريها البنك ويبيعها لك بربح ثابت. المبلغ الإجمالي متفق عليه مسبقًا ولا يزداد.","ON · members pool contributions to cover 80% of car, medical and phone bills":"مفعّل · يجمع الأعضاء الاشتراكات لتغطية 80% من فواتير السيارة والعلاج والهاتف",
 "⚠ SUSPICIOUS MESSAGE · YOUR CALL":"⚠ رسالة مشبوهة · القرار لك","Bank text: 'account blocked'":"رسالة بنك: «حسابك محظور»","A text says your account is frozen and asks for the code (OTP) it just sent you. A caller waits on the line.":"رسالة تقول إن حسابك مجمّد وتطلب الرمز (OTP) الذي وصلك للتو. وهناك متصل ينتظر على الخط.","Prize message: 'pay a small fee'":"رسالة جائزة: «ادفع رسمًا بسيطًا»","You 'won' a prize, but must first pay a processing fee to claim it.":"«ربحت» جائزة لكن عليك أولًا دفع رسوم معالجة لاستلامها.","Task job: 'like videos, earn daily'":"وظيفة مهام: «أعجب بالفيديوهات واربح يوميًا»","A chat offers easy money for liking videos, after you deposit your 'starter balance'.":"محادثة تعرض مالًا سهلًا مقابل الإعجاب بالفيديوهات بعد إيداع «رصيد البداية».","Investment tip: 'guaranteed 30%'":"نصيحة استثمار: «ربح مضمون 30%»","A stranger in a group chat promises guaranteed returns if you send money today.":"شخص غريب في مجموعة يعد بعوائد مضمونة إذا أرسلت المال اليوم.","Fake toll fine (Salik-style SMS)":"مخالفة سالك مزيفة (رسالة نصية)","A text says you owe a toll fine and must pay through a link in the next hour.":"رسالة تقول إن عليك غرامة رسوم طريق ويجب الدفع عبر رابط خلال ساعة.","Fake rental listing":"إعلان إيجار مزيف","A great flat at a low rent. The agent asks for a deposit before you can view it.":"شقة رائعة بإيجار منخفض. يطلب الوسيط وديعة قبل أن تعاينها.","📖 Scams use urgency and fear. Stop, verify through the official app or number, never share a code.":"📖 تعتمد الاحتيالات على الاستعجال والخوف. توقف وتحقق عبر التطبيق أو الرقم الرسمي ولا تشارك أي رمز.","Ignore and report it":"تجاهل وأبلغ عنها","Do what it says":"افعل ما تطلبه","Fraud and Social Engineering":"الاحتيال والهندسة الاجتماعية","Behavioural security · phishing":"الأمن السلوكي · التصيّد","Con artists use urgency, fear and greed. Verify through the official channel and never share a code.":"يستغل المحتالون الاستعجال والخوف والطمع. تحقق عبر القناة الرسمية ولا تشارك أي رمز.","SCAMS":"الاحتيال","Good call. Real banks never ask for your code, and 'guaranteed' returns do not exist.":"قرار سليم. البنوك الحقيقية لا تطلب رمزك، ولا وجود لعوائد «مضمونة».","It was a scam. The money is gone and cannot be recovered.":"كان احتيالًا. ضاع المال ولا يمكن استرداده.",
 "📈 AECB credit score":"📈 التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)","AECB credit score":"التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)",
 "Precautionary Saving":"الادخار الاحترازي","John Maynard Keynes · liquidity preference":"جون مينارد كينز · تفضيل السيولة","People hold ready cash for emergencies. Finishing your emergency fund means a bad month cannot become debt.":"يحتفظ الناس بنقد جاهز للطوارئ. إكمال صندوق الطوارئ يعني أن الشهر السيئ لن يتحول إلى دين.","Mental Accounting":"المحاسبة الذهنية","Richard Thaler":"ريتشارد ثالر","Splitting pay into needs, lifestyle and savings buckets makes you spend more wisely.":"تقسيم الراتب إلى احتياجات ونمط حياة ومدخرات يجعلك تنفق بحكمة أكبر.","Nudge and Defaults":"الدفع الخفيف والإعدادات الافتراضية","Thaler & Sunstein":"ثالر وسانستين","Saving automatically beats relying on willpower. Employer matches are the strongest nudge.":"الادخار التلقائي أفضل من الاعتماد على قوة الإرادة. مساهمة صاحب العمل أقوى دافع.","Life-Cycle Hypothesis":"فرضية دورة الحياة","Modigliani & Brumberg":"موديلياني وبرومبرغ","Earn now, spend later: save in working years so retirement is funded.":"اكسب الآن وأنفق لاحقًا: ادّخر في سنوات العمل ليتمول تقاعدك.","Information and Credit Scores":"المعلومات والتصنيف الائتماني","Akerlof · Stiglitz & Weiss":"أكيرلوف · ستيغليتز وفايس","Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.":"لا يرى المقرضون شخصيتك فيقرؤون تصنيفك الائتماني. السجل الجيد يعني اقتراضًا أرخص.","Risk Pooling":"تجميع المخاطر","Kenneth Arrow · insurance":"كينيث أرو · التأمين","A small certain premium protects you from a large uncertain loss.":"قسط صغير مؤكد يحميك من خسارة كبيرة غير مؤكدة.","Scarcity and Bandwidth":"الندرة والقدرة الذهنية","Mullainathan & Shafir":"مولاينثان وشافير","Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.":"ضغط المال يضيّق الانتباه فتطغى الحلول القصيرة على الخطط الطويلة. الاحتياطي يحرر ذهنك.","Tax Incentives":"الحوافز الضريبية","Public finance · tax-advantaged saving":"المالية العامة · ادخار بحوافز ضريبية","Pre-tax saving lowers your tax bill, so the state helps you save.":"الادخار قبل الضريبة يخفض فاتورتك الضريبية، فتساعدك الدولة على الادخار.","🌍 Global edition":"🌍 النسخة العالمية","Dollars. Everyday money life anywhere.":"بالدولار. حياة مالية يومية في أي مكان.","🇦🇪 Gulf edition":"🇦🇪 النسخة الخليجية","NEW · UAE":"جديد · الإمارات","Dirhams · rent cheques · end-of-service gratuity · remittances · pay-in-4 · zakat · interest-free family loan · credit report":"دراهم · شيكات الإيجار · مكافأة نهاية الخدمة · التحويلات · الدفع على 4 دفعات · الزكاة · قرض عائلي بلا فوائد · تقرير ائتماني","🎯 Goal: reach month 12 debt-free. 5 minutes. No quiz.":"🎯 الهدف: بلوغ الشهر 12 بلا ديون. 5 دقائق. بلا اختبار.",
@@ -1667,7 +1677,7 @@ function rep(r,q,v){
 function tr(s){
  if(!s||AR.test(s)||s.indexOf("\u2066")>-1)return s;
  var aed=s.indexOf("AED\u00a0")>-1;if(aed)s=s.split("AED\u00a0").join("$");
- if(!/[A-Za-z]/.test(s))return s.replace(NUM,function(m){return"\u2066"+m+"\u2069"});
+ if(!/[A-Za-z]/.test(s)){var q0=s.replace(NUM,function(m){return"\u2066"+m+"\u2069"});return aed?q0.replace(/\$(?=\u2066?\d)/g,"AED\u00a0"):q0}
  var lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0],core=norm(s);
  if(!core)return s;
  var toks=[];var key=core.replace(NUM,function(m){toks.push(m);return"#"});
