@@ -44,3 +44,8 @@ Add to the page description: "Real-time 3D dungeon, animated knight and monsters
 Screenshots to upload: itch-screenshot-3d-game.png, itch-screenshot-3d-arena.png, itch-screenshot-codex.png, itch-screenshot-budget.png, itch-screenshot-title.png.
 
 - Credit score, tax relief and a retirement account with employer match (free money) are part of the monthly budget.
+
+## Generative AI disclosure (required by the jam rules; visible to judges only)
+- **Tool:** Claude (Anthropic) was used as a coding and writing assistant for the game code (HTML, CSS, JavaScript, three.js scene code), the procedural cellar textures and geometry (generated in code, no external texture files), the automated balance tests, the Arabic translation (not yet reviewed by a native speaker) and the draft of the design document, budget and write-up.
+- **Human direction:** the developer chose the concept, theme, rules, economic theories, target audience and regional packs, reviewed and tested the game, and made every final decision.
+- **Third-party assets (credited in assets/CREDITS.md):** knight character by Kay Lousberg (KayKit, CC0); monster models by Quaternius (CC0). The game was started and finished within the jam period and was never released or submitted elsewhere before.
