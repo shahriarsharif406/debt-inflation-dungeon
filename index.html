@@ -74,6 +74,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .hall .fig svg{filter:url(#m3d)}.hall .kn svg{filter:url(#m3d)}.hall .fig svg.img3d{filter:drop-shadow(0 4px 5px #000b)}
 .hall .kn svg{filter:url(#m3d) drop-shadow(0 8px 10px #000a)}
 .hall .am .fig{filter:drop-shadow(0 10px 8px #000b)}
+.hall canvas.a3d{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+.hall3 .lit,.hall3 .fogl{display:none}
+.hall3 .am .fig,.hall3 .kn,.hall3 .stash i,.hall3 .tch{visibility:hidden}
+.hall3 .floorline{display:none}
+.hall3 .am b,.hall3 .stash span{position:relative;z-index:3;text-shadow:0 1px 3px #000}
 .floorline{position:absolute;left:0;right:0;bottom:0;height:20px;background:linear-gradient(#1b1630,#0a0814);border-top:1px solid #ffffff14}
 .tch{position:absolute;top:62px;width:20px;height:58px;z-index:2}
 .tch.l{left:16px}.tch.r{right:16px}
@@ -687,10 +692,10 @@ function arenaHTML(){
   const sal=T().salary,coins=Math.max(0,Math.min(12,Math.ceil(S.cash/(sal*.18))));
   const stack=Array.from({length:coins},(_,i)=>`<i style="--i:${i}"></i>`).join("");
   const mons=S.mons.map(m=>{const sc=(0.7+0.55*Math.min(m.debt/m.ref,2.2)).toFixed(2);
-    return `<div class="am" style="--c:${m.color};--s:${sc}"><div class="fig">${monsterSVG(m.kind,m.id)}</div><b>${fmt(m.debt)}</b></div>`}).join("");
+    return `<div class="am" data-mid="${m.id}" data-kind="${m.kind}" data-debt="${Math.round(m.debt)}" style="--c:${m.color};--s:${sc}"><div class="fig">${monsterSVG(m.kind,m.id)}</div><b>${fmt(m.debt)}</b></div>`}).join("");
   const tex=hallTex(+(document.body.dataset.floor||0));
   return `<div class="hall"${tex?` style="background-image:url(${tex})"`:""}><i class="lit"></i><i class="fogl"></i><div class="tch l"><u></u></div><div class="tch r"><u></u></div>
-    <div class="knw"><div class="kn">${KNIGHT}</div><div class="stash" title="cash">${stack}<span>${fmt(S.cash)}</span></div></div>
+    <div class="knw"><div class="kn">${KNIGHT}</div><div class="stash" data-coins="${coins}" title="cash">${stack}<span>${fmt(S.cash)}</span></div></div>
     <div class="horde">${mons||'<div class="win">ALL DEBT SLAIN<small>now guard your cash from inflation</small></div>'}</div>
     <div class="floorline"></div></div>`;
 }
@@ -805,6 +810,7 @@ function render(){
   $("#floor").innerHTML=`<h1><small>FLOOR ${fi+1} · ${T().label}${S.mode==="daily"?" · DAILY "+S.label:""}</small>${fl.name}</h1><span class="rt">Month <b>${S.month}</b> of ${LAST} &nbsp;·&nbsp; Inflation <span class="badge b-amb">${pct(fl.inf)}/month</span></span>`;
   const f=forecast(),net=(freeCash()+S.assets.vault)/shockSize(),nl=net<1?"lo":net<2?"md":"hi";
   $("#arena").innerHTML=arenaHTML();
+  if(window.Arena3D&&Arena3D.ready&&!Arena3D.failed){const h=$("#arena .hall");if(h)Arena3D.mount(h)}
   $("#forecast").innerHTML=
    `<div class="fc up"><small>▲ DEBT GROWS BY</small><strong data-num="fd" data-v="${f.di}" data-f="usd">${fmt(f.di)}</strong><em>if you end the month now</em></div>
     <div class="fc dn"><small>▼ CASH MELTS BY</small><strong data-num="fc" data-v="${f.cl}" data-f="usd">${fmt(f.cl)}</strong><em>if you end the month now</em></div>
@@ -1214,7 +1220,7 @@ function openHelp(){
     <dt>Insurance</dt><dd>You pay a small, certain cost so a big, uncertain one cannot wreck you. It will not cover everything (a party or a rent rise is on you).</dd>
     <dt>Diversification</dt><dd>Spreading money across assets so one crash cannot sink you.</dd></dl>
     <p class="note"><b>Simplified model, not financial advice.</b> This game teaches ideas with simplified numbers. Real products, rates and laws differ.</p>
-    <p class="note" style="opacity:.6;font-size:11px">Credits: 3D monster models by Quaternius (CC0), rendered to sprites. Everything else is original code and art.</p>
+    <p class="note" style="opacity:.6;font-size:11px">Credits (all CC0): 3D monsters by Quaternius; knight and dungeon pieces by Kay Lousberg (KayKit). Rendered with three.js. Game code and design are original.</p>
     <p class="note">Shortcuts: <kbd>1</kbd>–<kbd>9</kbd> pay a monster (<kbd>Shift</kbd> = pay all) · <kbd>I</kbd> insurance · <kbd>Enter</kbd> or <kbd>E</kbd> end month · <kbd>?</kbd> this help</p>
     <button class="go" id="closeHelp">GOT IT</button></div>`;
   o.classList.add("on");o.scrollTop=0;$("#closeHelp").onclick=closeHelp;try{$("#closeHelp").focus({preventScroll:true})}catch(e){}
@@ -1456,5 +1462,7 @@ node(document.body);document.title="سجن الدين والتضخم · Debt & I
 mo.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["aria-label","title"]});
 })();
 </script>
+<script defer src="assets/arena3d.js"></script>
+<script>window.addEventListener("load",function(){var A=window.Arena3D;if(!A)return;A.onready=function(){try{window.__game&&window.__game.render&&window.__game.render()}catch(e){}};if(A.ready&&A.onready)A.onready()})</script>
 </body>
 </html>

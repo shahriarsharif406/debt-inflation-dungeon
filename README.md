@@ -100,8 +100,7 @@ Expected shape: doing nothing loses; lavish living plus status purchases loses; 
 - [Submission pack](docs/SUBMISSION.md)
 
 ## Credits
-
-Design and code: Shahariar / FutureTech.ai. No open-source licence has been chosen yet. Zoud holds the jam's non-commercial display licence for the version submitted to Zoud GameLab; ownership remains with the creator.
-
-## Credits
-3D monster art is rendered from CC0 models by [Quaternius](https://quaternius.com) (Demon, BlueDemon, Orc, CreepCreature). Dungeon backdrop, lighting, UI, code and music are original.
+Real-time 3D arena built with [three.js](https://threejs.org). All 3D art is CC0:
+- Knight and dungeon pieces: [KayKit](https://kaylousberg.com) by Kay Lousberg (Adventurers 1.0, Dungeon Remastered 1.0)
+- Monsters: [Quaternius](https://quaternius.com) (Demon, BlueDemon, Orc, CreepCreature)
+Game code, design, UI, balance and music are original. See `assets/CREDITS.md`. If WebGL is unavailable the game falls back to a 2D arena.
