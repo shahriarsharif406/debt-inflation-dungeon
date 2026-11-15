@@ -240,6 +240,17 @@ h1 em{background:linear-gradient(90deg,#ffe08a,#ffb347);-webkit-background-clip:
 .step b{display:block;font-size:19px;margin-bottom:3px}
 .step span{font-size:12px;color:#cfc8f5;line-height:1.3;display:block}
 .step.s1 b{color:var(--red)}.step.s2 b{color:var(--amber)}.step.s3 b{color:var(--green)}
+.goal12{text-align:center;margin:-2px 0 10px;font-weight:800;font-size:13.5px;color:#cfe;letter-spacing:.02em}
+.edition{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}
+.edition button{position:relative;text-align:left;padding:12px 12px 11px;border-radius:14px;background:#0c0919;border:1px solid var(--line);color:var(--mute);min-height:92px}
+.edition button b{display:block;font-size:15px;color:#fff;margin-bottom:3px}.edition button span{display:block;font-size:12px;line-height:1.35}
+.edition button.on{box-shadow:inset 0 0 0 2px #6ea8ff;background:linear-gradient(180deg,#241e4a,#171335)}
+.edition button.g{background:linear-gradient(160deg,#2a1d12,#171020);border-color:#a8782d}
+.edition button.g.on{box-shadow:inset 0 0 0 2px #ffcf5c,0 0 22px #ffcf5c33}
+.edition button.g b{color:#ffd98a}.edition .tagn{position:absolute;top:8px;right:8px;font-size:9.5px;font-weight:900;letter-spacing:.08em;background:#ffcf5c;color:#1a1208;padding:2px 6px;border-radius:7px}
+body.gulf .brand::after{content:"🇦🇪 GULF EDITION";margin-left:10px;font-size:10.5px;font-weight:900;letter-spacing:.1em;color:#1a1208;background:#ffcf5c;padding:3px 8px;border-radius:8px;white-space:nowrap}
+body.gulf .card{box-shadow:0 0 0 1px #d9a44144}
+@media(max-width:520px){.edition{grid-template-columns:1fr}}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:#0c0919;border:1px solid var(--line);margin:4px 0 10px}
 .seg button{padding:10px 8px;border-radius:10px;font-weight:800;font-size:13.5px;color:var(--mute);min-height:44px}
 .seg button small{display:block;font-weight:600;font-size:11px;opacity:.8}
@@ -828,6 +839,7 @@ function addMon(key,debt){
   const m=Object.assign({id:S.nid++,key,debt:d,ref:Math.max(d,300)},t,{debt:d});S.mons.push(m);return m;
 }
 function newGame(tier,mode){
+  document.body.classList.toggle("gulf",REGION==="gulf");
   tier=tier||(S&&S.tier)||"mid";mode=mode||MODE;
   let seed=0,label="";
   if(mode==="daily"){label=new Date().toISOString().slice(0,10);seed=hashStr(label+"|"+tier+(REGION==="gulf"?"|gulf":""));R=mulberry32(seed)}else R=Math.random;
@@ -1262,12 +1274,14 @@ function shareResult(){
 
 /* ---------- title & help ---------- */
 function showTitle(){
+  document.body.classList.toggle("gulf",REGION==="gulf");
   const ov=$("#ov");
   const best=k=>{const b=JSON.parse(store.get("best_"+k)||"null");return b?`<small>best ${"★".repeat(b.stars)||"☠"} ${fmt(b.nw)}</small>`:"<small>no run yet</small>"};
   ov.innerHTML=`<div class="card hero"><div class="tch l"><u></u></div><div class="tch r"><u></u></div><div class="peek"><div class="fig" style="--c:#ff4d6d">${monsterSVG("wyrm",1)}</div><div class="fig" style="--c:#b388ff">${monsterSVG("imp",2)}</div><div class="fig" style="--c:#f4a261">${monsterSVG("golem",3)}</div></div>
     <div class="kick" style="text-align:center">A FINLIT ROGUELITE</div>
     <h1>DEBT &amp; <em>INFLATION</em><br>DUNGEON</h1>
     <p class="tg">Debt grows. Cash melts. <b>Your move.</b></p>
+    <p class="goal12">🎯 Goal: reach month 12 debt-free. 5 minutes. No quiz.</p>
     ${(()=>{const xp=+store.get("xp")||0;if(!xp)return"";const L=lvlInfo(xp);return`<p class="lvl">Level ${L.n} · <b>${L.name}</b> · ${xp} XP</p>`})()}
     <div class="steps">
       <div class="step s1"><b>▲ DEBT</b><span>Monsters grow bigger every month</span></div>
@@ -1278,9 +1292,9 @@ function showTitle(){
       <button data-mode="free" class="${MODE==="free"?"on":""}">Free play<small>random events</small></button>
       <button data-mode="daily" class="${MODE==="daily"?"on":""}">Daily Dungeon<small>same run for everyone today</small></button>
     </div>
-    <div class="seg" role="group" aria-label="Region pack">
-      <button data-region="global" class="${REGION==="global"?"on":""}">Global<small>universal money life</small></button>
-      <button data-region="gulf" class="${REGION==="gulf"?"on":""}">Gulf pack · UAE<small>remittances, pay-in-4, giving</small></button>
+    <div class="edition" role="group" aria-label="Choose your edition">
+      <button data-region="global" class="${REGION==="global"?"on":""}" aria-pressed="${REGION==="global"}"><b>🌍 Global edition</b><span>Dollars. Everyday money life anywhere.</span></button>
+      <button data-region="gulf" class="g ${REGION==="gulf"?"on":""}" aria-pressed="${REGION==="gulf"}"><span class="tagn">NEW · UAE</span><b>🇦🇪 Gulf edition</b><span>Dirhams · rent cheques · end-of-service gratuity · remittances · pay-in-4 · zakat · interest-free family loan · credit report</span></button>
     </div>
     <div class="tiers">${["low","mid","high"].map(k=>`<button class="tier t-${k}" data-tier="${k}"><b>${TIERS[k].label}</b><span>${TIERS[k].sub}</span><em>${fmt(TIERS[k].salary)} / month${best(k)}</em></button>`).join("")}</div>
     <div class="links"><button id="helpLink">How to play</button><span>Made for Zoud GameLab 2026 · a FutureTech.ai game</span></div>
@@ -1300,11 +1314,19 @@ const CODEX=[
  {id:"swan",n:"Black Swan Risk",w:"Nassim Taleb",d:"Rare shocks hit hardest when you have no buffer or protection.",ok:(st,v)=>v&&st.shocks>=2&&st.emerg===0},
  {id:"humancap",n:"Human Capital",w:"Gary Becker · Theodore Schultz",d:"Skills are an asset. Borrowing cheaply to raise your pay is good debt; borrowing to consume is bad debt.",ok:(st,v)=>v&&st.skill>0&&st.skillMonth<=6},
  {id:"rational",n:"Rational Choice",w:"Classical economics · debt avalanche",d:"Pay the most expensive debt first. It is the cheapest path to freedom.",ok:(st)=>st.pays>=3&&st.payOK/st.pays>=.7}
+ ,{id:"liquid",n:"Precautionary Saving",w:"John Maynard Keynes · liquidity preference",d:"People hold ready cash for emergencies. Finishing your emergency fund means a bad month cannot become debt.",ok:()=>S.fortress}
+ ,{id:"mental",n:"Mental Accounting",w:"Richard Thaler",d:"Splitting pay into needs, lifestyle and savings buckets makes you spend more wisely.",ok:(st)=>st.saveMonths>=4}
+ ,{id:"nudge",n:"Nudge and Defaults",w:"Thaler & Sunstein",d:"Saving automatically beats relying on willpower. Employer matches are the strongest nudge.",ok:(st)=>(st.match||0)>0||st.saveMonths>=8}
+ ,{id:"lifecycle",n:"Life-Cycle Hypothesis",w:"Modigliani & Brumberg",d:"Earn now, spend later: save in working years so retirement is funded.",ok:(st)=>(st.retGain||0)>0}
+ ,{id:"signal",n:"Information and Credit Scores",w:"Akerlof · Stiglitz & Weiss",d:"Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.",ok:()=>S.cs>=700}
+ ,{id:"risk",n:"Risk Pooling",w:"Kenneth Arrow · insurance",d:"A small certain premium protects you from a large uncertain loss.",ok:(st)=>st.insPaid>0}
+ ,{id:"scarcity",n:"Scarcity and Bandwidth",w:"Mullainathan & Shafir",d:"Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.",ok:(st,v)=>v&&S.tier==="low"}
+ ,{id:"taxinc",n:"Tax Incentives",w:"Public finance · tax-advantaged saving",d:"Pre-tax saving lowers your tax bill, so the state helps you save.",ok:(st)=>(st.taxBack||0)>0}
 ];
 function codexUnlocked(survived,debt){return CODEX.filter(c=>c.ok(S.stats,survived,debt)).map(c=>c.id)}
 function openCodex(){
   const had=(store.get("cdx")||"").split(",").filter(Boolean),o=$("#ov2");
-  o.innerHTML=`<div class="card help"><div class="kick">MONEY CODEX</div><h1>Eleven ideas that <em>run money</em></h1>
+  o.innerHTML=`<div class="card help"><div class="kick">MONEY CODEX</div><h1>${CODEX.length} ideas that <em>run money</em></h1>
     <p class="tg">Real economic theories live inside this dungeon. Practise them in play to unlock each one (${had.length}/${CODEX.length}).</p>
     <div class="cdx">${CODEX.map(c=>`<div class="${had.includes(c.id)?"on":""}"><b>${had.includes(c.id)?"✓ ":"◇ "}${c.n}</b><em>${c.w}</em><br>${c.d}</div>`).join("")}</div>
     <p class="note">Simplified for play. Not financial advice.</p><button class="go" id="closeHelp">CLOSE</button></div>`;
@@ -1547,6 +1569,7 @@ var S={
 "Month":"الشهر","/mo":"/شهر",
 };
 Object.assign(S,{
+"Precautionary Saving":"الادخار الاحترازي","John Maynard Keynes · liquidity preference":"جون مينارد كينز · تفضيل السيولة","People hold ready cash for emergencies. Finishing your emergency fund means a bad month cannot become debt.":"يحتفظ الناس بنقد جاهز للطوارئ. إكمال صندوق الطوارئ يعني أن الشهر السيئ لن يتحول إلى دين.","Mental Accounting":"المحاسبة الذهنية","Richard Thaler":"ريتشارد ثالر","Splitting pay into needs, lifestyle and savings buckets makes you spend more wisely.":"تقسيم الراتب إلى احتياجات ونمط حياة ومدخرات يجعلك تنفق بحكمة أكبر.","Nudge and Defaults":"الدفع الخفيف والإعدادات الافتراضية","Thaler & Sunstein":"ثالر وسانستين","Saving automatically beats relying on willpower. Employer matches are the strongest nudge.":"الادخار التلقائي أفضل من الاعتماد على قوة الإرادة. مساهمة صاحب العمل أقوى دافع.","Life-Cycle Hypothesis":"فرضية دورة الحياة","Modigliani & Brumberg":"موديلياني وبرومبرغ","Earn now, spend later: save in working years so retirement is funded.":"اكسب الآن وأنفق لاحقًا: ادّخر في سنوات العمل ليتمول تقاعدك.","Information and Credit Scores":"المعلومات والتصنيف الائتماني","Akerlof · Stiglitz & Weiss":"أكيرلوف · ستيغليتز وفايس","Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.":"لا يرى المقرضون شخصيتك فيقرؤون تصنيفك الائتماني. السجل الجيد يعني اقتراضًا أرخص.","Risk Pooling":"تجميع المخاطر","Kenneth Arrow · insurance":"كينيث أرو · التأمين","A small certain premium protects you from a large uncertain loss.":"قسط صغير مؤكد يحميك من خسارة كبيرة غير مؤكدة.","Scarcity and Bandwidth":"الندرة والقدرة الذهنية","Mullainathan & Shafir":"مولاينثان وشافير","Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.":"ضغط المال يضيّق الانتباه فتطغى الحلول القصيرة على الخطط الطويلة. الاحتياطي يحرر ذهنك.","Tax Incentives":"الحوافز الضريبية","Public finance · tax-advantaged saving":"المالية العامة · ادخار بحوافز ضريبية","Pre-tax saving lowers your tax bill, so the state helps you save.":"الادخار قبل الضريبة يخفض فاتورتك الضريبية، فتساعدك الدولة على الادخار.","🌍 Global edition":"🌍 النسخة العالمية","Dollars. Everyday money life anywhere.":"بالدولار. حياة مالية يومية في أي مكان.","🇦🇪 Gulf edition":"🇦🇪 النسخة الخليجية","NEW · UAE":"جديد · الإمارات","Dirhams · rent cheques · end-of-service gratuity · remittances · pay-in-4 · zakat · interest-free family loan · credit report":"دراهم · شيكات الإيجار · مكافأة نهاية الخدمة · التحويلات · الدفع على 4 دفعات · الزكاة · قرض عائلي بلا فوائد · تقرير ائتماني","🎯 Goal: reach month 12 debt-free. 5 minutes. No quiz.":"🎯 الهدف: بلوغ الشهر 12 بلا ديون. 5 دقائق. بلا اختبار.",
 "🌅 Retirement account":"🌅 حساب التقاعد","pre-tax · employer adds 50% of the first 5% · locked until the end":"قبل الضريبة · صاحب العمل يضيف 50% من أول 5% · مقفل حتى النهاية","📈 Credit score":"📈 التصنيف الائتماني","Excellent: lenders offer their best rates":"ممتاز: المقرضون يقدمون أفضل أسعارهم","Good":"جيد","Fair: lenders see some risk":"مقبول: يرى المقرضون بعض المخاطر","Poor: borrowing gets expensive":"ضعيف: الاقتراض يصبح مكلفًا","CREDIT SCORE":"التصنيف الائتماني","RETIREMENT AND TAX":"التقاعد والضريبة","🧾 Tax relief: contributions are taken before tax":"🧾 إعفاء ضريبي: تُخصم المساهمات قبل الضريبة","You saved nothing for retirement, so you missed the employer match and the tax relief. Free money is the best return there is.":"لم تدّخر شيئًا للتقاعد، فخسرت مساهمة صاحب العمل والإعفاء الضريبي. المال المجاني هو أفضل عائد.","Credit score":"التصنيف الائتماني","A number lenders use to judge you. Paying on time and keeping card use low raises it; missed bills and maxed cards lower it.":"رقم يستخدمه المقرضون للحكم عليك. السداد في الموعد وقلة استخدام البطاقة يرفعانه، والفواتير المتأخرة والبطاقات المستنفدة تخفضانه.","Retirement account":"حساب التقاعد","Money locked away for later. Your employer adds a match (free money) and contributions are taken before tax, so you pay less tax now.":"مال محفوظ للمستقبل. يضيف صاحب العمل مساهمة (مال مجاني) وتُخصم المساهمات قبل الضريبة فتدفع ضريبة أقل الآن.","Tax":"الضريبة","Part of your pay goes to the state. Pre-tax savings cut that bill.":"جزء من راتبك يذهب للدولة. الادخار قبل الضريبة يخفض هذه الفاتورة.",
 "Rent cheque due":"استحقاق شيك الإيجار","Your landlord's post-dated rent cheque clears. The cash must be there":"يُصرف شيك الإيجار المؤجَّل لمالك العقار. يجب أن يكون المبلغ متوفرًا",
 "End-of-service gratuity":"مكافأة نهاية الخدمة","A UAE employer pays a gratuity when a job ends. Plan it before it plans you":"يدفع صاحب العمل في الإمارات مكافأة عند انتهاء العمل. خطّط لها قبل أن تُنفق",

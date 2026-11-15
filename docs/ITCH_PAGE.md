@@ -20,7 +20,7 @@ Every debt is a monster that grows by a visible percentage every month. Every do
 - Good debt vs bad debt (a cheap skill-course loan against a 4%-a-month card)
 - Lifestyle creep when your pay rises
 - Investing against inflation: steady, volatile and a space-tech Orbit Fund
-- Eleven real economic ideas in the Money Codex, from compound interest to human capital
+- Nineteen real economic ideas in the Money Codex, from compound interest to human capital
 
 **Features**
 - Three income levels: low, middle and high. Rich or poor, the debt trap works the same way
