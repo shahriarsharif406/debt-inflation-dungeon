@@ -10,7 +10,7 @@ const M={};let renderer,scene,cam,canvas,hall=null,clock,torches=[],running=fals
 const inst={},stat={};let knight=null,coins=null,prevSum=null,floorTheme=0;
 const THEME=[{fog:0x2a3466,amb:0x8a9ad0,torch:0xffa24d,tint:0x8fa0d8},{fog:0x3a2618,amb:0xb89070,torch:0xff9438,tint:0xd8a070},{fog:0x3a1620,amb:0xb06a78,torch:0xff6a3a,tint:0xd87080}];
 const KIND={wyrm:{m:"demon"},golem:{m:"orc"},imp:{m:"blue"},vamp:{m:"creep"},hydra:{m:"blue",tint:0x3ddc84},emerg:{m:"demon",tint:0xff8a3d}};
-const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",wall:"wall.glb",floor:"floor_tile_large.glb",column:"column.glb",torch:"torch_mounted.glb",cs:"coin_stack_small.glb",cm:"coin_stack_medium.glb",cl:"coin_stack_large.glb",barrel:"barrel_large.glb",crates:"crates_stacked.glb",rubble:"rubble_half.glb",banner:"banner_shield_red.glb",chest:"chest_gold.glb",creep:"creep.glb"};
+const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",wall:"wall.glb",floor:"floor_tile_large.glb",column:"column.glb",torch:"torch_mounted.glb",cs:"coin_stack_small.glb",cm:"coin_stack_medium.glb",cl:"coin_stack_large.glb",barrel:"barrel_large.glb",crates:"crates_stacked.glb",rubble:"rubble_half.glb",banner:"banner_shield_red.glb",chest:"chest_gold.glb",creep:"creep.glb",wgate:"wall_archedwindow_gated.glb",wcrack:"wall_cracked.glb",shelves:"shelves.glb",shelfL:"shelf_large.glb",shelfC:"shelf_small_candles.glb",keg:"keg.glb",kegD:"keg_decorated.glb",barS:"barrel_small.glb",barSS:"barrel_small_stack.glb",barD:"barrel_large_decorated.glb",boxL:"box_large.glb",boxS:"box_stacked.glb",trunk:"trunk_large_A.glb",table:"table_long_decorated_A.glb",candle:"candle_triple.glb",grate:"floor_tile_big_grate_open.glb",rocks:"floor_tile_large_rocks.glb",sword:"sword_shield.glb",bannerT:"banner_triple_red.glb",stairs:"stairs_wide.glb"};
 const ESSENTIAL=["knight","demon","blue","orc","wall","floor","column","torch","cl","cm","cs"];
 
 function load(){
@@ -41,10 +41,11 @@ function build(){
   const wb=new THREE.Box3().setFromObject(M.wall.scene);const ww=wb.max.x-wb.min.x||4,wh=wb.max.y-wb.min.y||4;
   const stage=new THREE.Group();scene.add(stage);
   // floor grid
-  for(let ix=-9;ix<=9;ix++)for(let iz=-3;iz<=3;iz++){const t=skClone(M.floor.scene);t.position.set(ix*ft,-fb.min.y*0-(fb.max.y),iz*ft);t.position.y=-fb.max.y;stage.add(t)}
+  for(let ix=-9;ix<=9;ix++)for(let iz=-3;iz<=3;iz++){const h=Math.abs(ix*7+iz*13)%11;const src=(h===0&&M.rocks)?M.rocks:(ix===0&&iz===-1&&M.grate)?M.grate:M.floor;const t=skClone(src.scene);t.position.set(ix*ft,-fb.min.y*0-(fb.max.y),iz*ft);t.position.y=-fb.max.y;stage.add(t)}
   // back wall + columns + torches
   const wallZ=-ft*1.5-1.2;
-  for(let i=-10;i<=10;i++){const w=skClone(M.wall.scene);w.position.set(i*ww,-wb.min.y,wallZ);stage.add(w);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(ww*24,wh*2.2),new THREE.MeshStandardMaterial({color:0x14101c,roughness:1}));back.position.set(0,wh,wallZ-1.1);stage.add(back);
+  for(let i=-10;i<=10;i++){const k=Math.abs(i)%5===0&&i!==0?'wgate':(Math.abs(i*3)%7===1?'wcrack':'wall');const w=skClone((M[k]||M.wall).scene);w.position.set(i*ww,-wb.min.y,wallZ);stage.add(w);
     const w2=skClone(M.wall.scene);w2.position.set(i*ww,-wb.min.y+wh,wallZ);stage.add(w2)}
   for(let i=-6;i<=6;i++){const c=skClone(M.column.scene);c.position.set(i*ww*2-ww*.5,0,wallZ+.8);c.scale.setScalar(1.15);stage.add(c)}
   const tpos=[-7,-2.2,2.6,7.4];
@@ -52,7 +53,13 @@ function build(){
     const L=new THREE.PointLight(0xffa24d,60,26,1.6);L.position.set(t.position.x,t.position.y+.5,t.position.z+1.2);L.userData.seed=Math.random()*9;if(i===1||i===2){scene.add(L)}else{L.intensity=0;L.visible=false}torches.push(L);const gc=document.createElement('canvas');gc.width=gc.height=64;const gx=gc.getContext('2d');const gg=gx.createRadialGradient(32,32,1,32,32,32);gg.addColorStop(0,'rgba(255,214,120,.9)');gg.addColorStop(.3,'rgba(255,140,40,.35)');gg.addColorStop(1,'rgba(255,100,20,0)');gx.fillStyle=gg;gx.fillRect(0,0,64,64);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(gc),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false}));sp.scale.set(1.0,1.0,1);sp.position.set(t.position.x,t.position.y+1.05,t.position.z+.5);scene.add(sp);L.userData.glow=sp});
   // props
   const addP=(k,x,z,s,ry)=>{if(!M[k])return;const p=skClone(M[k].scene);p.position.set(x,0,z);p.scale.setScalar(s||1);p.rotation.y=ry||0;stage.add(p)};
-  addP("barrel",-13.5,-2.6,1.2,.4);addP("crates",13.5,-2.4,1.2,-.3);addP("rubble",-9.2,-2,.45,0);addP("rubble",10.4,-1.6,.4,2);
+  // cellar dressing: shelves of bottles, kegs, barrels, crates, a tasting table
+  const zb=wallZ+1.9;
+  addP("shelves",-6.2,zb-.2,1.15,0);addP("shelfL",6.4,zb-.2,1.1,0);addP("shelfC",-0.4,zb-.3,1.1,0);
+  addP("kegD",-11.2,zb+.4,1.25,.5);addP("keg",-12.9,zb+1.1,1.2,-.4);addP("barSS",-9.1,zb+.2,1.2,.2);addP("barD",-14.4,zb-.2,1.3,.3);
+  addP("barD",11.2,zb+.2,1.3,-.5);addP("barS",13,zb+1.3,1.3,.7);addP("crates",9.1,zb+.4,1.15,.15);addP("boxL",14.3,zb-.3,1.2,.4);addP("boxS",12.2,zb+2,1,1.2);
+  addP("table",2.8,zb-.1,1.1,0);addP("candle",2.2,zb-.1,1.4,0);addP("trunk",-3.6,zb+.2,1.15,.1);addP("sword",-8.2,zb-.6,1.1,.2);
+  addP("rubble",-9.8,zb+3.2,.45,0);addP("rubble",10.4,zb+3.4,.4,2);
   if(M.banner){[-4.2,5.2].forEach(x=>{const b=skClone(M.banner.scene);b.position.set(x,wh*.55,wallZ+.45);b.scale.setScalar(1.2);stage.add(b)})}
   // merge static stage into few draw calls
   stage.updateMatrixWorld(true);const groups=new Map();
