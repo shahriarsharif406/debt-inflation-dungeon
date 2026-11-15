@@ -547,15 +547,67 @@ function aInit(){
   try{
     A.ctx=new(window.AudioContext||window.webkitAudioContext)();
     A.master=A.ctx.createGain();A.master.gain.value=A.on?1:0;A.master.connect(A.ctx.destination);
-    const c=A.ctx,g=c.createGain();g.gain.value=.03;
+    const c=A.ctx,g=c.createGain();g.gain.value=.018;
     const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=320;f.Q.value=3;
     const o1=c.createOscillator(),o2=c.createOscillator(),lfo=c.createOscillator(),lg=c.createGain();
     o1.type="sawtooth";o2.type="triangle";o1.frequency.value=55;o2.frequency.value=82.4;
     lfo.frequency.value=.07;lg.gain.value=140;lfo.connect(lg);lg.connect(f.frequency);
     o1.connect(f);o2.connect(f);f.connect(g);g.connect(A.master);
-    [o1,o2,lfo].forEach(o=>o.start());A.amb={o1,o2,f};ambFloor(floorOf(S?S.month:1));
+    [o1,o2,lfo].forEach(o=>o.start());A.amb={o1,o2,f};ambFloor(floorOf(S?S.month:1));musicStart();
   }catch(e){A.ctx=null}
 }
+
+/* ---------- procedural soundtrack (WebAudio, no samples, original) ---------- */
+const MUS={keys:[[57,60,64,69],[50,53,57,62],[52,55,59,64]],base:[66,76,88]};
+// progression as semitone offsets from the key root, one chord per bar
+const PROG=[[0,[0,3,7,12]],[ -4,[0,4,7,12]],[ -9,[0,4,7,12]],[ -2,[0,4,7,10]],[0,[0,3,7,12]],[5,[0,3,7,12]],[ -4,[0,4,7,12]],[7,[0,4,7,10]]];
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+function musicBar(c,dest,t,bar,fl,mood,bpm){
+  const root=[45,38,40][fl],sp=60/bpm,beat=sp,[off,ch]=PROG[bar%8];
+  const minor=mood!=="win";
+  const chord=ch.map(x=>root+12+off+(mood==="win"&&x===3?4:x));
+  const env=(g,t0,a,d,v)=>{g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(v,t0+a);g.gain.exponentialRampToValueAtTime(.0001,t0+d)};
+  // pad: two detuned saws through a lowpass, one chord per bar
+  chord.slice(0,3).forEach((m,i)=>{
+    const o=c.createOscillator(),o2=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain();
+    o.type="sawtooth";o2.type="triangle";o.frequency.value=mtof(m);o2.frequency.value=mtof(m)*1.004;o.detune.value=-6;
+    f.type="lowpass";f.frequency.setValueAtTime(380,t);f.frequency.linearRampToValueAtTime(900+fl*220,t+beat*2.2);f.frequency.linearRampToValueAtTime(420,t+beat*4);f.Q.value=.7;
+    env(g,t,beat*1.2,beat*4.1,.016);o.connect(f);o2.connect(f);f.connect(g);g.connect(dest);o.start(t);o2.start(t);o.stop(t+beat*4.2);o2.stop(t+beat*4.2)});
+  // bass: root on 1 and a pulse on the "and" of 3
+  [[0,1],[2.5,.7]].forEach(([b,v])=>{const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type="sine";o.frequency.value=mtof(chord[0]-12);f.type="lowpass";f.frequency.value=320;
+    const t0=t+b*beat;env(g,t0,.02,beat*1.6,.07*v);o.connect(f);f.connect(g);g.connect(dest);o.start(t0);o.stop(t0+beat*1.7)});
+  // arpeggio: plucked triangle, 8th notes, pattern changes each bar; busier when tense
+  const pat=[[0,1,2,3,2,1,2,3],[0,2,1,3,0,2,3,1],[3,2,1,0,1,2,3,2],[0,1,3,2,0,1,3,2]][bar%4];
+  for(let i=0;i<8;i++){
+    if(fl===0&&i%2===1&&bar%2===0)continue;
+    const m=chord[pat[i]]+12,t0=t+i*beat/2,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();
+    o.type="triangle";o.frequency.value=mtof(m);f.type="lowpass";f.frequency.value=1800+fl*500;
+    env(g,t0,.008,beat*.9,.032+(i%4===0?.012:0));o.connect(f);f.connect(g);g.connect(dest);o.start(t0);o.stop(t0+beat);
+  }
+  // lead bell every 2 bars, with soft echo built from a second quiet copy
+  if(bar%2===1||mood==="win"){const notes=[chord[2]+24,chord[1]+24,chord[3]+24,chord[0]+24];
+    [0,1.5,2.5,3].forEach((b,i)=>{if(Math.random()<.35&&mood!=="win")return;const t0=t+b*beat,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=mtof(notes[i]);
+      env(g,t0,.01,beat*1.8,.028);o.connect(g);g.connect(dest);o.start(t0);o.stop(t0+beat*1.9);
+      const o2=c.createOscillator(),g2=c.createGain();o2.type="sine";o2.frequency.value=mtof(notes[i]);env(g2,t0+beat*.75,.01,beat*1.4,.012);o2.connect(g2);g2.connect(dest);o2.start(t0+beat*.75);o2.stop(t0+beat*2.2)})}
+  // soft shaker on off-beats
+  for(let i=0;i<4;i++){const t0=t+(i+.5)*beat,n=c.createBufferSource(),b=c.createBuffer(1,2205,44100),d=b.getChannelData(0);for(let k=0;k<d.length;k++)d[k]=(Math.random()*2-1)*(1-k/d.length);
+    n.buffer=b;const f=c.createBiquadFilter(),g=c.createGain();f.type="highpass";f.frequency.value=6000;env(g,t0,.002,.05,.012+(fl*.004));n.connect(f);f.connect(g);g.connect(dest);n.start(t0)}
+  return beat*4;
+}
+const MU={bar:0,next:0,timer:null,mood:"play",moodUntil:0,gain:null};
+function musicStart(){
+  const c=A.ctx;if(!c||MU.timer)return;
+  MU.gain=c.createGain();MU.gain.gain.value=1.35;MU.gain.connect(A.master);MU.next=c.currentTime+.2;
+  const tick=()=>{if(!A.ctx||A.ctx.state!=="running")return;
+    while(MU.next<c.currentTime+.6){
+      const fl=floorOf(S?S.month:1),bpm=MUS.base[fl]+Math.min(10,(S?S.month:1)*.8)+(MU.mood==="lose"?-16:0)+(MU.mood==="win"?10:0);
+      if(MU.mood!=="play"&&c.currentTime>MU.moodUntil)MU.mood="play";
+      MU.next+=musicBar(c,MU.gain,MU.next,MU.bar++,fl,MU.mood,bpm)}};
+  MU.timer=setInterval(tick,120);tick();
+  document.addEventListener("visibilitychange",()=>{if(!A.ctx)return;if(document.hidden)A.ctx.suspend();else A.ctx.resume()});
+}
+function musicMood(m,sec){MU.mood=m;MU.moodUntil=(A.ctx?A.ctx.currentTime:0)+sec}
+window.__musicBar=musicBar;
 function ambFloor(fl){
   if(!A.amb)return;const t=A.ctx.currentTime,r=[55,49,46.25][fl];
   A.amb.o1.frequency.setTargetAtTime(r,t,1.5);A.amb.o2.frequency.setTargetAtTime(fl===2?r*1.414:r*1.5,t,1.5);
@@ -573,8 +625,8 @@ const sfx={
   bad(){beep(140,.28,"sawtooth",.05)},
   end(){beep(300,.1,"square");setTimeout(()=>beep(200,.18,"square"),90)},
   tick(){beep(660,.04,"triangle",.02)},
-  win(){[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.2,"triangle",.05),i*110))},
-  lose(){[330,277,233,196].forEach((f,i)=>setTimeout(()=>beep(f,.25,"sawtooth",.045),i*150))}
+  win(){musicMood('win',16);[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.2,"triangle",.05),i*110))},
+  lose(){musicMood('lose',14);[330,277,233,196].forEach((f,i)=>setTimeout(()=>beep(f,.25,"sawtooth",.045),i*150))}
 };
 function setSound(on){A.on=on;store.set("sound",on?"on":"off");if(A.master)A.master.gain.setTargetAtTime(on?1:0,A.ctx.currentTime,.05);$("#mute").textContent=on?"♪ On":"♪ Off"}
 
