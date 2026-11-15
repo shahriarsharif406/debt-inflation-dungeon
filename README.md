@@ -104,6 +104,6 @@ Real-time 3D dungeon arena (three.js) with animated knight and monsters, plus an
 
 ## Credits
 Real-time 3D arena built with [three.js](https://threejs.org). All 3D art is CC0:
-- Knight and dungeon pieces: [KayKit](https://kaylousberg.com) by Kay Lousberg (Adventurers 1.0, Dungeon Remastered 1.0)
+- Knight: [KayKit](https://kaylousberg.com) by Kay Lousberg (Adventurers 1.0, CC0). The cellar environment is procedurally generated in code.
 - Monsters: [Quaternius](https://quaternius.com) (Demon, BlueDemon, Orc, CreepCreature)
 Game code, design, UI, balance and music are original. See `assets/CREDITS.md`. If WebGL is unavailable the game falls back to a 2D arena.

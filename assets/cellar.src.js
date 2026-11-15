@@ -97,11 +97,12 @@ export function buildCellar(stage,scene,opt){
     const b=new THREE.Mesh(new THREE.BoxGeometry(1.7,.7,1.5),padM);b.position.set(x,.35,wallZ+.62);stage.add(b);
     const c=new THREE.Mesh(new THREE.BoxGeometry(1.7,.5,1.5),padM);c.position.set(x,cornY-.5,wallZ+.62);stage.add(c)});
   // ---- arched wine alcoves
-  const bottleGeo=new THREE.CylinderGeometry(.19,.19,.55,14);bottleGeo.rotateX(Math.PI/2);
-  const glassM=[0x1c3b2a,0x23422e,0x2e2a1a,0x152f22].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.22,metalness:.25,emissive:0x0a2a18,emissiveIntensity:.22}));
+  const bottleGeo=new THREE.CylinderGeometry(.19,.19,.55,16);bottleGeo.rotateX(Math.PI/2);
+  const glassM=[0xa88c5c,0x967a4c,0xb89c68,0x8c7348].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.85,metalness:0,emissive:0x1a1004,emissiveIntensity:.15}));
   const rackWood=(()=>{const q=tex(woodB,1.2,1.2);return new THREE.MeshStandardMaterial({map:q.m,normalMap:q.n,roughness:.8,color:0xa07c58})})();
   const backM=new THREE.MeshStandardMaterial({color:0x120c08,roughness:1});
   const alT=glowTex([[0,'rgba(255,190,110,.55)'],[.45,'rgba(255,150,60,.22)'],[1,'rgba(255,120,30,0)']],128);
+  const coreGeo=new THREE.CylinderGeometry(.075,.075,.58,10);coreGeo.rotateX(Math.PI/2);const coreM=new THREE.MeshStandardMaterial({color:0x3a2a16,roughness:1});const n0=c=>c.reduce((a,b)=>a+b,0);
   function alcove(cx,half,hs){
     const ag=new THREE.Sprite(new THREE.SpriteMaterial({map:alT,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false,opacity:.6}));ag.scale.set(half*3.2,half*3.2,1);ag.position.set(cx,hs*.8,wallZ+.85);ag.renderOrder=3;scene.add(ag);
     const t=.42,R=half+t;
@@ -115,40 +116,47 @@ export function buildCellar(stage,scene,opt){
     const bp=new THREE.Mesh(new THREE.ShapeGeometry((()=>{const s=new THREE.Shape();s.moveTo(-half,0);s.lineTo(-half,hs);s.absarc(0,hs,half,Math.PI,0,true);s.lineTo(half,0);s.lineTo(-half,0);return s})(),18),backM);bp.position.set(cx,0,wallZ+.06);stage.add(bp);
     // lattice rack + bottles (end-on)
     const rows=Math.floor((hs+half*.55)/.5),cols=Math.max(3,Math.floor(half*2/.46));
-    const inst=new THREE.InstancedMesh(bottleGeo,glassM[0],rows*cols);const dm=new THREE.Object3D();let n=0;
+    const insts=glassM.map(m=>new THREE.InstancedMesh(bottleGeo,m,rows*cols)),cnt=[0,0,0,0];const dm=new THREE.Object3D();
     for(let r=0;r<rows;r++){const y=.5+r*.5;const off=(r%2)*.23;
-      for(let c=0;c<cols;c++){const x=-half+.35+c*.46+off-(cols%2?0:0);if(Math.abs(x)>half-.2)continue;
+      for(let c=0;c<cols;c++){const x=-half+.35+c*.46+off;if(Math.abs(x)>half-.2)continue;
         const inArch=y>hs?(Math.hypot(x,y-hs)<half-.22):true;if(!inArch)continue;
-        dm.position.set(cx+x,y,wallZ+.36);dm.rotation.set(0,0,0);dm.scale.setScalar(.92+((r*7+c*3)%5)*.03);dm.updateMatrix();inst.setMatrixAt(n++,dm.matrix)}}
-    inst.count=n;inst.instanceMatrix.needsUpdate=true;scene.add(inst);
+        const k=(r*5+c*3+((r*c)%3))%4;dm.position.set(cx+x,y,wallZ+.36);dm.rotation.set(0,0,0);dm.scale.set(.92+((r*7+c*3)%5)*.03,.92+((r*7+c*3)%5)*.03,1);dm.updateMatrix();insts[k].setMatrixAt(cnt[k]++,dm.matrix)}}
+    insts.forEach((q,k)=>{q.count=cnt[k];q.instanceMatrix.needsUpdate=true;scene.add(q)});
+    const core=new THREE.InstancedMesh(coreGeo,coreM,n0(cnt));let ci=0;insts.forEach((q,k)=>{for(let i=0;i<cnt[k];i++){q.getMatrixAt(i,dm.matrix);dm.matrix.decompose(dm.position,dm.quaternion,dm.scale);dm.position.z+=.02;dm.scale.set(1,1,1);dm.updateMatrix();core.setMatrixAt(ci++,dm.matrix)}});core.count=ci;scene.add(core);
+    const n=cnt[0]+cnt[1]+cnt[2]+cnt[3];
     // slats
     for(let r=0;r<=rows;r++){const y=.25+r*.5;if(y>hs+half-.5)break;const wlen=y>hs?2*Math.sqrt(Math.max(.01,half*half-(y-hs)*(y-hs))):half*2;
       const s=new THREE.Mesh(new THREE.BoxGeometry(wlen,.07,.5),rackWood);s.position.set(cx,y,wallZ+.3);stage.add(s)}
     [-half+.05,0,half-.05].forEach(x=>{const s=new THREE.Mesh(new THREE.BoxGeometry(.08,hs,.5),rackWood);s.position.set(cx+x,hs/2,wallZ+.3);stage.add(s)});
     return n}
   alcove(-10.3,1.85,3.3);alcove(0,1.85,3.3);alcove(10.3,1.85,3.3);
-  // ---- oak barrels (lathe) + crates
-  const hoopM=new THREE.MeshStandardMaterial({color:0x2a2a2e,metalness:.75,roughness:.42});
-  const barrelMat=(()=>{const q=tex(woodA,2,1);return new THREE.MeshStandardMaterial({map:q.m,normalMap:q.n,roughness:.72,color:0xc89a68})})();
-  const prof=[];for(let i=0;i<=12;i++){const t=i/12;const y=t*1.5;const r=.55+.2*Math.sin(t*Math.PI);prof.push(new THREE.Vector2(r,y))}
-  const barrelGeo=new THREE.LatheGeometry(prof,22);
-  const topGeo=new THREE.CircleGeometry(.55,22);topGeo.rotateX(-Math.PI/2);
-  function barrel(x,z,s,ry,tilt){const g=new THREE.Group();const b=new THREE.Mesh(barrelGeo,barrelMat);g.add(b);
-    const tp=new THREE.Mesh(topGeo,barrelMat);tp.position.y=1.5;g.add(tp);
-    [.16,.5,1.0,1.34].forEach(t=>{const y=t,r=.55+.2*Math.sin(y/1.5*Math.PI)+.012;const h=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.09,22,1,true),hoopM);h.position.y=y;g.add(h)});
-    g.position.set(x,0,z);g.rotation.y=ry||0;g.scale.setScalar(s||1);if(tilt){g.rotation.z=Math.PI/2;g.position.y=.78*(s||1)}stage.add(g);return g}
+  // ---- grain sacks, clay storage jars, crates
+  const sackM=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#b8996a';x.fillRect(0,0,128,128);const r=rng(9);for(let i=0;i<900;i++){x.fillStyle=`rgba(${r()<.5?'90,66,36':'214,188,140'},${.12+r()*.18})`;x.fillRect(r()*128,r()*128,r()<.5?1:12,r()<.5?12:1)}const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;return new THREE.MeshStandardMaterial({map:t,roughness:1,color:0xe6d2aa})})();
+  const ropeM=new THREE.MeshStandardMaterial({color:0x5a4228,roughness:1});
+  const sackGeo=new THREE.SphereGeometry(.62,20,16);
+  function sack(x,y,z,s,ry,lean){const g=new THREE.Group();const b=new THREE.Mesh(sackGeo,sackM);b.scale.set(1,1.15,.78);b.position.y=.68;g.add(b);
+    const nk=new THREE.Mesh(new THREE.CylinderGeometry(.2,.3,.34,12),sackM);nk.position.y=1.38;g.add(nk);
+    const tp=new THREE.Mesh(new THREE.ConeGeometry(.26,.28,12),sackM);tp.position.y=1.66;tp.rotation.z=.2;g.add(tp);
+    const rp=new THREE.Mesh(new THREE.TorusGeometry(.24,.04,6,14),ropeM);rp.rotation.x=Math.PI/2;rp.position.y=1.28;g.add(rp);
+    g.position.set(x,y,z);g.rotation.y=ry||0;g.rotation.z=lean||0;g.scale.setScalar(s||1);stage.add(g)}
+  const clayM=new THREE.MeshStandardMaterial({color:0xa5583a,roughness:.78,metalness:0});
+  const clayDark=new THREE.MeshStandardMaterial({color:0x5a2e1e,roughness:.9});
+  const jarProf=[[.0,0],[.34,0],[.5,.2],[.62,.55],[.56,.95],[.34,1.2],[.26,1.38],[.34,1.5],[.3,1.55]].map(p=>new THREE.Vector2(p[0],p[1]));
+  const jarGeo=new THREE.LatheGeometry(jarProf,22);
+  function jar(x,z,s,ry){const g=new THREE.Group();g.add(new THREE.Mesh(jarGeo,clayM));const bd=new THREE.Mesh(new THREE.CylinderGeometry(.585,.585,.06,22,1,true),clayDark);bd.position.y=.6;g.add(bd);
+    g.position.set(x,0,z);g.rotation.y=ry||0;g.scale.setScalar(s||1);stage.add(g)}
   const crateM=(()=>{const q=tex(woodA,1,1);return new THREE.MeshStandardMaterial({map:q.m,normalMap:q.n,roughness:.8,color:0xa07848})})();
   const strapM=new THREE.MeshStandardMaterial({color:0x35302c,metalness:.6,roughness:.5});
   function crate(x,y,z,s,ry){const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.2,1.5),crateM);b.position.y=.6;g.add(b);
     [[-.7,0],[.7,0]].forEach(([dx])=>{const st=new THREE.Mesh(new THREE.BoxGeometry(.12,1.24,1.54),strapM);st.position.set(dx,.6,0);g.add(st)});
     g.position.set(x,y,z);g.rotation.y=ry||0;g.scale.setScalar(s||1);stage.add(g)}
   const zb=wallZ+2.6;
-  barrel(-13.2,zb+.2,1.05,.3);barrel(-11.7,zb+1.0,.95,1.1);crate(-13.6,0,zb+2.0,.9,.4);crate(-13.6,1.08,zb+2.0,.7,-.2);
-  barrel(13.0,zb+.1,1.1,2.0);barrel(11.5,zb+1.3,.9,.7);barrel(14.4,zb+1.6,.95,1.2,true);crate(8.4,0,zb+.3,.85,-.3);
-  barrel(-7.9,zb+.3,.9,.9);
+  sack(-13.2,0,zb+.2,1.0,.3);sack(-11.9,0,zb+.9,.9,1.1,.05);sack(-12.5,.95,zb+.35,.8,.6,-.1);jar(-10.6,zb+1.4,.9,0);crate(-13.8,0,zb+2.2,.85,.4);
+  sack(12.6,0,zb+.1,1.05,2.0);sack(11.2,0,zb+1.0,.9,.7,-.05);jar(14.2,zb+1.1,1.0,0);jar(13.2,zb+2.2,.8,0);crate(8.6,0,zb+.3,.85,-.3);crate(8.6,1.02,zb+.3,.62,.2);
+  jar(-7.9,zb+.5,.85,0);
   // contact shadows under props
   const shadowT=glowTex([[0,'rgba(0,0,0,.7)'],[.6,'rgba(0,0,0,.35)'],[1,'rgba(0,0,0,0)']],64);
-  [[-13.2,zb+.2,2.4],[-11.7,zb+1,2.2],[-13.6,zb+2,2.2],[13,zb+.1,2.5],[11.5,zb+1.3,2.1],[14.4,zb+1.6,2.2],[8.4,zb+.3,2.2],[-7.9,zb+.3,2.1]].forEach(([x,z,s])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(s,s*.8),new THREE.MeshBasicMaterial({map:shadowT,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(x,.025,z);m.renderOrder=1;scene.add(m)});
+  [[-12.9,zb+.5,3],[-10.6,zb+1.4,1.6],[-13.8,zb+2.2,2.2],[12,zb+.5,3],[14.2,zb+1.1,1.8],[13.2,zb+2.2,1.5],[8.6,zb+.3,2.2],[-7.9,zb+.5,1.6]].forEach(([x,z,s])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(s,s*.8),new THREE.MeshBasicMaterial({map:shadowT,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(x,.025,z);m.renderOrder=1;scene.add(m)});
   // wall base AO + vignette bands
   const aoT=(()=>{const c=document.createElement('canvas');c.width=4;c.height=64;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,0,64);g.addColorStop(0,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,4,64);return new THREE.CanvasTexture(c)})();
   const ao=new THREE.Mesh(new THREE.PlaneGeometry(W,3.2),new THREE.MeshBasicMaterial({map:aoT,transparent:true,depthWrite:false}));ao.rotation.x=-Math.PI/2;ao.position.set(0,.03,wallZ+1.6);ao.renderOrder=1;scene.add(ao);
@@ -182,3 +190,21 @@ export function buildCellar(stage,scene,opt){
   const dust=new THREE.Points(pg,new THREE.PointsMaterial({map:glowTex([[0,'rgba(255,240,210,1)'],[.4,'rgba(255,230,190,.4)'],[1,'rgba(255,220,180,0)']],32),size:.16,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,fog:false}));dust.frustumCulled=false;scene.add(dust);
   ctl.tick=(t,dt)=>{const p=pg.attributes.position.array;for(let i=0;i<N;i++){const s=sp[i];p[i*3+1]+=s[0]*dt;p[i*3]+=Math.sin(t*.4+s[1])*dt*.12;if(p[i*3+1]>7.4)p[i*3+1]=.4}pg.attributes.position.needsUpdate=true};
   return ctl}
+
+export function cashStack(key){
+  const c=document.createElement('canvas');c.width=128;c.height=64;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,128,64);g.addColorStop(0,'#5f9a62');g.addColorStop(1,'#3f7a4c');x.fillStyle=g;x.fillRect(0,0,128,64);
+  x.strokeStyle='#d9ecc9';x.lineWidth=3;x.strokeRect(5,5,118,54);x.lineWidth=1.5;x.strokeRect(11,11,106,42);
+  x.fillStyle='#d9ecc9';x.beginPath();x.arc(64,32,15,0,6.3);x.fill();x.fillStyle='#2f6a40';x.font='bold 22px system-ui,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('$',64,33);
+  x.fillStyle='#d9ecc9';x.font='bold 13px system-ui,Arial';x.fillText('100',24,32);x.fillText('100',104,32);
+  const top=new THREE.CanvasTexture(c);top.colorSpace=THREE.SRGBColorSpace;top.anisotropy=4;
+  const side=new THREE.MeshStandardMaterial({color:0x8e9c7a,roughness:.95});
+  const topM=new THREE.MeshStandardMaterial({map:top,roughness:.8,color:0x8fb48f});
+  const mats=[side,side,topM,side,side,side];
+  const band=new THREE.MeshStandardMaterial({color:0x9c8c66,roughness:.9});
+  const layers=key==='cs'?[2,1]:key==='cm'?[3,2,1]:[4,3,2,1];const bh=.3,bw=1.0,bd=.5;
+  const grp=new THREE.Group();let n=0;
+  layers.forEach((cnt,li)=>{for(let i=0;i<cnt;i++){const b=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,bd),mats);
+    b.position.set((i-(cnt-1)/2)*(bw+.05),li*bh+bh/2,((n*37)%7-3)*.02);b.rotation.y=((n*53)%9-4)*.018;grp.add(b);
+    const bn=new THREE.Mesh(new THREE.BoxGeometry(.14,bh+.01,bd+.01),band);bn.position.copy(b.position);bn.rotation.copy(b.rotation);grp.add(bn);n++}});
+  const o=new THREE.Group();o.add(grp);o.userData.h=layers.length*bh;return o}

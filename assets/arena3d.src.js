@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {buildCellar} from './cellar.js';
+import {buildCellar,cashStack} from './cellar.js';
 import {clone as skClone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 const BASE=(document.currentScript&&document.currentScript.src)?document.currentScript.src.replace(/[^/]*$/,""):"assets/";
@@ -11,8 +11,8 @@ const M={};let cellar=null,renderer,scene,cam,canvas,hall=null,clock,torches=[],
 const inst={},stat={};let knight=null,coins=null,prevSum=null,floorTheme=0;
 const THEME=[{fog:0x2a3466,amb:0x8a9ad0,torch:0xffa24d,tint:0x8fa0d8},{fog:0x3a2618,amb:0xb89070,torch:0xff9438,tint:0xd8a070},{fog:0x3a1620,amb:0xb06a78,torch:0xff6a3a,tint:0xd87080}];
 const KIND={wyrm:{m:"demon"},golem:{m:"orc"},imp:{m:"blue"},vamp:{m:"creep"},hydra:{m:"blue",tint:0x3ddc84},emerg:{m:"demon",tint:0xff8a3d}};
-const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",cs:"coin_stack_small.glb",cm:"coin_stack_medium.glb",cl:"coin_stack_large.glb",creep:"creep.glb"};
-const ESSENTIAL=["knight","demon","blue","orc","cl","cm","cs"];
+const FILES={knight:"knight.glb",demon:"demon.glb",blue:"bluedemon.glb",orc:"orc.glb",creep:"creep.glb"};
+const ESSENTIAL=["knight","demon","blue","orc"];
 
 function load(){
   const L=new GLTFLoader();let n=0;const need=ESSENTIAL.length;
@@ -108,7 +108,7 @@ function layout(first){
   const st=hall.querySelector(".stash");
   if(st){const n=+(st.dataset.coins||0),sr=st.getBoundingClientRect(),px=sr.left+sr.width/2-r.left,py=sr.bottom-r.top-6;const p=floorAt(px,py,w,h);
     const key=n===0?null:n<=3?"cs":n<=7?"cm":"cl";
-    if(!coins||coins.key!==key){if(coins){scene.remove(coins.o);}coins=null;if(key&&M[key]){const o=skClone(M[key].scene);const b=new THREE.Box3().setFromObject(o);o.position.y=-b.min.y;const g=new THREE.Group();g.add(o);g.userData.h=b.max.y-b.min.y;scene.add(g);coins={o:g,key}}}
+    if(!coins||coins.key!==key){if(coins){scene.remove(coins.o);}coins=null;if(key){const g=cashStack(key);scene.add(g);coins={o:g,key}}}
     if(coins&&p){const ppu=pxPerUnit(p,w,h);coins.o.position.copy(p);const target=Math.max(30,Math.min(56,h*.24))/ppu;coins.o.scale.setScalar(target/coins.o.userData.h)}}
 }
 const Q={n:0,sum:0,level:0,last:0,skip:false};
