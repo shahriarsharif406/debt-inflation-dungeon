@@ -25,7 +25,8 @@ Every debt is a monster that grows by a visible percentage every month. Every do
 **Features**
 - Three income levels: low, middle and high. Rich or poor, the debt trap works the same way
 - Daily Dungeon: the same run for everyone today
-- Gulf pack: remittances, pay-in-4 instalments, giving season, Eid hosting
+- Gulf pack (UAE): amounts in AED, rent cheques, end-of-service gratuity, remittance fees, pay-in-4, zakat, and an interest-free family loan (qard hasan) next to the 4% card
+- Accessibility panel: text size, high contrast, colour-blind-safe colours, reduce motion, sound captions, plain-language mode, full keyboard play
 - Full Arabic interface with right-to-left layout (button on the title screen)
 - Report card with "what could have been", XP, levels and a share image
 - Plays in the browser on desktop and phone, no install, no account, no personal data

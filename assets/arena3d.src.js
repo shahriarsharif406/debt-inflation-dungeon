@@ -77,7 +77,7 @@ function placeCam(w,h){cam.aspect=w/h;
   const D=Math.max(19,Math.min(34,w/52));cam.fov=17;cam.position.set(0,3.9,D);cam.lookAt(0,1.2,0);cam.updateProjectionMatrix();cam.updateMatrixWorld(true)}
 function layout(first){
   if(!hall)return;const r=hall.getBoundingClientRect();const w=Math.max(10,r.width),h=Math.max(10,r.height);
-  if(canvas._w!==w||canvas._h!==h){renderer.setSize(w,h,false);canvas.style.width=w+"px";canvas.style.height=h+"px";canvas._w=w;canvas._h=h;placeCam(w,h)}
+  if(canvas._w!==w||canvas._h!==h){renderer.setSize(w,h,false);canvas.style.width="100%";canvas.style.height="100%";canvas._w=w;canvas._h=h;placeCam(w,h)}
   const idx=+(document.body.dataset.floor||0);applyTheme(idx);
   // monsters
   const seen=new Set();let sum=0;
@@ -124,7 +124,7 @@ function frame(now){
   if(Q.last){const d=now-Q.last;if(d<1000){Q.sum+=d;Q.n++;if(Q.n>=24){const avg=Q.sum/Q.n;Q.n=0;Q.sum=0;if(avg>85&&!/force3d/.test(location.search)){degrade();return}}}}
   Q.last=now;
   const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;
-  torches.forEach(l=>{const s=l.userData.seed;if(l.visible)l.intensity=150+40*Math.sin(t*9+s)+24*Math.sin(t*23+s*2);if(l.userData.glow)l.userData.glow.material.opacity=.75+.25*Math.sin(t*11+s)});
+  torches.forEach(l=>{const s=l.userData.seed;if(l.visible)l.intensity=A.rm?150:150+40*Math.sin(t*9+s)+24*Math.sin(t*23+s*2);if(l.userData.glow)l.userData.glow.material.opacity=A.rm?.9:.75+.25*Math.sin(t*11+s)});
   const all=Object.values(inst).concat(knight?[knight]:[]);
   for(const I of all){
     I.mx.update(dt);
@@ -133,9 +133,9 @@ function frame(now){
     if(I.pulse)I.pulse=Math.max(0,I.pulse-dt*1.6);
     if(I.dying===2){I.fade=Math.max(0,I.fade-dt*.7);I.root.scale.setScalar(Math.max(.001,(I.ts0||1)*Math.min(1,I.fade*1.6)));if(I.fade<=0){scene.remove(I.root);delete inst[I.id]}}
   }
-  if(cellar&&cellar.tick)cellar.tick(t,dt);
+  if(cellar&&cellar.tick&&!A.rm)cellar.tick(t,dt);
   // gentle camera sway
-  cam.position.x=Math.sin(t*.35)*.35;cam.lookAt(0,1.2,0);
+  cam.position.x=A.rm?0:Math.sin(t*.35)*.35;cam.lookAt(0,1.2,0);
   renderer.render(scene,cam);
 }
 A.mount=function(h){

@@ -378,6 +378,27 @@ body:has(#ov.on .hero) #langBtn{display:block}
 html[dir=rtl] body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;letter-spacing:0}
 html[dir=rtl] *{letter-spacing:0!important}
 html[dir=rtl] b,html[dir=rtl] strong,html[dir=rtl] .n,html[dir=rtl] [data-num]{unicode-bidi:isolate}
+
+/* accessibility */
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#cap{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);z-index:60;max-width:90vw;background:#000d;border:1px solid #ffffff55;border-radius:10px;padding:8px 14px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:opacity .15s}
+#cap.on{opacity:1}
+.plain{display:none;margin:6px 0 10px;padding:10px 14px;border-radius:12px;background:#12311f;border:1px solid #4de2a199;font-weight:600;font-size:14px;line-height:1.4}
+html.a-simple .plain{display:block}
+html.a-simple .ctag,html.a-simple .tg{display:none}
+html[data-ts="1"] body{zoom:1.12}
+html[data-ts="2"] body{zoom:1.28}
+html.a-hc{--ink:#fff;--mute:#ece9ff;--line:#9d96e8}
+html.a-hc body{background:#000}
+html.a-hc .btn,html.a-hc .ib,html.a-hc .card{border-color:#fff!important}
+html.a-hc small,html.a-hc .sub{color:#fff!important}
+html.a-cb{--red:#ff8a2b;--green:#4aa3ff;--amber:#ffd23f}
+html.a-rm *,html.a-rm *::before,html.a-rm *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.arow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.arow span{display:flex;flex-direction:column;gap:3px}.arow small{color:var(--mute);font-size:12px;line-height:1.35}
+.arow>.btn{flex:none;min-width:84px}
+.arow .btn[aria-pressed="true"]{background:linear-gradient(#4de2a1,#2bb37f);color:#06210f;font-weight:800}
+.seg2{display:flex;gap:6px}.seg2 .btn{padding:8px 10px;font-size:13px}
 </style>
 </head>
 <body data-floor="0">
@@ -406,9 +427,10 @@ html[dir=rtl] b,html[dir=rtl] strong,html[dir=rtl] .n,html[dir=rtl] [data-num]{u
   <div id="top">
     <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M16 76Q8 42 34 34Q50 27 66 34Q92 42 84 76Q50 92 16 76Z" fill="#ff4d6d"/><circle cx="38" cy="52" r="8" fill="#fff"/><circle cx="62" cy="52" r="8" fill="#fff"/><circle cx="40" cy="54" r="4" fill="#14091a"/><circle cx="60" cy="54" r="4" fill="#14091a"/></svg><span><b>DEBT</b> &amp; <b>INFLATION</b> DUNGEON</span></div>
     <div id="track" aria-hidden="true"></div>
-    <div class="hudb"><button class="ib" id="codex" aria-label="Money Codex">📖</button><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
+    <div class="hudb"><button class="ib" id="acc" aria-label="Accessibility settings">♿</button><button class="ib" id="codex" aria-label="Money Codex">📖</button><button class="ib" id="help" aria-label="How to play">?</button><button class="ib" id="mute" aria-label="Toggle sound">♪ On</button></div>
   </div>
   <div id="floor"></div>
+  <div id="plain" class="plain" role="note">In plain words: debt grows every month. Pay the debt with the biggest % first. Keep some cash for surprises. Skip things you do not need.</div>
   <div id="escape" aria-label="Escape velocity"></div>
   <div id="arena" aria-hidden="true"></div>
   <div id="forecast"></div>
@@ -422,6 +444,7 @@ html[dir=rtl] b,html[dir=rtl] strong,html[dir=rtl] .n,html[dir=rtl] [data-num]{u
 <div id="ov" class="ov" role="dialog" aria-modal="true"></div>
 <div id="ov2" class="ov" role="dialog" aria-modal="true"></div>
 <div id="toast" role="status"></div>
+<div id="cap" role="status" aria-live="polite"></div>
 <div id="sr" class="sr" aria-live="polite"></div>
 <noscript><p style="padding:24px;position:relative;z-index:2">This game needs JavaScript. Please enable it to play.</p></noscript>
 
@@ -432,6 +455,10 @@ const LAST=12;
 const $=s=>document.querySelector(s);
 const store={get(k){try{return localStorage.getItem("ddd_"+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("ddd_"+k,v)}catch(e){}}};
 const REDUCED=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}})();
+/* ---------- accessibility ---------- */
+const ACC=(()=>{let o={ts:0,hc:0,cb:0,rm:0,cap:0,simple:0};try{o=Object.assign(o,JSON.parse(store.get("acc")||"{}"))}catch(e){}return o})();
+function accApply(){const h=document.documentElement;h.classList.toggle("a-hc",!!ACC.hc);h.classList.toggle("a-cb",!!ACC.cb);h.classList.toggle("a-rm",!!(ACC.rm||REDUCED));h.classList.toggle("a-simple",!!ACC.simple);h.dataset.ts=String(ACC.ts||0);try{if(window.Arena3D){window.Arena3D.rm=!!(ACC.rm||REDUCED);window.Arena3D.resize&&window.Arena3D.resize()}}catch(e){}}
+let capT;function cap(t){if(!ACC.cap)return;const e=document.getElementById("cap");if(!e)return;e.textContent=t;e.classList.add("on");clearTimeout(capT);capT=setTimeout(()=>e.classList.remove("on"),1900)}
 
 /* ---------- data ---------- */
 const TIERS={
@@ -455,6 +482,7 @@ const MON={
   shark:{name:"Loan Shark Imp",tag:"Payday loan",debt:300,rate:.10,color:"#b388ff",kind:"imp"},
   vamp:{name:"Overdraft Vampire",tag:"Overdraft & fees",debt:600,rate:.07,color:"#4dd0e1",kind:"vamp"},
   hydra:{name:"Medical Hydra",tag:"Medical bills",debt:1000,rate:.03,color:"#7bd88f",kind:"hydra"},
+  qard:{name:"Family Qard Hasan",tag:"Interest-free loan from family",debt:0,rate:0,color:"#7bd88f",kind:"golem"},
   skill:{name:"Skill Loan Sprite",tag:"Debt used to earn more",debt:0,rate:.015,color:"#4de2a1",kind:"golem"},
   emerg:{name:"Emergency Imp",tag:"Emergency borrowing",debt:0,rate:.15,color:"#ff8a3d",kind:"emerg"}
 };
@@ -483,7 +511,10 @@ const GULF_EVENTS=[
   {name:"Pay-in-4 instalments land",txt:"Four small payments you forgot about all fall due",cash:-230,t:"bad"},
   {name:"Hidden exchange margin",txt:"A ZERO FEE transfer hid its cost in the exchange rate",cash:-110,t:"bad"},
   {name:"Eid gifts and hosting",txt:"Family event everyone expects you to fund",cash:-260,t:"bad"},
-  {name:"Giving season",txt:"Annual charity or zakat. Planned savings make this painless",cash:-140,t:"bad"},
+  {name:"Giving season",txt:"Annual charity. Zakat is 2.5% of qualifying savings held for a year. Planned savings make this painless",cash:-140,t:"bad"},
+  {name:"Rent cheque due",txt:"Your landlord's post-dated rent cheque clears. The cash must be there",cash:-170,t:"bad"},
+  {name:"End-of-service gratuity",txt:"A UAE employer pays a gratuity when a job ends. Plan it before it plans you",cash:260,t:"good"},
+  {name:"Credit report check",txt:"A late card payment sat on your credit report, and a bank charged a higher loan fee",cash:-120,t:"bad"},
   {name:"Year-end bonus",txt:"A bonus arrives. Plan it before it plans you",cash:230,t:"good"}
 ];
 const GULF_TEMPT=[{name:"Friday brunch with everyone",base:180},{name:"Luxury watch for status",base:550},{name:"Weekend desert-resort trip",base:420}];
@@ -521,8 +552,9 @@ const GOALS=[
 ];
 const dailyGoal=()=>GOALS[hashStr(new Date().toISOString().slice(0,10)+"|goal")%GOALS.length];
 /* ---------- helpers ---------- */
-const fmt=n=>(n<0?"−":"")+"$"+Math.abs(Math.round(n)).toLocaleString("en-US");
-const FM={usd:fmt,x:v=>v.toFixed(1)+"×",pp:v=>"$"+v.toFixed(2)};
+const gulf=()=>REGION==="gulf",CUR=()=>gulf()?"AED\u00a0":"$";
+const fmt=n=>(n<0?"−":"")+CUR()+Math.abs(Math.round(n*(gulf()?3.6725:1))).toLocaleString("en-US");
+const FM={usd:fmt,x:v=>v.toFixed(1)+"×",pp:v=>CUR()+v.toFixed(2)};
 const pct=(x,d=1)=>(x*100).toFixed(d).replace(/\.0$/,"")+"%";
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -620,14 +652,14 @@ function beep(f,d=.08,t="square",v=.035){
     o.connect(g);g.connect(A.master);o.start();g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+d);o.stop(c.currentTime+d)}catch(e){}
 }
 const sfx={
-  hit(){beep(220,.07,"sawtooth");setTimeout(()=>beep(330,.08,"square"),60)},
-  kill(){[392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.12,"triangle",.05),i*80))},
-  coin(){beep(880,.06,"triangle");setTimeout(()=>beep(1175,.08,"triangle"),55)},
-  bad(){beep(140,.28,"sawtooth",.05)},
-  end(){beep(300,.1,"square");setTimeout(()=>beep(200,.18,"square"),90)},
+  hit(){cap("🔊 Clang! A hit on a debt monster");beep(220,.07,"sawtooth");setTimeout(()=>beep(330,.08,"square"),60)},
+  kill(){cap("🔊 Fanfare: a debt is cleared");[392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,.12,"triangle",.05),i*80))},
+  coin(){cap("🔊 Coins: money moved");beep(880,.06,"triangle");setTimeout(()=>beep(1175,.08,"triangle"),55)},
+  bad(){cap("🔊 Low buzz: bad news");beep(140,.28,"sawtooth",.05)},
+  end(){cap("🔊 Two drops: the month ends");beep(300,.1,"square");setTimeout(()=>beep(200,.18,"square"),90)},
   tick(){beep(660,.04,"triangle",.02)},
-  win(){musicMood('win',16);[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.2,"triangle",.05),i*110))},
-  lose(){musicMood('lose',14);[330,277,233,196].forEach((f,i)=>setTimeout(()=>beep(f,.25,"sawtooth",.045),i*150))}
+  win(){cap("🔊 Victory music: you did it");musicMood('win',16);[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.2,"triangle",.05),i*110))},
+  lose(){cap("🔊 Sad tones: this run is lost");musicMood('lose',14);[330,277,233,196].forEach((f,i)=>setTimeout(()=>beep(f,.25,"sawtooth",.045),i*150))}
 };
 function setSound(on){A.on=on;store.set("sound",on?"on":"off");if(A.master)A.master.gain.setTargetAtTime(on?1:0,A.ctx.currentTime,.05);$("#mute").textContent=on?"♪ On":"♪ Off"}
 
@@ -814,8 +846,9 @@ function rollTemptation(){
   if(S.month<2||R()>T().tempFreq)return;
   const t=tpPool()[Math.floor(R()*tpPool().length)];S.temp={name:t.name,cost:sc(t.base)};S.stats.seen++;
 }
-function buyTemp(onCard){
-  if(S.busy||S.over||!S.temp)return;const c=S.temp.cost;
+function buyTemp(m){
+  if(S.busy||S.over||!S.temp)return;const c=S.temp.cost;const mode=m===true?"card":m===false?"cash":m,onCard=mode==="card";
+  if(mode==="qard"){if(!gulf()||qardRoom()<c)return;addMon("qard",c);S.stats.qard=(S.stats.qard||0)+1;S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");toast("Borrowed from family at 0%. It never grows, but it must be repaid.");render();return}
   if(onCard){addMon("card",c);S.stats.onCard++}else{if(freeCash()<c)return;S.cash-=c}
   S.status+=10;S.stats.bought++;S.stats.acts++;S.temp=null;sfx.coin();flash("#6ea8ff");
   toast(onCard?"Bought on credit. The Wyrm just grew.":"Bought with cash. Status +10, wealth +0.");render();
@@ -841,11 +874,13 @@ function raisePick(k){
   else toast("Same life, more free cash.");
   S.raise=null;sfx.coin();$("#ov").classList.remove("on");render();
 }
+const qardRoom=()=>{const ex=S.mons.find(m=>m.key==="qard");return Math.max(0,Math.round(T().salary*.8)-(ex?ex.debt:0))};
 const premium=()=>Math.max(1,Math.round(T().salary*.10));
 function toggleIns(){if(S.busy||S.over)return;S.ins=!S.ins;S.stats.acts++;sfx.coin();toast(S.ins?`Shield ON. ${fmt(premium())} a month, paid when the month ends.`:"Shield OFF. Disasters are on you.");render()}
 function takeOpp(mode){
   if(S.busy||S.over||!S.opp)return;const c=S.opp.cost;
-  if(mode==="cash"){if(freeCash()<c)return;S.cash-=c}else{addMon("skill",c);S.stats.skillLoan=1}
+  if(mode==="qard"){if(!gulf()||qardRoom()<c)return;addMon("qard",c);S.stats.qard=(S.stats.qard||0)+1}
+  else if(mode==="cash"){if(freeCash()<c)return;S.cash-=c}else{addMon("skill",c);S.stats.skillLoan=1}
   S.sal=Math.round(S.sal*(1+S.opp.gain));S.stats.skill=1;S.stats.skillMonth=S.month;S.stats.acts++;S.opp=null;sfx.win();flash("#4de2a1");
   toast("New skill! Your pay rises 12% from the next paycheck.");render();
 }
@@ -900,7 +935,7 @@ function render(){
   $("#wallet").innerHTML=
    `<div class="cash"><div><div class="big" data-num="cash" data-v="${S.cash}" data-f="usd">${fmt(S.cash)}</div>
       <div class="sub">Cash on hand ${cashBadge}</div></div>
-      <div class="pp">${ring(S.pp)}<span>buying power of<br>your first $1</span><b data-num="pp" data-v="${S.pp.toFixed(3)}" data-f="pp">$${S.pp.toFixed(2)}</b></div></div>
+      <div class="pp">${ring(S.pp)}<span>buying power of<br>your first ${gulf()?"AED 1":"$1"}</span><b data-num="pp" data-v="${S.pp.toFixed(3)}" data-f="pp">${CUR()}${S.pp.toFixed(2)}</b></div></div>
     ${(()=>{const b=budget(),fr=freeCash(),tgt=3*(b.needs+b.wants),fund=S.assets.vault,fp=Math.min(100,fund/tgt*100);
       const seg=(k,names,cur)=>`<div class="seg3" role="group">${names.map((n,i)=>`<button data-${k}="${i}" class="${cur===i?"on":""}" aria-pressed="${cur===i}">${n}</button>`).join("")}</div>`;
       return `<div class="budget"><div class="bh"><b>MONTHLY BUDGET</b><span>paid at month end</span></div>
@@ -916,12 +951,15 @@ function render(){
       <div class="ctag">📖 Human capital (Becker): spending on skills can earn more than it costs, if enough months remain. A 1.5%/mo loan is cheap next to a 4% card.</div>
       <div class="tb"><button class="btn" data-obuy="cash" ${freeCash()<S.opp.cost?"disabled":""}>Pay with cash</button>
       <button class="btn" data-obuy="loan">Take a skill loan (1.5%/mo)</button>
+      ${gulf()?`<button class="btn" data-obuy="qard" ${qardRoom()<S.opp.cost?"disabled":""}>Take an interest-free family loan (0%)</button>`:""}
       <button class="btn" data-oskip="1">Skip it</button></div></div>`:""}
     ${S.temp?`<div class="tempt"><small>EVERYONE AROUND YOU HAS ONE · OPTIONAL</small>
       <div class="tn"><span>${S.temp.name}</span><b>${fmt(S.temp.cost)}</b></div>
       <div class="ctag">📖 Social proof · Present bias · Opportunity cost</div>
+      ${gulf()?`<div class="ctag">📖 Qard hasan is an interest-free loan: you repay only what you borrowed. It is still debt, and family can lend only so much.</div>`:""}
       <div class="tb"><button class="btn" data-tbuy="cash" ${freeCash()<S.temp.cost?"disabled":""}>Buy with cash</button>
       <button class="btn" data-tbuy="card">Put it on credit</button>
+      ${gulf()?`<button class="btn" data-tbuy="qard" ${qardRoom()<S.temp.cost?"disabled":""}>Borrow from family, 0% (qard hasan)</button>`:""}
       <button class="btn" data-tskip="1">Skip it</button></div></div>`:""}
     <div class="shield ${S.ins?"on":""}"><div class="si">${S.ins?"🛡":"◇"}</div><div class="st"><b>Insurance Shield</b><small>${S.ins?"ON · covers 80% of car, medical and phone bills":"Costs "+fmt(premium())+"/month · covers 80% of car, medical and phone bills"}</small></div>
       <button class="btn" data-ins="1" aria-pressed="${S.ins}">${S.ins?"Turn off":"Turn on"}</button></div>
@@ -1278,6 +1316,20 @@ function openHelp(){
     <button class="go" id="closeHelp">GOT IT</button></div>`;
   o.classList.add("on");o.scrollTop=0;$("#closeHelp").onclick=closeHelp;try{$("#closeHelp").focus({preventScroll:true})}catch(e){}
 }
+function openAccess(){
+  const o=$("#ov2");
+  const sw=(k,l,d)=>`<div class="arow"><span><b>${l}</b><small>${d}</small></span><button class="btn" data-acc="${k}" aria-pressed="${!!ACC[k]}">${ACC[k]?"On":"Off"}</button></div>`;
+  o.innerHTML=`<div class="card help"><div class="kick">ACCESSIBILITY</div><h1>Play it <em>your way</em></h1>
+    <div class="arow"><span><b>Text size</b><small>Make everything larger</small></span><div class="seg2">${["Normal","Large","Larger"].map((n,i)=>`<button class="btn" data-acc="ts" data-v="${i}" aria-pressed="${(ACC.ts||0)===i}">${n}</button>`).join("")}</div></div>
+    ${sw("hc","High contrast","Brighter text and stronger outlines")}
+    ${sw("cb","Colour-blind safe colours","Orange and blue instead of red and green. Every signal also has an arrow or a label")}
+    ${sw("rm","Reduce motion","Stops shaking, flicker and camera sway")}
+    ${sw("cap","Sound captions","Shows on screen what each sound means")}
+    ${sw("simple","Plain-language mode","Hides theory jargon and adds a simple reminder")}
+    <p class="note">Also built in: keyboard play (1-9 pay, E end month, ? help), screen-reader labels, and a full Arabic interface.</p>
+    <button class="go" id="closeHelp">DONE</button></div>`;
+  o.classList.add("on");o.scrollTop=0;$("#closeHelp").onclick=closeHelp;
+}
 function closeHelp(){$("#ov2").classList.remove("on")}
 
 /* ---------- wiring ---------- */
@@ -1288,7 +1340,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.all)pay(+t.dataset.all,true);
   else if(t.dataset.inv)invest(t.dataset.inv);
   else if(t.dataset.sell)sell(t.dataset.sell);
-  else if(t.dataset.tbuy)buyTemp(t.dataset.tbuy==="card");
+  else if(t.dataset.tbuy)buyTemp(t.dataset.tbuy);
   else if(t.dataset.tskip)skipTemp();
   else if(t.dataset.obuy)takeOpp(t.dataset.obuy);
   else if(t.dataset.oskip)skipOpp();
@@ -1299,6 +1351,8 @@ document.addEventListener("click",e=>{
   else if(t.dataset.region){REGION=t.dataset.region;store.set("region",REGION);showTitle()}
   else if(t.dataset.mode){MODE=t.dataset.mode;store.set("mode",MODE);showTitle()}
   else if(t.dataset.tier){$("#ov").classList.remove("on");newGame(t.dataset.tier,MODE);render();beep(440,.1,"triangle");if(!store.get("tut"))say("Tutorial: tap PAY on the fastest-growing debt.")}
+  else if(t.dataset.acc){const k=t.dataset.acc;if(k==="ts")ACC.ts=+t.dataset.v;else ACC[k]=ACC[k]?0:1;store.set("acc",JSON.stringify(ACC));accApply();openAccess();try{$("#ov2").querySelector(`[data-acc="${k}"]`).focus()}catch(e){}}
+  else if(t.id==="acc")openAccess();
   else if(t.id==="helpLink"||t.id==="help")openHelp();
   else if(t.id==="codex"||t.id==="cdxLink")openCodex();
 });
@@ -1316,7 +1370,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="i"||e.key==="I"){toggleIns();return}
   const n=parseInt(e.key,10);if(n>=1&&n<=S.mons.length)pay(S.mons[n-1].id,e.shiftKey);
 });
-setSound(A.on);
+setSound(A.on);accApply();
 window.__game={get S(){return S},endMonth,pay,invest,sell,newGame,render,buyTemp,skipTemp,rollTemptation,showTitle,drawCard,starsFor,toggleIns,lvlInfo,dailyGoal,setBud,raisePick,budget,freeCash,takeOpp,setRegion:r=>{REGION=r},seed:n=>{R=mulberry32(n)}};
 bgInit();fxInit();newGame("mid",MODE);render();showTitle();
 })();
@@ -1467,6 +1521,24 @@ var S={
 "Money Codex ·":"موسوعة المال ·","CLOSE":"إغلاق","Close":"إغلاق","Can you beat it?":"هل تستطيع التغلب عليه؟","The debt won. Can you do better?":"فاز الدين. هل تستطيع أن تفعل أفضل؟",
 "Month":"الشهر","/mo":"/شهر",
 };
+Object.assign(S,{
+"Rent cheque due":"استحقاق شيك الإيجار","Your landlord's post-dated rent cheque clears. The cash must be there":"يُصرف شيك الإيجار المؤجَّل لمالك العقار. يجب أن يكون المبلغ متوفرًا",
+"End-of-service gratuity":"مكافأة نهاية الخدمة","A UAE employer pays a gratuity when a job ends. Plan it before it plans you":"يدفع صاحب العمل في الإمارات مكافأة عند انتهاء العمل. خطّط لها قبل أن تُنفق",
+"Credit report check":"فحص التقرير الائتماني","A late card payment sat on your credit report, and a bank charged a higher loan fee":"ظهر تأخر سداد البطاقة في تقريرك الائتماني، فرفع بنك رسوم القرض",
+"Annual charity. Zakat is 2.5% of qualifying savings held for a year. Planned savings make this painless":"صدقة سنوية. الزكاة 2.5% من المدخرات المستوفية للشروط بعد مرور عام. الادخار المخطَّط يجعلها يسيرة",
+"Family Qard Hasan":"قرض حسن من العائلة","Interest-free loan from family":"قرض بلا فوائد من العائلة",
+"Borrow from family, 0% (qard hasan)":"اقترض من العائلة بلا فوائد (قرض حسن)","Take an interest-free family loan (0%)":"خذ قرضًا حسنًا من العائلة (0%)",
+"Borrowed from family at 0%. It never grows, but it must be repaid.":"اقترضت من العائلة بلا فوائد. لا ينمو الدين لكن عليك سداده.",
+"📖 Qard hasan is an interest-free loan: you repay only what you borrowed. It is still debt, and family can lend only so much.":"📖 القرض الحسن قرض بلا فوائد: تسدّد ما اقترضته فقط. يبقى دينًا، والعائلة لا تستطيع الإقراض إلى ما لا نهاية.",
+"ACCESSIBILITY":"سهولة الاستخدام","Play it":"العب","your way":"بطريقتك","Text size":"حجم النص","Make everything larger":"تكبير كل شيء","Normal":"عادي","Large":"كبير","Larger":"أكبر",
+"High contrast":"تباين عالٍ","Brighter text and stronger outlines":"نص أكثر سطوعًا وحدود أوضح","Colour-blind safe colours":"ألوان آمنة لعمى الألوان","Orange and blue instead of red and green. Every signal also has an arrow or a label":"برتقالي وأزرق بدل الأحمر والأخضر. وكل إشارة معها سهم أو تسمية",
+"Reduce motion":"تقليل الحركة","Stops shaking, flicker and camera sway":"يوقف الاهتزاز والوميض وحركة الكاميرا","Sound captions":"تسميات الأصوات","Shows on screen what each sound means":"يعرض على الشاشة معنى كل صوت",
+"Plain-language mode":"وضع اللغة المبسّطة","Hides theory jargon and adds a simple reminder":"يخفي مصطلحات النظريات ويضيف تذكيرًا بسيطًا","DONE":"تم","On":"مفعّل","Off":"متوقف",
+"Also built in: keyboard play (1-9 pay, E end month, ? help), screen-reader labels, and a full Arabic interface.":"ومضمّن أيضًا: اللعب بلوحة المفاتيح (1-9 للسداد، E لإنهاء الشهر، ? للمساعدة)، وتسميات لقارئات الشاشة، وواجهة عربية كاملة.",
+"Accessibility settings":"إعدادات سهولة الاستخدام",
+"In plain words: debt grows every month. Pay the debt with the biggest % first. Keep some cash for surprises. Skip things you do not need.":"بكلمات بسيطة: الدين ينمو كل شهر. سدّد أولًا الدين ذا النسبة الأكبر. احتفظ ببعض النقود للمفاجآت. تجاهل ما لا تحتاجه.",
+"🔊 Clang! A hit on a debt monster":"🔊 رنّة! ضربة لوحش دين","🔊 Fanfare: a debt is cleared":"🔊 نفير: سُدِّد دين","🔊 Coins: money moved":"🔊 عملات: تحرّك المال","🔊 Low buzz: bad news":"🔊 طنين منخفض: خبر سيئ","🔊 Two drops: the month ends":"🔊 نغمتان هابطتان: انتهى الشهر","🔊 Victory music: you did it":"🔊 موسيقى النصر: أحسنت","🔊 Sad tones: this run is lost":"🔊 نغمات حزينة: خسرت هذه الجولة"
+});
 var keys=Object.keys(S).sort(function(a,b){return b.length-a.length});
 var NUM=/[−+\-]?\$?\d[\d,]*(?:\.\d+)?[%×]?/g;
 var AR=/[؀-ۿ]/;
@@ -1480,6 +1552,7 @@ function rep(r,q,v){
 }
 function tr(s){
  if(!s||AR.test(s)||s.indexOf("\u2066")>-1)return s;
+ var aed=s.indexOf("AED\u00a0")>-1;if(aed)s=s.split("AED\u00a0").join("$");
  if(!/[A-Za-z]/.test(s))return s.replace(NUM,function(m){return"\u2066"+m+"\u2069"});
  var lead=s.match(/^\s*/)[0],trail=s.match(/\s*$/)[0],core=norm(s);
  if(!core)return s;
@@ -1492,6 +1565,7 @@ function tr(s){
   for(var k=0;k<keys.length;k++){var q=keys[k];if(r.indexOf(q)>-1)r=rep(r,q,S[q])}
  }
  r=r.replace(NUM,function(m){return"\u2066"+m+"\u2069"});
+ if(aed)r=r.replace(/\$(?=\d)/g,"AED\u00a0");
  return lead+r+trail;
 }
 window.__tr=tr;

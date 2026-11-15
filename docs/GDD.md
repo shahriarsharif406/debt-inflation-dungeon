@@ -85,7 +85,8 @@ Adults and older teens, new to personal finance or tired of dry money apps. Play
 - **Sound:** procedural effects and a low ambient drone whose pitch changes per floor. Mutable.
 - **First minute:** a three-step coach highlights the fastest monster, then investing, then ending the month. The "FASTEST" tag appears only during the tutorial.
 - **Sharing:** one tap creates a result image (and text) for any platform.
-- **Accessibility:** reduced-motion support, non-colour cues, keyboard shortcuts, screen-reader announcements.
+- **Accessibility:** an accessibility panel on the top bar: text size (3 levels), high contrast, colour-blind-safe colours (orange and blue; every signal also has an arrow or label), reduce motion, sound captions (each sound shown as text), plain-language mode. Full keyboard play, screen-reader labels, English and Arabic (right-to-left). Settings are remembered.
+- **Gulf pack localisation:** amounts in AED, rent cheques, end-of-service gratuity, a credit-report check, remittance fees, hidden exchange margins, pay-in-4, Eid hosting, zakat (2.5% of qualifying savings held for a year) and qard hasan, an interest-free family loan offered next to the 4% card so players compare real borrowing costs. Native-speaker review of the Arabic and Islamic-finance wording is budgeted.
 
 ## 9. Technical summary
 
