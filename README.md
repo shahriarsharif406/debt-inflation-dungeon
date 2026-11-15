@@ -99,6 +99,9 @@ Expected shape: doing nothing loses; lavish living plus status purchases loses; 
 - [Game budget and production plan](docs/BUDGET.md)
 - [Submission pack](docs/SUBMISSION.md)
 
+## Presentation
+Real-time 3D dungeon arena (three.js) with animated knight and monsters, plus an original procedural soundtrack generated in WebAudio (no audio files, per-floor key and tempo, win and lose moods). Mute button top right.
+
 ## Credits
 Real-time 3D arena built with [three.js](https://threejs.org). All 3D art is CC0:
 - Knight and dungeon pieces: [KayKit](https://kaylousberg.com) by Kay Lousberg (Adventurers 1.0, Dungeon Remastered 1.0)
