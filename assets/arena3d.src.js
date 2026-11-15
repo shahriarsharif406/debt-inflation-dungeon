@@ -54,6 +54,7 @@ function applyTheme(i){
   scene.fog.color.set(t.fog);scene.background=new THREE.Color(t.fog);torches.forEach(l=>l.color.set(t.torch));
   scene.children[0].color.set(t.amb);
   if(cellar&&cellar.setFloor)cellar.setFloor(i);
+  Q.warm=90;Q.n=0;Q.sum=0;
 }
 function blob(w){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:stat.blob,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.y=.02;m.scale.set(w,w*.55,1);return m}
 function setupAnim(o,g){
@@ -112,9 +113,9 @@ function layout(first){
     if(!coins||coins.key!==key){if(coins){scene.remove(coins.o);}coins=null;if(key){const g=cashStack(key);scene.add(g);coins={o:g,key}}}
     if(coins&&p){const ppu=pxPerUnit(p,w,h);coins.o.position.copy(p);const target=Math.max(30,Math.min(56,h*.24))/ppu;coins.o.scale.setScalar(target/coins.o.userData.h)}}
 }
-const Q={n:0,sum:0,level:0,last:0,skip:false};
+const Q={n:0,sum:0,level:0,last:0,skip:false,warm:0};
 function degrade(){
-  if(Q.level===0){Q.level=1;Q.n=0;Q.sum=0;renderer.setPixelRatio(.7);canvas._w=0;torches.forEach(l=>{l.visible=false;});return}
+  if(Q.level===0){Q.level=1;Q.n=0;Q.sum=0;Q.warm=60;renderer.setPixelRatio(.75);canvas._w=0;torches.forEach(l=>{l.userData.dim=.7});return}
   A.fallback()}
 A.fallback=function(){A.failed=true;running=false;try{if(hall){hall.classList.remove("hall3");canvas.remove()}}catch(e){}hall=null;try{window.__game&&window.__game.render&&window.__game.render()}catch(e){}};
 function frame(now){
@@ -122,10 +123,11 @@ function frame(now){
   if(!hall||!hall.isConnected||document.hidden)return;
   if(Q.last&&now-Q.last<30)return;
   const rr=hall.getBoundingClientRect();if(rr.bottom<0||rr.top>innerHeight){Q.last=0;return}
-  if(Q.last){const d=now-Q.last;if(d<1000){Q.sum+=d;Q.n++;if(Q.n>=24){const avg=Q.sum/Q.n;Q.n=0;Q.sum=0;if(avg>85&&!/force3d/.test(location.search)){degrade();return}}}}
+  if(Q.last&&Q.warm>0){Q.warm--;Q.n=0;Q.sum=0}
+  else if(Q.last){const d=now-Q.last;if(d<1000){Q.sum+=d;Q.n++;if(Q.n>=45){const avg=Q.sum/Q.n;Q.n=0;Q.sum=0;if(avg>(Q.level?200:120)&&!/force3d/.test(location.search)){degrade();return}}}}
   Q.last=now;
   const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;
-  torches.forEach(l=>{const s=l.userData.seed;if(l.visible)l.intensity=A.rm?150:150+40*Math.sin(t*9+s)+24*Math.sin(t*23+s*2);if(l.userData.glow)l.userData.glow.material.opacity=A.rm?.9:.75+.25*Math.sin(t*11+s)});
+  torches.forEach(l=>{const s=l.userData.seed;if(l.visible)l.intensity=(l.userData.dim||1)*(A.rm?150:150+40*Math.sin(t*9+s)+24*Math.sin(t*23+s*2));if(l.userData.glow)l.userData.glow.material.opacity=A.rm?.9:.75+.25*Math.sin(t*11+s)});
   const all=Object.values(inst).concat(knight?[knight]:[]);
   for(const I of all){
     I.mx.update(dt);
@@ -142,7 +144,7 @@ function frame(now){
 A.mount=function(h){
   if(!A.ready||A.failed)return false;
   try{hall=h;h.insertBefore(canvas,h.firstChild);h.classList.add("hall3");canvas._w=0;layout(true);renderer.render(scene,cam);
-    if(!running){running=true;clock.start();Q.last=0;requestAnimationFrame(frame)}return true}catch(e){console.warn("Arena3D mount",e);A.failed=true;h.classList.remove("hall3");return false}
+    Q.warm=60;Q.n=0;Q.sum=0;Q.last=0;if(!running){running=true;clock.start();requestAnimationFrame(frame)}return true}catch(e){console.warn("Arena3D mount",e);A.failed=true;h.classList.remove("hall3");return false}
 };
 A._dbg=()=>({renderer,scene,cam,torches});
 A.info=()=>({calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,lights:scene.children.filter(c=>c.isLight).length});

@@ -204,7 +204,7 @@ export function buildCellar(stage,scene,opt){
   const lava=new THREE.Mesh(new THREE.PlaneGeometry(40,11),new THREE.MeshBasicMaterial({map:lavaT,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.0,fog:false}));
   lava.rotation.x=-Math.PI/2;lava.position.set(0,.045,wallZ+6);lava.renderOrder=2;lava.visible=false;scene.add(lava);
   const lavaGlow=new THREE.PointLight(0xff5a1e,0,16,1.8);lavaGlow.position.set(0,.8,wallZ+6);scene.add(lavaGlow);
-  const FT=[{tint:0xffffff,ember:0xfff0d2,lava:0},{tint:0x7a98cc,ember:0xbcd8ff,lava:0},{tint:0x8c6a64,ember:0xff7a3a,lava:1}];
+  const FT=[{tint:0xffffff,ember:0xfff0d2,lava:0},{tint:0xbccae6,ember:0xcfe0ff,lava:0},{tint:0xb28f86,ember:0xff7a3a,lava:1}];
   ctl.mats.forEach(m=>{if(m.color)m.userData.base=m.color.clone()});
   ctl.floor=0;
   ctl.setFloor=i=>{const f=FT[i]||FT[0];ctl.floor=i;
