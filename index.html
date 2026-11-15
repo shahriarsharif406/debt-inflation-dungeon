@@ -447,6 +447,7 @@ html.a-rm .esc::before{animation:none}
 .ib:active{transform:translateY(0) scale(.96)}
 @media (prefers-reduced-motion:reduce){.pip.now{animation:none}.ib{transition:none}}
 html.a-rm .pip.now{animation:none}
+.tempt.scam{border-color:#ff8a3d88;background:linear-gradient(180deg,#2a1608,#170d10)}.tempt.scam small{color:#ffb070}
 </style>
 </head>
 <body data-floor="0">
@@ -936,6 +937,20 @@ function takeOpp(mode){
   toast("New skill! Your pay rises 12% from the next paycheck.");render();
 }
 function skipOpp(){if(S.busy||S.over||!S.opp)return;S.opp=null;S.stats.acts++;sfx.coin();toast("Skipped. Not every offer is worth taking.");render()}
+const SCAMS=[
+ {n:"Bank text: 'account blocked'",t:"A text says your account is frozen and asks for the code (OTP) it just sent you. A caller waits on the line.",base:150},
+ {n:"Prize message: 'pay a small fee'",t:"You 'won' a prize, but must first pay a processing fee to claim it.",base:90},
+ {n:"Task job: 'like videos, earn daily'",t:"A chat offers easy money for liking videos, after you deposit your 'starter balance'.",base:120},
+ {n:"Investment tip: 'guaranteed 30%'",t:"A stranger in a group chat promises guaranteed returns if you send money today.",base:180}];
+const SCAMS_GULF=[{n:"Fake toll fine (Salik-style SMS)",t:"A text says you owe a toll fine and must pay through a link in the next hour.",base:80},{n:"Fake rental listing",t:"A great flat at a low rent. The agent asks for a deposit before you can view it.",base:160}];
+function rollScam(){
+  S.scam=null;if(S.month<3||S.month>11||(S.lastScam&&S.month-S.lastScam<3)||R()>.3)return;
+  const pool=SCAMS.concat(gulf()?SCAMS_GULF:[]),c=pool[Math.floor(R()*pool.length)];S.scam={n:c.n,t:c.t,loss:sc(c.base)};S.lastScam=S.month}
+function scamPick(k){
+  if(S.busy||S.over||!S.scam)return;const sm=S.scam;S.scam=null;S.stats.acts++;
+  if(k==="ignore"){S.stats.scamOK=(S.stats.scamOK||0)+1;sfx.coin();toast("Good call. Real banks never ask for your code, and 'guaranteed' returns do not exist.")}
+  else{const pay=Math.min(sm.loss,Math.max(0,S.cash));S.cash-=pay;const rest=sm.loss-pay;if(rest>0){addMon("card",rest);S.stats.billDebt+=0}S.stats.scamLost=(S.stats.scamLost||0)+sm.loss;S.stats.scamHit=(S.stats.scamHit||0)+1;S.cs=Math.max(300,S.cs-6);sfx.bad();shake();flash("#ff4d6d");toast("It was a scam. The money is gone and cannot be recovered.")}
+  render()}
 function skipTemp(){if(S.busy||S.over||!S.temp)return;S.temp=null;S.stats.acts++;sfx.coin();toast("Skipped. Future you says thanks.");render()}
 
 /* ---------- render ---------- */
@@ -1015,6 +1030,12 @@ function render(){
       <button class="btn" data-tbuy="card">Put it on credit</button>
       ${gulf()?`<button class="btn" data-tbuy="qard" ${qardRoom()<S.temp.cost?"disabled":""}>Borrow from family, 0% (qard hasan)</button>`:""}
       <button class="btn" data-tskip="1">Skip it</button></div></div>`:""}
+    ${S.scam?`<div class="tempt scam"><small>⚠ SUSPICIOUS MESSAGE · YOUR CALL</small>
+      <div class="tn"><span>${S.scam.n}</span><b>${fmt(S.scam.loss)}</b></div>
+      <div class="ctag">${S.scam.t}</div>
+      <div class="ctag">📖 Scams use urgency and fear. Stop, verify through the official app or number, never share a code.</div>
+      <div class="tb"><button class="btn" data-scam="ignore">Ignore and report it</button>
+      <button class="btn" data-scam="fall">Do what it says</button></div></div>`:""}
     <div class="shield ${S.ins?"on":""}"><div class="si">${S.ins?"🛡":"◇"}</div><div class="st"><b>Insurance Shield</b><small>${S.ins?"ON · covers 80% of car, medical and phone bills":"Costs "+fmt(premium())+"/month · covers 80% of car, medical and phone bills"}</small></div>
       <button class="btn" data-ins="1" aria-pressed="${S.ins}">${S.ins?"Turn off":"Turn on"}</button></div>
     <div class="assets">${Object.keys(ASSETS).map(k=>{
@@ -1148,7 +1169,8 @@ function endMonth(){
   let fc=null;
   if(S.month===5){addMon("vamp",T().later.vamp);fc={title:"FLOOR 2 · THE VAULTS",text:`Inflation rises to ${pct(FLOORS[1].inf)}/month. An Overdraft Vampire appears (${fmt(T().later.vamp)}).`}}
   if(S.month===9){addMon("hydra",T().later.hydra);fc={title:"FLOOR 3 · THE ABYSS",text:`Inflation rises to ${pct(FLOORS[2].inf)}/month. A Medical Hydra appears (${fmt(T().later.hydra)}).`}}
-  rollTemptation();S.hist.push(netWorth());
+  if(S.scam){S.stats.scamOK=(S.stats.scamOK||0)+1}
+  rollScam();rollTemptation();S.hist.push(netWorth());
   if(m0===1)store.set("tut","1");
   showReport(m0,rep,fc);
 }
@@ -1254,6 +1276,7 @@ function finish(survived,m){
       <div class="tile"><b>SAVINGS</b>You saved <strong>${fmt(st.saved)}</strong> automatically (<strong>${S.income?Math.round(st.saved/S.income*100):0}%</strong> of pay)${st.fundUsed?` and used <strong>${fmt(st.fundUsed)}</strong> of it in emergencies instead of borrowing`:""}. Fund: <strong>${(S.assets.vault/Math.max(1,budget().needs+budget().wants)).toFixed(1)}</strong> months of living costs.</div>
       <div class="tile"><b>CREDIT SCORE</b>Ended at <strong>${csShow()}</strong> (${csLabel().split(":")[0].toLowerCase()}). Paying on time and keeping the card under 30% of its limit raises it.</div>
       <div class="tile"><b>RETIREMENT AND TAX</b>${S.stats.retIn?`You put in <strong>${fmt(S.stats.retIn)}</strong>, your employer added <strong>${fmt(S.stats.match)}</strong> of free money, tax relief returned <strong>${fmt(S.stats.taxBack)}</strong>, and it grew by <strong>${fmt(S.stats.retGain)}</strong>. Pot: <strong>${fmt(S.ret)}</strong>.`:"You saved nothing for retirement, so you missed the employer match and the tax relief. Free money is the best return there is."}</div>
+      ${(S.stats.scamOK||0)+(S.stats.scamHit||0)?`<div class="tile"><b>SCAMS</b>You ignored <strong>${S.stats.scamOK||0}</strong> suspicious ${(S.stats.scamOK||0)===1?"message":"messages"}${S.stats.scamHit?` and fell for <strong>${S.stats.scamHit}</strong>, losing <strong>${fmt(S.stats.scamLost)}</strong>`:""}. Verify before you pay.</div>`:""}
       <div class="tile"><b>LIFESTYLE</b>Living costs took <strong>${S.income?Math.round(st.living/S.income*100):0}%</strong> of your pay.${st.raises?` Of ${st.raises} raises, you put <strong>${st.raises-st.raiseLife}</strong> toward savings or debt.`:""}</div>
       <div class="tile"><b>PRESSURE</b>${st.seen?`You gave in to <strong>${st.bought}</strong> of <strong>${st.seen}</strong> status temptations${st.onCard?` (${st.onCard} on credit)`:""}.`:"No status temptations showed up."} ${st.gap?`Income gaps hit <strong>${st.gap}×</strong>.`:""}</div>
     </div>
@@ -1359,6 +1382,7 @@ const CODEX=[
  ,{id:"signal",n:"Information and Credit Scores",w:"Akerlof · Stiglitz & Weiss",d:"Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.",ok:()=>S.cs>=700}
  ,{id:"risk",n:"Risk Pooling",w:"Kenneth Arrow · insurance",d:"A small certain premium protects you from a large uncertain loss.",ok:(st)=>st.insPaid>0}
  ,{id:"scarcity",n:"Scarcity and Bandwidth",w:"Mullainathan & Shafir",d:"Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.",ok:(st,v)=>v&&S.tier==="low"}
+ ,{id:"fraud",n:"Fraud and Social Engineering",w:"Behavioural security · phishing",d:"Con artists use urgency, fear and greed. Verify through the official channel and never share a code.",ok:(st)=>(st.scamOK||0)>=1&&!(st.scamLost)}
  ,{id:"taxinc",n:"Tax Incentives",w:"Public finance · tax-advantaged saving",d:"Pre-tax saving lowers your tax bill, so the state helps you save.",ok:(st)=>(st.taxBack||0)>0}
 ];
 function codexUnlocked(survived,debt){return CODEX.filter(c=>c.ok(S.stats,survived,debt)).map(c=>c.id)}
@@ -1426,6 +1450,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.sell)sell(t.dataset.sell);
   else if(t.dataset.tbuy)buyTemp(t.dataset.tbuy);
   else if(t.dataset.tskip)skipTemp();
+  else if(t.dataset.scam)scamPick(t.dataset.scam);
   else if(t.dataset.obuy)takeOpp(t.dataset.obuy);
   else if(t.dataset.oskip)skipOpp();
   else if(t.dataset.ins)toggleIns();
@@ -1607,6 +1632,7 @@ var S={
 "Month":"الشهر","/mo":"/شهر",
 };
 Object.assign(S,{
+"⚠ SUSPICIOUS MESSAGE · YOUR CALL":"⚠ رسالة مشبوهة · القرار لك","Bank text: 'account blocked'":"رسالة بنك: «حسابك محظور»","A text says your account is frozen and asks for the code (OTP) it just sent you. A caller waits on the line.":"رسالة تقول إن حسابك مجمّد وتطلب الرمز (OTP) الذي وصلك للتو. وهناك متصل ينتظر على الخط.","Prize message: 'pay a small fee'":"رسالة جائزة: «ادفع رسمًا بسيطًا»","You 'won' a prize, but must first pay a processing fee to claim it.":"«ربحت» جائزة لكن عليك أولًا دفع رسوم معالجة لاستلامها.","Task job: 'like videos, earn daily'":"وظيفة مهام: «أعجب بالفيديوهات واربح يوميًا»","A chat offers easy money for liking videos, after you deposit your 'starter balance'.":"محادثة تعرض مالًا سهلًا مقابل الإعجاب بالفيديوهات بعد إيداع «رصيد البداية».","Investment tip: 'guaranteed 30%'":"نصيحة استثمار: «ربح مضمون 30%»","A stranger in a group chat promises guaranteed returns if you send money today.":"شخص غريب في مجموعة يعد بعوائد مضمونة إذا أرسلت المال اليوم.","Fake toll fine (Salik-style SMS)":"مخالفة سالك مزيفة (رسالة نصية)","A text says you owe a toll fine and must pay through a link in the next hour.":"رسالة تقول إن عليك غرامة رسوم طريق ويجب الدفع عبر رابط خلال ساعة.","Fake rental listing":"إعلان إيجار مزيف","A great flat at a low rent. The agent asks for a deposit before you can view it.":"شقة رائعة بإيجار منخفض. يطلب الوسيط وديعة قبل أن تعاينها.","📖 Scams use urgency and fear. Stop, verify through the official app or number, never share a code.":"📖 تعتمد الاحتيالات على الاستعجال والخوف. توقف وتحقق عبر التطبيق أو الرقم الرسمي ولا تشارك أي رمز.","Ignore and report it":"تجاهل وأبلغ عنها","Do what it says":"افعل ما تطلبه","Fraud and Social Engineering":"الاحتيال والهندسة الاجتماعية","Behavioural security · phishing":"الأمن السلوكي · التصيّد","Con artists use urgency, fear and greed. Verify through the official channel and never share a code.":"يستغل المحتالون الاستعجال والخوف والطمع. تحقق عبر القناة الرسمية ولا تشارك أي رمز.","SCAMS":"الاحتيال","Good call. Real banks never ask for your code, and 'guaranteed' returns do not exist.":"قرار سليم. البنوك الحقيقية لا تطلب رمزك، ولا وجود لعوائد «مضمونة».","It was a scam. The money is gone and cannot be recovered.":"كان احتيالًا. ضاع المال ولا يمكن استرداده.",
 "📈 AECB credit score":"📈 التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)","AECB credit score":"التصنيف الائتماني (الاتحاد للمعلومات الائتمانية)",
 "Precautionary Saving":"الادخار الاحترازي","John Maynard Keynes · liquidity preference":"جون مينارد كينز · تفضيل السيولة","People hold ready cash for emergencies. Finishing your emergency fund means a bad month cannot become debt.":"يحتفظ الناس بنقد جاهز للطوارئ. إكمال صندوق الطوارئ يعني أن الشهر السيئ لن يتحول إلى دين.","Mental Accounting":"المحاسبة الذهنية","Richard Thaler":"ريتشارد ثالر","Splitting pay into needs, lifestyle and savings buckets makes you spend more wisely.":"تقسيم الراتب إلى احتياجات ونمط حياة ومدخرات يجعلك تنفق بحكمة أكبر.","Nudge and Defaults":"الدفع الخفيف والإعدادات الافتراضية","Thaler & Sunstein":"ثالر وسانستين","Saving automatically beats relying on willpower. Employer matches are the strongest nudge.":"الادخار التلقائي أفضل من الاعتماد على قوة الإرادة. مساهمة صاحب العمل أقوى دافع.","Life-Cycle Hypothesis":"فرضية دورة الحياة","Modigliani & Brumberg":"موديلياني وبرومبرغ","Earn now, spend later: save in working years so retirement is funded.":"اكسب الآن وأنفق لاحقًا: ادّخر في سنوات العمل ليتمول تقاعدك.","Information and Credit Scores":"المعلومات والتصنيف الائتماني","Akerlof · Stiglitz & Weiss":"أكيرلوف · ستيغليتز وفايس","Lenders cannot see your character, so they read a credit score. A good history means cheaper borrowing.":"لا يرى المقرضون شخصيتك فيقرؤون تصنيفك الائتماني. السجل الجيد يعني اقتراضًا أرخص.","Risk Pooling":"تجميع المخاطر","Kenneth Arrow · insurance":"كينيث أرو · التأمين","A small certain premium protects you from a large uncertain loss.":"قسط صغير مؤكد يحميك من خسارة كبيرة غير مؤكدة.","Scarcity and Bandwidth":"الندرة والقدرة الذهنية","Mullainathan & Shafir":"مولاينثان وشافير","Money stress narrows attention, so short-term fixes crowd out long-term plans. A buffer frees your mind.":"ضغط المال يضيّق الانتباه فتطغى الحلول القصيرة على الخطط الطويلة. الاحتياطي يحرر ذهنك.","Tax Incentives":"الحوافز الضريبية","Public finance · tax-advantaged saving":"المالية العامة · ادخار بحوافز ضريبية","Pre-tax saving lowers your tax bill, so the state helps you save.":"الادخار قبل الضريبة يخفض فاتورتك الضريبية، فتساعدك الدولة على الادخار.","🌍 Global edition":"🌍 النسخة العالمية","Dollars. Everyday money life anywhere.":"بالدولار. حياة مالية يومية في أي مكان.","🇦🇪 Gulf edition":"🇦🇪 النسخة الخليجية","NEW · UAE":"جديد · الإمارات","Dirhams · rent cheques · end-of-service gratuity · remittances · pay-in-4 · zakat · interest-free family loan · credit report":"دراهم · شيكات الإيجار · مكافأة نهاية الخدمة · التحويلات · الدفع على 4 دفعات · الزكاة · قرض عائلي بلا فوائد · تقرير ائتماني","🎯 Goal: reach month 12 debt-free. 5 minutes. No quiz.":"🎯 الهدف: بلوغ الشهر 12 بلا ديون. 5 دقائق. بلا اختبار.",
 "🌅 Retirement account":"🌅 حساب التقاعد","pre-tax · employer adds 50% of the first 5% · locked until the end":"قبل الضريبة · صاحب العمل يضيف 50% من أول 5% · مقفل حتى النهاية","📈 Credit score":"📈 التصنيف الائتماني","Excellent: lenders offer their best rates":"ممتاز: المقرضون يقدمون أفضل أسعارهم","Good":"جيد","Fair: lenders see some risk":"مقبول: يرى المقرضون بعض المخاطر","Poor: borrowing gets expensive":"ضعيف: الاقتراض يصبح مكلفًا","CREDIT SCORE":"التصنيف الائتماني","RETIREMENT AND TAX":"التقاعد والضريبة","🧾 Tax relief: contributions are taken before tax":"🧾 إعفاء ضريبي: تُخصم المساهمات قبل الضريبة","You saved nothing for retirement, so you missed the employer match and the tax relief. Free money is the best return there is.":"لم تدّخر شيئًا للتقاعد، فخسرت مساهمة صاحب العمل والإعفاء الضريبي. المال المجاني هو أفضل عائد.","Credit score":"التصنيف الائتماني","A number lenders use to judge you. Paying on time and keeping card use low raises it; missed bills and maxed cards lower it.":"رقم يستخدمه المقرضون للحكم عليك. السداد في الموعد وقلة استخدام البطاقة يرفعانه، والفواتير المتأخرة والبطاقات المستنفدة تخفضانه.","Retirement account":"حساب التقاعد","Money locked away for later. Your employer adds a match (free money) and contributions are taken before tax, so you pay less tax now.":"مال محفوظ للمستقبل. يضيف صاحب العمل مساهمة (مال مجاني) وتُخصم المساهمات قبل الضريبة فتدفع ضريبة أقل الآن.","Tax":"الضريبة","Part of your pay goes to the state. Pre-tax savings cut that bill.":"جزء من راتبك يذهب للدولة. الادخار قبل الضريبة يخفض هذه الفاتورة.",
