@@ -2,11 +2,11 @@
 
 *Zoud GameLab 2026 · funding request for taking the jam build to a public release · all amounts in USD*
 
-> **Assumption to confirm:** the jam page states a prize pool "up to $140,000" but no per-entry funding cap. This plan asks for **$48,000** over **six months**, sized for a solo lead developer plus contractors. Change the total in one place (the table below) and scale each line by its share.
+*The jam page does not state a per-entry funding cap. This plan requests **$48,000** over **six months**, sized for a solo lead developer plus contractors; each line scales by its share.*
 
 ## 1. What exists today
 
-The jam build is complete and playable in a browser: 12-month game, 3 income levels, 4 assets including a space-tech Orbit Fund, budgeting and savings systems, insurance, a Daily Dungeon, XP and levels, an 11-theory Money Codex, a "what could have been" report card, a Gulf region pack, and an Arabic interface with right-to-left layout. Balance is checked by thousands of automated games. **The funding pays for expansion, validation and reach, not for a first version.**
+The jam build is complete and playable in a browser: 12-month game, 3 income levels, 4 assets including a space-tech Orbit Fund, budgeting and savings systems, insurance, a Daily Dungeon, XP and levels, a 21-theory Money Codex, a real-time 3D arena across three floors, a retirement account with employer match and tax relief, a credit score, scam alerts, a "what could have been" report card, a Gulf edition (AED, Islamic finance, takaful, zakat), an accessibility panel, and an Arabic interface with right-to-left layout. Balance is checked by thousands of automated games. **The funding pays for expansion, validation and reach, not for a first version.**
 
 ## 2. Budget
 
