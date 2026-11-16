@@ -2,7 +2,7 @@
 
 *Zoud GameLab 2026 · funding request for taking the jam build to a public release · all amounts in USD*
 
-*The jam page does not state a per-entry funding cap. This plan requests **$48,000** over **six months**, sized for a solo lead developer plus contractors; each line scales by its share.*
+*The jam page does not state a per-entry funding cap. This plan requests **$25,000** over **six months**, sized for a solo lead developer plus contractors; each line scales by its share.*
 
 ## 1. What exists today
 
@@ -12,17 +12,17 @@ The jam build is complete and playable in a browser: 12-month game, 3 income lev
 
 | # | Category | What it pays for | Amount | Share |
 |---|---|---|---|---|
-| 1 | Lead development | Teacher mode and class codes, multi-year careers, debt consolidation and minimum-payment mechanics, save and sync, analytics without personal data | $17,000 | 35% |
-| 2 | Localisation and regional adaptation | Native-speaker review and polish of the Arabic already in the jam build, then Spanish, Bengali, Hindi; a native-speaker finance review of each region pack (UAE/Gulf first: remittances, zakat and giving, buy-now-pay-later) | $7,500 | 15.6% |
-| 3 | Art and animation | Full monster set, floor backgrounds, knight and Orbit Fund art, rocket and singularity finale, UI polish | $6,000 | 12.5% |
-| 4 | Music and sound | Original loops for each floor, 40 effects, mix for headphones and phone speakers | $3,500 | 7.3% |
-| 5 | Playtesting and learning evaluation | 60 players in 3 rounds, short before and after questions, independent summary report | $5,500 | 11.5% |
-| 6 | Accessibility and quality | Screen-reader and contrast audit, low-end phone testing, bug fixing sprint | $2,500 | 5.2% |
-| 7 | Packaging and release | Installable web app, store listing assets, trailer, press kit | $2,000 | 4.2% |
-| 8 | Hosting, domain, tooling | Domain, hosting, error monitoring, build tools (12 months) | $1,200 | 2.5% |
-| 9 | Community and teacher outreach | Classroom guide, 5 partner schools or youth groups, short creator videos | $1,300 | 2.7% |
-| 10 | Contingency | Unplanned costs (about 5%) | $1,500 | 3.1% |
-| | **Total** | | **$48,000** | **100%** |
+| 1 | Lead development | Teacher mode and class codes, multi-year careers, debt consolidation and minimum-payment mechanics, save and sync, analytics without personal data | $9,000 | 36% |
+| 2 | Localisation and regional adaptation | Native-speaker review and polish of the Arabic already in the jam build, then Spanish, Bengali, Hindi; a native-speaker finance review of each region pack (UAE/Gulf first: remittances, zakat and giving, buy-now-pay-later) | $4,000 | 16% |
+| 3 | Art and animation | Full monster set, floor backgrounds, knight and Orbit Fund art, rocket and singularity finale, UI polish | $3,000 | 12% |
+| 4 | Music and sound | Original loops for each floor, 40 effects, mix for headphones and phone speakers | $1,800 | 7.2% |
+| 5 | Playtesting and learning evaluation | 60 players in 3 rounds, short before and after questions, independent summary report | $2,700 | 10.8% |
+| 6 | Accessibility and quality | Screen-reader and contrast audit, low-end phone testing, bug fixing sprint | $1,200 | 4.8% |
+| 7 | Packaging and release | Installable web app, store listing assets, trailer, press kit | $900 | 3.6% |
+| 8 | Hosting, domain, tooling | Domain, hosting, error monitoring, build tools (12 months) | $700 | 2.8% |
+| 9 | Community and teacher outreach | Classroom guide, 5 partner schools or youth groups, short creator videos | $700 | 2.8% |
+| 10 | Contingency | Unplanned costs (about 5%) | $1,000 | 4% |
+| | **Total** | | **$25,000** | **100%** |
 
 ## 3. Schedule
 
